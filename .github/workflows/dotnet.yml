@@ -1,4 +1,4 @@
-name: .NET
+name: Build and Test FluentSetups
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
