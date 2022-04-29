@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+ SOLUTION_PATH : src/FluentSetups.sln
+
+
 jobs:
   build:
 
@@ -19,8 +23,10 @@ jobs:
         dotnet-version: 6.0.x
         
     - name: Restore dependencies
-      run: dotnet restore src/FluentSetups.sln
+      run: dotnet restore ${{ SOLUTION_PATH }}
+
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build ${{ SOLUTION_PATH }} --no-restore
+      
     - name: Test
       run: dotnet test --no-build --verbosity normal
