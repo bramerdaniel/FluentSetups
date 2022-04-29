@@ -9,6 +9,7 @@ namespace FluentSetupTester
    using System;
    using System.Collections.Generic;
    using System.Collections.Immutable;
+   using System.IO;
    using System.Linq;
    using System.Reflection;
 
@@ -24,9 +25,14 @@ namespace FluentSetupTester
    {
       #region Methods
 
+      static ConsoleProxy consoleProxy = new ConsoleProxy();
+
       private static (ImmutableArray<Diagnostic>, string) GetGeneratedOutput(string source)
       {
+
+
          new FluentSetupAttribute();
+
          var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
          var references = new List<MetadataReference>();
@@ -44,11 +50,11 @@ namespace FluentSetupTester
 
          var compilationDiagnostics = compilation.GetDiagnostics();
          foreach (var diagnostic in compilationDiagnostics)
-         {
             WriteDiagnostic(diagnostic);
-         }
-         //if (compilationDiagnostics.Any())
-         //   return (compilationDiagnostics, "");
+
+         consoleProxy.WriteLine();
+         consoleProxy.WriteLine($"Starting {nameof(FluentSetupSourceGenerator)}");
+         consoleProxy.WriteLine();
 
          var generator = new FluentSetupSourceGenerator();
 
@@ -61,7 +67,7 @@ namespace FluentSetupTester
 
       private static void WriteDiagnostic(Diagnostic diagnostic)
       {
-         var consoleProxy = new ConsoleProxy();
+
          consoleProxy.WriteLine(diagnostic.GetMessage(), GetColor(diagnostic.Severity));
       }
 
@@ -84,6 +90,7 @@ namespace FluentSetupTester
 
       static void Main(string[] args)
       {
+         
          string source = @"
 namespace Foo.Demo.Namespace
 {
@@ -109,21 +116,27 @@ namespace Foo.Demo.Namespace
    }
 }
 ";
-         var (diagnostics, output) = GetGeneratedOutput(source);
 
-         if (diagnostics.Length > 0)
+         var resourceStream = typeof(Program).Assembly.GetManifestResourceStream("FluentSetupTester.ToolSetup.cs");
+         using (var reader = new StreamReader(resourceStream))
          {
-            Console.WriteLine("Diagnostics:");
-            foreach (var diag in diagnostics)
+            var (diagnostics, output) = GetGeneratedOutput(reader.ReadToEnd());
+            if (diagnostics.Length > 0)
             {
-               Console.WriteLine($"   {diag}");
+               Console.WriteLine("Diagnostics:");
+               foreach (var diag in diagnostics)
+               {
+                  Console.WriteLine($"   {diag}");
+               }
+
+               Console.WriteLine();
+               Console.WriteLine("Output:");
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Output:");
+            Console.WriteLine(output);
          }
 
-         Console.WriteLine(output);
+
       }
 
       #endregion
