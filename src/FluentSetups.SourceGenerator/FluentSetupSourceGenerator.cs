@@ -1,12 +1,8 @@
 ﻿namespace FluentSetups.SourceGenerator
 {
-   using System.Reflection;
-   using System.Text;
-
    using Microsoft.CodeAnalysis;
    using Microsoft.CodeAnalysis.CSharp;
    using Microsoft.CodeAnalysis.CSharp.Syntax;
-   using Microsoft.CodeAnalysis.Text;
 
    [Generator]
    public class FluentSetupSourceGenerator : ISourceGenerator
@@ -33,11 +29,8 @@
       }
 
       private static readonly DiagnosticDescriptor InvalidXmlWarning = new DiagnosticDescriptor(id: "MYXMLGEN001",
-         title: "fluent setup class",
-         messageFormat: "Starting generation for fluent setup class: '{0}'.",
-         category: nameof(FluentSetupSourceGenerator),
-         DiagnosticSeverity.Warning,
-         isEnabledByDefault: true);
+         title: "fluent setup class", messageFormat: "Starting generation for fluent setup class: '{0}'",
+         category: nameof(FluentSetupSourceGenerator), DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
       private void GenerateClass(GeneratorExecutionContext context, ClassDeclarationSyntax candidate)
       {
@@ -62,43 +55,11 @@
             if (attributeClassName == "FluentSetupAttribute")
                return true;
 
-
-            // TODO why does this not work
             if (fluentSetupAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
                return true;
          }
 
          return false;
-      }
-
-      private void GenerateApi(GeneratorExecutionContext context)
-      {
-         var assembly = GetType().Assembly;
-
-         fluentSetupAttribute = AddAttribute(context, assembly, "FluentSetupAttribute");
-         AddAttribute(context, assembly, "IFluentSetup");
-      }
-
-      private INamedTypeSymbol AddAttribute(GeneratorExecutionContext context, Assembly assembly, string attributeName)
-      {
-         using (var resourceStream = assembly.GetManifestResourceStream($"FluentSetups.{attributeName}.cs"))
-         {
-            if (resourceStream == null)
-            {
-               //context.ReportDiagnostic(Diagnostic.Create("Error", null, ); 
-               return null;
-            }
-
-            var sourceText = SourceText.From(resourceStream, Encoding.UTF8);
-            context.AddSource(attributeName, sourceText);
-
-            //var options = context.Compilation.Options as CSharpCompilationOptions;
-            //var syntaxTree = CSharpSyntaxTree.ParseText(sourceText);
-
-            //var compiledTree = context.Compilation.AddSyntaxTrees(syntaxTree);
-            //return compiledTree.GetTypeByMetadataName($"FluentSetups.{attributeName}");
-            return null;
-         }
       }
    }
 }
