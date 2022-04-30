@@ -29,7 +29,22 @@ namespace FluentSetups.SourceGenerator
          ClassDeclarationSyntax = classDeclarationSyntax;
          var semanticModel = GeneratorContext.Compilation.GetSemanticModel(ClassDeclarationSyntax.SyntaxTree);
          ClassSymbol = semanticModel.GetDeclaredSymbol(ClassDeclarationSyntax, GeneratorContext.CancellationToken);
-         SetupTypeName = ClassSymbol.BaseType.TypeArguments.FirstOrDefault();
+         SetupTypeName = FindSetupType();
+      }
+
+      private ITypeSymbol FindSetupType()
+      {
+         var typeByMetadataName = GeneratorContext.Compilation.GetTypeByMetadataName("FluentSetups.IFluentSetup<T>");
+
+         foreach (var namedTypeSymbol in ClassSymbol.Interfaces)
+         {
+            var name = namedTypeSymbol.Name;
+            if (name == "IFluentSetup" && namedTypeSymbol.TypeArguments.Length == 1)
+               return namedTypeSymbol.TypeArguments[0];
+            
+         }
+
+         return ClassSymbol.BaseType.TypeArguments.FirstOrDefault();
       }
 
       public ITypeSymbol SetupTypeName { get; set; }
@@ -57,19 +72,20 @@ namespace FluentSetups.SourceGenerator
          string source = $@"
          namespace {ClassSymbol.ContainingNamespace}
          {{ 
+            using System;
+
             /// <summary>Automatic generated class part by fluent setups</summary>
             public partial class {ClassSymbol.Name}
              {{
                  {GenerateFluentMethods(ClassSymbol)}
                  public {SetupTypeName} Done()
                  {{
-                     // This is so cool
                      var instance = CreateInstance();
                      return instance;
                  }}
-             }}
 
-             internal partial {SetupTypeName} CreateInstance();
+                 internal partial {SetupTypeName} CreateInstance();
+             }}
          }}";
 
          var syntaxTree = CSharpSyntaxTree.ParseText(source).GetRoot().NormalizeWhitespace();
@@ -139,7 +155,13 @@ namespace FluentSetups.SourceGenerator
       {
          foreach (var attribute in propertySymbol.GetAttributes())
          {
-            if (attribute.AttributeClass != null && attribute.AttributeClass.Name == "FluentProperty")
+            if (attribute.AttributeClass == null)
+               continue;
+
+            if (attribute.AttributeClass.Name == "FluentProperty")
+               return true;
+
+            if (attribute.AttributeClass.Name == "FluentPropertyAttribute")
                return true;
          }
 

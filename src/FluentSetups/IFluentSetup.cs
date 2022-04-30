@@ -1,6 +1,6 @@
 ﻿namespace FluentSetups
 {
-   public interface IFluentSetup<T>
+   public interface IFluentSetup<out T>
    {
       T Done();
    }

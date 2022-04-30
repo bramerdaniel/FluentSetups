@@ -1,5 +1,7 @@
 ﻿namespace FluentSetups.SourceGenerator
 {
+   using System.Linq;
+
    using Microsoft.CodeAnalysis;
    using Microsoft.CodeAnalysis.CSharp;
    using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,16 +23,13 @@
 
          fluentSetupAttribute = context.Compilation.GetTypeByMetadataName("FluentSetups.FluentSetupAttribute");
          
-         foreach (var candidate in syntaxReceiver.SetupCandidates)
-         {
-            if (IsSetupClass(context, candidate))
-               GenerateClass(context, candidate);
-         }
+         foreach (var candidate in syntaxReceiver.SetupCandidates.Where(candidate => IsSetupClass(context, candidate)))
+            GenerateClass(context, candidate);
       }
 
-      private static readonly DiagnosticDescriptor InvalidXmlWarning = new DiagnosticDescriptor(id: "MYXMLGEN001",
+      private static readonly DiagnosticDescriptor InvalidXmlWarning = new DiagnosticDescriptor(id: "FS0001",
          title: "fluent setup class", messageFormat: "Starting generation for fluent setup class: '{0}'",
-         category: nameof(FluentSetupSourceGenerator), DiagnosticSeverity.Warning, isEnabledByDefault: true);
+         category: nameof(FluentSetupSourceGenerator), DiagnosticSeverity.Info, isEnabledByDefault: true);
 
       private void GenerateClass(GeneratorExecutionContext context, ClassDeclarationSyntax candidate)
       {
@@ -48,14 +47,14 @@
 
          foreach (var attributeData in classSymbol.GetAttributes())
          {
-            var attributeClassName = attributeData.AttributeClass.Name;
-            if (attributeClassName == "FluentSetup")
-               return true;
-
-            if (attributeClassName == "FluentSetupAttribute")
-               return true;
-
             if (fluentSetupAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
+               return true;
+
+            var attributeName = attributeData.AttributeClass?.Name;
+            if (attributeName == "FluentSetupAttribute")
+               return true;
+
+            if (attributeName == "FluentSetup")
                return true;
          }
 
