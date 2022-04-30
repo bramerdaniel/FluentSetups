@@ -23,53 +23,19 @@ namespace FluentSetupTester
 
    class Program
    {
+      #region Constants and Fields
+
+      static readonly ConsoleProxy ConsoleProxy = new();
+
+      #endregion
+
+      #region Public Properties
+
+      public static Assembly FluentSetupsAssembly { get; set; }
+
+      #endregion
+
       #region Methods
-
-      static ConsoleProxy consoleProxy = new ConsoleProxy();
-
-      private static (ImmutableArray<Diagnostic>, string) GetGeneratedOutput(string source)
-      {
-
-
-         new FluentSetupAttribute();
-
-         var syntaxTree = CSharpSyntaxTree.ParseText(source);
-
-         var references = new List<MetadataReference>();
-         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-         foreach (var assembly in assemblies)
-         {
-            if (!assembly.IsDynamic)
-            {
-               references.Add(MetadataReference.CreateFromFile(assembly.Location));
-            }
-         }
-
-         var compilation = CSharpCompilation.Create("foo", new[] { syntaxTree }, references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-         var compilationDiagnostics = compilation.GetDiagnostics();
-         foreach (var diagnostic in compilationDiagnostics)
-            WriteDiagnostic(diagnostic);
-
-         consoleProxy.WriteLine();
-         consoleProxy.WriteLine($"Starting {nameof(FluentSetupSourceGenerator)}");
-         consoleProxy.WriteLine();
-
-         var generator = new FluentSetupSourceGenerator();
-
-         var driver = CSharpGeneratorDriver.Create(generator);
-         driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generateDiagnostics);
-
-         var immutableArray = compilation.GetDiagnostics();
-         return (generateDiagnostics, outputCompilation.SyntaxTrees.Last().ToString());
-      }
-
-      private static void WriteDiagnostic(Diagnostic diagnostic)
-      {
-
-         consoleProxy.WriteLine(diagnostic.GetMessage(), GetColor(diagnostic.Severity));
-      }
 
       private static ConsoleColor GetColor(DiagnosticSeverity diagnosticSeverity)
       {
@@ -85,58 +51,75 @@ namespace FluentSetupTester
             default:
                throw new ArgumentOutOfRangeException(nameof(diagnosticSeverity), diagnosticSeverity, null);
          }
-
       }
 
-      static void Main(string[] args)
+      static void Main()
       {
-         
-         string source = @"
-namespace Foo.Demo.Namespace
-{
-   using FluentSetups;
-   
-   class MyBase
-   {
-   }
-
-   [FluentSetup]
-   public partial class ToolSetup : IFluentSetup<string>
-   {
-      [FluentProperty]
-      public int Number { get; set; }
-
-      [FluentProperty]
-      public string Name { get; set; }
-
-      internal string CreateInstance()
-      {
-         return $""{Name} => {Number}"";
-      }
-   }
-}
-";
-
          var resourceStream = typeof(Program).Assembly.GetManifestResourceStream("FluentSetupTester.ToolSetup.cs");
-         using (var reader = new StreamReader(resourceStream))
+         if (resourceStream == null)
+            return;
+
+         using var reader = new StreamReader(resourceStream);
+         var (diagnostics, output) = RunSourceGenerator(reader.ReadToEnd());
+         if (diagnostics.Length > 0)
          {
-            var (diagnostics, output) = GetGeneratedOutput(reader.ReadToEnd());
-            if (diagnostics.Length > 0)
-            {
-               Console.WriteLine("Diagnostics:");
-               foreach (var diag in diagnostics)
-               {
-                  Console.WriteLine($"   {diag}");
-               }
+            Console.WriteLine("Diagnostics:");
+            foreach (var diagnostic in diagnostics)
+               WriteDiagnostic(diagnostic);
 
-               Console.WriteLine();
-               Console.WriteLine("Output:");
-            }
-
-            Console.WriteLine(output);
+            Console.WriteLine();
+            Console.WriteLine("Output:");
          }
 
+         Console.WriteLine(output);
+      }
 
+      private static (ImmutableArray<Diagnostic>, string) RunSourceGenerator(string source)
+      {
+         var syntaxTree = CSharpSyntaxTree.ParseText(source);
+         FluentSetupsAssembly = typeof(FluentSetupAttribute).Assembly;
+         var references = new List<MetadataReference>();
+
+         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+         foreach (var assembly in assemblies)
+         {
+            if (!assembly.IsDynamic)
+            {
+               references.Add(MetadataReference.CreateFromFile(assembly.Location));
+            }
+         }
+
+         var compilation = CSharpCompilation.Create("foo", new[] { syntaxTree }, references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+         WriteDiagnosticsBeforeSourceGeneration(compilation);
+
+         ConsoleProxy.WriteLine();
+         ConsoleProxy.WriteLine($"Starting {nameof(FluentSetupSourceGenerator)}");
+         ConsoleProxy.WriteLine();
+
+         var generator = new FluentSetupSourceGenerator();
+
+         var driver = CSharpGeneratorDriver.Create(generator);
+         driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generateDiagnostics);
+
+         //// var immutableArray = compilation.GetDiagnostics();
+         return (generateDiagnostics, outputCompilation.SyntaxTrees.Last().ToString());
+      }
+
+      private static void WriteDiagnostic(Diagnostic diagnostic)
+      {
+         ConsoleProxy.WriteLine(diagnostic.GetMessage(), GetColor(diagnostic.Severity));
+      }
+
+      private static void WriteDiagnosticsBeforeSourceGeneration(CSharpCompilation compilation)
+      {
+         var compilationDiagnostics = compilation.GetDiagnostics();
+         if (compilationDiagnostics.Length == 0)
+            return;
+
+         foreach (var diagnostic in compilationDiagnostics)
+            WriteDiagnostic(diagnostic);
       }
 
       #endregion
