@@ -63,15 +63,16 @@ namespace FluentSetupTester
          var (diagnostics, output) = RunSourceGenerator(reader.ReadToEnd());
          if (diagnostics.Length > 0)
          {
-            Console.WriteLine("Diagnostics:");
+            ConsoleProxy.WriteLine("Diagnostics:");
             foreach (var diagnostic in diagnostics)
                WriteDiagnostic(diagnostic);
 
-            Console.WriteLine();
-            Console.WriteLine("Output:");
+            ConsoleProxy.WriteLine();
+            ConsoleProxy.WriteLine("Output:");
          }
 
-         Console.WriteLine(output);
+         ConsoleProxy.WriteLine(output);
+         ConsoleProxy.ReadLine();
       }
 
       private static (ImmutableArray<Diagnostic>, string) RunSourceGenerator(string source)
