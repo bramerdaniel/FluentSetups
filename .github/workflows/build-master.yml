@@ -22,10 +22,10 @@ jobs:
     - name: checkout branch
       uses: actions/checkout@v3
     
-    - name: setup .NET
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
+    ##- name: setup .NET
+    ##  uses: actions/setup-dotnet@v2
+    ##  with:
+    ##    dotnet-version: 6.0.x
 
     - name: setup NuGet.exe
       uses: NuGet/setup-nuget@v1.0.6
@@ -39,8 +39,8 @@ jobs:
     - name: restore NuGet packages with NuGet.exe
       run: nuget restore ${{ env.SOLUTION_PATH }}
 
-    - name: restore NuGet packages
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+    ##- name: restore NuGet packages
+    ##  run: dotnet restore ${{ env.SOLUTION_PATH }}
 
     - name: build solution
       run: msbuild ${{ env.SOLUTION_PATH }} -property:Configuration=Release
