@@ -47,7 +47,7 @@ jobs:
         nuget-api-key: ${{secrets.NUGET_API_KEY}}
         
     - name: push to nuget.org
-      run: nuget push src\Release\FluentSetups.0.0.1-dev.6.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}}
+      run: nuget push src\Release\*.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}}
   
     #- name: FluentSetups to nuget.org
       #uses: brandedoutcast/publish-nuget@v2.5.2
