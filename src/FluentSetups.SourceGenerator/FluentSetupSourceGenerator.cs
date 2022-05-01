@@ -20,19 +20,23 @@
             return;
 
          Api = FluentApi.FromExecutionContext(context);
-         if(Api.TryGetMissingType(out string missingType))
+         if (Api.TryGetMissingType(out string missingType))
          {
             MissingReferenceDiagnostic(context, missingType);
             return;
          }
-         
-         GenerateSetups(context, Api.FindFluentSetups(syntaxReceiver.SetupCandidates).ToArray());
+
+         var fluentSetupClasses = Api.FindFluentSetups(syntaxReceiver.SetupCandidates).ToArray();
+         GenerateSetups(context, fluentSetupClasses);
       }
 
       private FluentApi Api { get; set; }
 
-      private void GenerateSetups(GeneratorExecutionContext context, ClassDeclarationSyntax[] fluentSetupClasses)
+      private void GenerateSetups(GeneratorExecutionContext context, SetupClassInfo[] fluentSetupClasses)
       {
+         if (fluentSetupClasses.Length == 0)
+            return;
+
          var generationRun = new GenerationRun(context);
          generationRun.Execute(fluentSetupClasses);
       }

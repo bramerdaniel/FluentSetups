@@ -38,7 +38,7 @@ namespace FluentSetups.SourceGenerator
       {
          if (FluentSetupAttribute == null)
          {
-            missingType =  FluentSetupAttributeName;
+            missingType = FluentSetupAttributeName;
             return true;
          }
 
@@ -52,19 +52,58 @@ namespace FluentSetups.SourceGenerator
          return false;
       }
 
-      public IEnumerable<ClassDeclarationSyntax> FindFluentSetups(IEnumerable<ClassDeclarationSyntax> setupCandidates)
+      public IEnumerable<SetupClassInfo> FindFluentSetups(IEnumerable<ClassDeclarationSyntax> setupCandidates)
       {
          foreach (var setupCandidate in setupCandidates)
          {
-            if (IsSetupClass(setupCandidate))
-               yield return setupCandidate;
+            if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
+               yield return classInfo;
          }
       }
 
+      private bool TryGetSetupClass(ClassDeclarationSyntax candidate, out SetupClassInfo setupClassInfo)
+      {
+         setupClassInfo = null;
+         var semanticModel = Context.Compilation.GetSemanticModel(candidate.SyntaxTree);
+
+         var classSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
+         if (classSymbol == null)
+            return false;
+
+         var fluentSetupAttribute = classSymbol.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
+         if (fluentSetupAttribute == null)
+            return false;
+
+         setupClassInfo = new SetupClassInfo
+         {
+            ClassSyntax = candidate,
+            ClassModel = semanticModel,
+            FluentSetupAttribute = fluentSetupAttribute
+         };
+
+         return true;
+
+      }
+
+      private bool IsFluentSetupAttribute(AttributeData attributeData)
+      {
+         if (FluentSetupAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
+            return true;
+
+         var attributeName = attributeData.AttributeClass?.Name;
+         if (attributeName == "FluentSetupAttribute")
+            return true;
+
+         if (attributeName == "FluentSetup")
+            return true;
+         
+         return false;
+      }
 
       private bool IsSetupClass(ClassDeclarationSyntax candidate)
       {
          var semanticModel = Context.Compilation.GetSemanticModel(candidate.SyntaxTree);
+
          var classSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
          if (classSymbol == null)
             return false;

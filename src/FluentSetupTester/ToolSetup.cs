@@ -2,7 +2,7 @@
 {
    using FluentSetups;
 
-   [FluentSetup]
+   [FluentSetup("Hans")]
    public partial class ToolSetup : IFluentSetup<string>
    {
       #region Public Properties

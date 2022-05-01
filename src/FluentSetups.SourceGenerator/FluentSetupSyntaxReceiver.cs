@@ -11,19 +11,15 @@ namespace FluentSetups.SourceGenerator
    using Microsoft.CodeAnalysis;
    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-   /// <summary>
-   /// Created on demand before each generation pass
-   /// </summary>
+   /// <summary>Created on demand before each generation pass</summary>
    internal class FluentSetupSyntaxReceiver : ISyntaxReceiver
    {
-      public List<ClassDeclarationSyntax> SetupCandidates { get; } = new List<ClassDeclarationSyntax>();
+      #region ISyntaxReceiver Members
 
-      /// <summary>
-      /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
-      /// </summary>
+      /// <summary>Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation</summary>
       public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
       {
-         // any field with at least one attribute is a candidate for property generation
+         // any class with at least one attribute is a candidate for source generation
          if (!(syntaxNode is ClassDeclarationSyntax classDeclaration))
             return;
 
@@ -31,37 +27,26 @@ namespace FluentSetups.SourceGenerator
             SetupCandidates.Add(classDeclaration);
       }
 
-      private static bool IsSetupClass(ClassDeclarationSyntax classDeclaration)
-      {
-         if(HasAttributes(classDeclaration) && IsPartial(classDeclaration))
-            return true;
-         return false;
-      }
+      #endregion
+
+      #region Public Properties
+
+      public List<ClassDeclarationSyntax> SetupCandidates { get; } = new List<ClassDeclarationSyntax>();
+
+      #endregion
+
+      #region Methods
 
       private static bool HasAttributes(ClassDeclarationSyntax classDeclaration)
       {
          return classDeclaration.AttributeLists.Count > 0;
       }
 
-      private static bool IsPartial(ClassDeclarationSyntax classDeclarationSyntax)
+      private static bool IsSetupClass(ClassDeclarationSyntax classDeclaration)
       {
-         return true;
-         foreach (var modifier in classDeclarationSyntax.DescendantNodes())
-         {
-            
-         }
-
-         var parentTrivia = classDeclarationSyntax.ParentTrivia;
-
-         foreach (var token in classDeclarationSyntax.ChildTokens())
-         {
-            var isKind = token.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword);
-
-            if (isKind)
-               return true;
-         }
-
-         return false;
+         return HasAttributes(classDeclaration);
       }
+
+      #endregion
    }
 }
