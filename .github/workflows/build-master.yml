@@ -3,6 +3,8 @@ name: Build and Test FluentSetups
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+       - '**.yml'
   pull_request:
     branches: [ master ]
   # this allowes running the workflow manualy on git hub 
