@@ -14,10 +14,17 @@ jobs:
   build:
 
     #runs-on: ubuntu-latest 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: setup-msbuild
+      run: msbuild ${{ env.SOLUTION_PATH }} -t:rebuild -verbosity:diag -property:Configuration=Release
+      
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
@@ -31,6 +38,8 @@ jobs:
       
     - name: Test
       run: dotnet test $SOLUTION_PATH --no-build --verbosity normal
+   
+
    
     - name: FluentSetups to nuget.org
       uses: brandedoutcast/publish-nuget@v2.5.2
