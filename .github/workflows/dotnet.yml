@@ -27,16 +27,16 @@ jobs:
     - name: setup-msbuild
       uses: microsoft/setup-msbuild@v1.1
 
-    - name: Restore nuget packages
+    - name: Restore NuGet packages
       run: dotnet restore ${{ env.SOLUTION_PATH }}
 
     - name: Build solution
       run: msbuild ${{ env.SOLUTION_PATH }} -property:Configuration=Release
    
-    - name: Setup vsest.console.exe
+    - name: Setup VSTest.console.exe
       uses: darenm/Setup-VSTest@v1
   
-    - name: Setup NuGet.exe for use with actions
+    - name: Setup NuGet.exe
       # You may pin to the exact commit or the version.
       # uses: NuGet/setup-nuget@b2bc17b761a1d88cab755a776c7922eb26eefbfa
       uses: NuGet/setup-nuget@v1.0.6
@@ -47,7 +47,7 @@ jobs:
         nuget-api-key: ${{secrets.NUGET_API_KEY}}
         
     - name: push to nuget.org
-      run: nuget push FluentSetups.0.0.1-dev.1.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}}
+      run: nuget push src\Release\FluentSetups.0.0.1-dev.6.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}}
   
     #- name: FluentSetups to nuget.org
       #uses: brandedoutcast/publish-nuget@v2.5.2
