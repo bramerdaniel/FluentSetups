@@ -35,7 +35,7 @@ jobs:
     - name: FluentSetups to nuget.org
       uses: brandedoutcast/publish-nuget@v2.5.2
       with:
-          PROJECT_FILE_PATH: src\FluentSetups\FluentSetups.csproj
+          PROJECT_FILE_PATH: /home/runner/work/FluentSetups/FluentSetups/src/FluentSetups/FluentSetups.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           PACKAGE_NAME: FluentSetups
           NUGET_SOURCE: https://api.nuget.org
