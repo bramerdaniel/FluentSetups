@@ -5,6 +5,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  # this allowes running the workflow manualy on git hub 
+  workflow_dispatch:
 
 env:
   SOLUTION_PATH : src/FluentSetups.sln
