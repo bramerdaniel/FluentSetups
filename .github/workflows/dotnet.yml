@@ -23,7 +23,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
 
     - name: setup-msbuild
-      run: msbuild ${{ env.SOLUTION_PATH }} -t:rebuild -verbosity:diag -property:Configuration=Release
+      run: msbuild ${{ env.SOLUTION_PATH }} -property:Configuration=Release
       
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
