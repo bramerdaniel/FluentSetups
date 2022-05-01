@@ -49,7 +49,7 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         name: nugetPackage
-        path: 
+        path: src\Release\*.nupkg
         warn: the nuget package could not be found
         retention-days: 1
       
