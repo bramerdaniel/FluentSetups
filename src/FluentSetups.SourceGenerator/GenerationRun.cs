@@ -10,7 +10,7 @@ namespace FluentSetups.SourceGenerator
    using System.Text;
 
    using Microsoft.CodeAnalysis;
-   using Microsoft.CodeAnalysis.CSharp.Syntax;
+   using Microsoft.CodeAnalysis.Text;
 
    internal struct GenerationRun
    {
@@ -29,38 +29,42 @@ namespace FluentSetups.SourceGenerator
             generator.Execute();
          }
 
-         GenerateSetupEntryClasses(fluentSetupClasses);
+         // GenerateSetupEntryClasses(fluentSetupClasses);
       }
 
       private void GenerateSetupEntryClasses(SetupClassInfo[] setupClassInfos)
       {
-         var entryBuilder = new StringBuilder();
+         if (setupClassInfos.Length == 0)
+            return;
 
-         foreach (var classInfos in setupClassInfos.GroupBy(GetSetupEntryClassName))
+         foreach (var entryNameSpace in setupClassInfos.GroupBy(x => x.GetSetupEntryNameSpace()))
          {
-            var existing = Context.Compilation.GetTypeByMetadataName(classInfos.Key);
-            entryBuilder.AppendLine($"internal partial class {classInfos.Key}");
+            var entryBuilder = new StringBuilder();
+            entryBuilder.AppendLine($"namespace {entryNameSpace.Key}");
             entryBuilder.AppendLine("{");
-            foreach (var classInfo in classInfos)
-            {
-               entryBuilder.AppendLine($"   internal static {classInfo.ClassName} {classInfo.ClassName}() => new {classInfo.ClassName}();");
-               entryBuilder.AppendLine();
 
+            foreach (var classInfos in setupClassInfos.GroupBy(x => x.GetSetupEntryClassName()))
+            {
+               var existing = Context.Compilation.GetTypeByMetadataName(classInfos.Key);
+               if (existing == null)
+               {
+                  entryBuilder.AppendLine($"   internal partial class {classInfos.Key}");
+                  entryBuilder.AppendLine("   {");
+                  foreach (var classInfo in classInfos)
+                  {
+                     entryBuilder.AppendLine($"      internal static {classInfo.ClassName} {classInfo.ClassName}() => new {classInfo.ClassName}();");
+                     entryBuilder.AppendLine();
+                  }
+
+                  entryBuilder.AppendLine("   }");
+                  entryBuilder.AppendLine();
+               }
             }
+
             entryBuilder.AppendLine("}");
 
+            Context.AddSource($"{entryNameSpace.Key}.Setups", SourceText.From(entryBuilder.ToString(), Encoding.UTF8));
          }
-
-      }
-
-      private static string GetSetupEntryClassName(SetupClassInfo setupClassInfo)
-      {
-         var firstArgument = setupClassInfo.FluentSetupAttribute.ConstructorArguments.FirstOrDefault();
-         if (firstArgument.IsNull)
-            return "Setup";
-
-         return firstArgument.Value?.ToString() ?? "Setup";
-
       }
    }
 }

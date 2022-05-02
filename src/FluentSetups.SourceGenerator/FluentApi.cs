@@ -74,10 +74,9 @@ namespace FluentSetups.SourceGenerator
          if (fluentSetupAttribute == null)
             return false;
 
-         setupClassInfo = new SetupClassInfo
+         setupClassInfo = new SetupClassInfo(candidate, semanticModel)
          {
-            ClassSyntax = candidate,
-            ClassModel = semanticModel,
+            ClassSymbol = classSymbol,
             FluentSetupAttribute = fluentSetupAttribute
          };
 

@@ -2,7 +2,8 @@
 {
    using FluentSetups;
 
-   [FluentSetup("Hans")]
+   [FluentSetup(EntryNamespace = "MySetups")]
+   // [FluentSetup("Hubert", EntryNamespace = "MySetups")]
    public partial class ToolSetup : IFluentSetup<string>
    {
       #region Public Properties
