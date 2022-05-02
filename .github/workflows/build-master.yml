@@ -47,7 +47,7 @@ jobs:
       uses: darenm/Setup-VSTest@v1
       
     - name: run unit tests
-      run: vstest.console.exe "${{ SOLUTION_DIRECTORY }}\Debug\net6.0\FluentSetups.UnitTests.dll"
+      run: vstest.console.exe ${{ SOLUTION_DIRECTORY }}\Debug\net6.0\FluentSetups.UnitTests.dll
 
     - name: upload nuget package to build artifact
       uses: actions/upload-artifact@v3.0.0
