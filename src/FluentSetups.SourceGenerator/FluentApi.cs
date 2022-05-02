@@ -22,17 +22,18 @@ namespace FluentSetups.SourceGenerator
 
       public INamedTypeSymbol FluentPropertyAttribute { get; set; }
 
-      public static FluentApi FromExecutionContext(GeneratorExecutionContext context)
+      public static FluentApi FromCompilation(Compilation compilation)
       {
          return new FluentApi
          {
-            Context = context,
-            FluentSetupAttribute = context.Compilation.GetTypeByMetadataName(FluentSetupAttributeName),
-            FluentPropertyAttribute = context.Compilation.GetTypeByMetadataName(FluentPropertyAttributeName)
+            Compilation = compilation,
+            FluentSetupAttribute = compilation.GetTypeByMetadataName(FluentSetupAttributeName),
+            FluentPropertyAttribute = compilation.GetTypeByMetadataName(FluentPropertyAttributeName)
          };
       }
 
-      public GeneratorExecutionContext Context { get; set; }
+      public Compilation Compilation { get; set; }
+
 
       public bool TryGetMissingType(out string missingType)
       {
@@ -63,25 +64,10 @@ namespace FluentSetups.SourceGenerator
 
       private bool TryGetSetupClass(ClassDeclarationSyntax candidate, out SetupClassInfo setupClassInfo)
       {
-         setupClassInfo = null;
-         var semanticModel = Context.Compilation.GetSemanticModel(candidate.SyntaxTree);
+         var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
+         setupClassInfo = new SetupClassInfo(this, candidate, semanticModel);
 
-         var classSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
-         if (classSymbol == null)
-            return false;
-
-         var fluentSetupAttribute = classSymbol.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
-         if (fluentSetupAttribute == null)
-            return false;
-
-         setupClassInfo = new SetupClassInfo(candidate, semanticModel)
-         {
-            ClassSymbol = classSymbol,
-            FluentSetupAttribute = fluentSetupAttribute
-         };
-
-         return true;
-
+         return setupClassInfo.IsValidSetup();
       }
 
       private bool IsFluentSetupAttribute(AttributeData attributeData)
@@ -101,7 +87,7 @@ namespace FluentSetups.SourceGenerator
 
       private bool IsSetupClass(ClassDeclarationSyntax candidate)
       {
-         var semanticModel = Context.Compilation.GetSemanticModel(candidate.SyntaxTree);
+         var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
 
          var classSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
          if (classSymbol == null)

@@ -19,7 +19,7 @@
          if (!(context.SyntaxReceiver is FluentSetupSyntaxReceiver syntaxReceiver))
             return;
 
-         Api = FluentApi.FromExecutionContext(context);
+         Api = FluentApi.FromCompilation(context.Compilation);
          if (Api.TryGetMissingType(out string missingType))
          {
             MissingReferenceDiagnostic(context, missingType);

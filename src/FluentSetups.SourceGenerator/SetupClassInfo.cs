@@ -15,12 +15,38 @@ namespace FluentSetups.SourceGenerator
    /// <summary>Data class containing all the required information along the generation process</summary>
    internal class SetupClassInfo
    {
+      private readonly FluentApi fluentApi;
+
+      internal static void InitializeFromCompilation(Compilation compilation)
+      {
+
+      }
+
       #region Constructors and Destructors
 
-      public SetupClassInfo(ClassDeclarationSyntax candidate, SemanticModel semanticModel)
+      public SetupClassInfo(FluentApi fluentApi, ClassDeclarationSyntax candidate, SemanticModel semanticModel)
       {
+         this.fluentApi = fluentApi;
+
          ClassSyntax = candidate ?? throw new ArgumentNullException(nameof(candidate));
          SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
+         ClassSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
+         FluentSetupAttribute = ClassSymbol?.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
+      }
+
+      private bool IsFluentSetupAttribute(AttributeData attributeData)
+      {
+         if (fluentApi.FluentPropertyAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
+            return true;
+
+         var attributeName = attributeData.AttributeClass?.Name;
+         if (attributeName == "FluentSetupAttribute")
+            return true;
+
+         if (attributeName == "FluentSetup")
+            return true;
+
+         return false;
       }
 
       #endregion
@@ -30,11 +56,11 @@ namespace FluentSetups.SourceGenerator
       public string ClassName => ClassSyntax.Identifier.Text;
 
       /// <summary>Gets or sets the class symbol.</summary>
-      public ITypeSymbol ClassSymbol { get; set; }
+      public ITypeSymbol ClassSymbol { get; }
 
       public ClassDeclarationSyntax ClassSyntax { get; }
 
-      public AttributeData FluentSetupAttribute { get; set; }
+      public AttributeData FluentSetupAttribute { get; }
 
       public SemanticModel SemanticModel { get; }
 
@@ -60,5 +86,16 @@ namespace FluentSetups.SourceGenerator
       }
 
       #endregion
+
+      public bool IsValidSetup()
+      {
+         if (ClassSymbol == null)
+            return false;
+
+         if (FluentSetupAttribute == null)
+            return false;
+
+         return true;
+      }
    }
 }
