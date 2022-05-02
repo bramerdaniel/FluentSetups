@@ -11,6 +11,7 @@ on:
   workflow_dispatch:
 
 env:
+  SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
 
 
@@ -33,20 +34,20 @@ jobs:
         nuget-version: latest
         nuget-api-key: ${{secrets.NUGET_API_KEY}}
 
-    - name: setup-msbuild
+    - name: setup MSBuild
       uses: microsoft/setup-msbuild@v1.1
 
-    - name: restore NuGet packages with NuGet.exe
+    - name: restore NuGet packages
       run: nuget restore ${{ env.SOLUTION_PATH }}
-
-    ##- name: restore NuGet packages
-    ##  run: dotnet restore ${{ env.SOLUTION_PATH }}
 
     - name: build solution
       run: msbuild ${{ env.SOLUTION_PATH }} -property:Configuration=Release
    
     - name: setup VSTest.console.exe
       uses: darenm/Setup-VSTest@v1
+      
+    - name: run unit tests
+      run: vstest.console.exe "${{ SOLUTION_DIRECTORY }}\Debug\net6.0\FluentSetups.UnitTests.dll"
 
     - name: upload nuget package to build artifact
       uses: actions/upload-artifact@v3.0.0

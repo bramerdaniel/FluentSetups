@@ -9,6 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentSetups", "FluentSetup
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentSetups.UnitTests", "FluentSetups.UnitTests\FluentSetups.UnitTests.csproj", "{FE0FE964-3367-4FDA-A475-EA820B523968}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1E00CC1E-EED2-47B8-A2A9-0999504DDE3E}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build-master.yml = ..\.github\workflows\build-master.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
