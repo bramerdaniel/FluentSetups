@@ -91,6 +91,13 @@ namespace FluentSetups.SourceGenerator
          var firstArgument = FluentSetupAttribute.NamedArguments.FirstOrDefault(x => x.Key == "EntryNamespace");
          if (firstArgument.Value.Value is string value)
             return value;
+
+         if (ClassSymbol.ContainingNamespace.IsGlobalNamespace)
+         {
+            // This should be the default namespace of the containing assembly
+            return ClassSymbol.ContainingAssembly.MetadataName;
+         }
+
          return ClassSymbol.ContainingNamespace.ToString();
       }
 

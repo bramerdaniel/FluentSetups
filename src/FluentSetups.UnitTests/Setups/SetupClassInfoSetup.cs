@@ -8,7 +8,6 @@ namespace FluentSetups.UnitTests.Setups;
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -23,6 +22,8 @@ internal class SetupClassInfoSetup
 
    private readonly List<SyntaxTree> syntaxTrees = new(5);
 
+   private string rootNamespace = "FluentSetups.UnitTests.Compilation";
+
    #endregion
 
    #region Public Properties
@@ -33,6 +34,11 @@ internal class SetupClassInfoSetup
 
    #region Public Methods and Operators
 
+   public SetupClassInfoSetup WithRootNamespace(string value)
+   {
+      rootNamespace = value;
+      return this;
+   }
    public SetupClassInfoSetup AddSource(string code)
    {
       var syntaxTree = CSharpSyntaxTree.ParseText(code);
@@ -46,7 +52,7 @@ internal class SetupClassInfoSetup
 
    public SetupClassInfo Done()
    {
-      var compilation = CSharpCompilation.Create("FluentSetups.UnitTests.Compilation", syntaxTrees, ComputeReferences(),
+      var compilation = CSharpCompilation.Create(rootNamespace, syntaxTrees, ComputeReferences(),
          new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
       var outputCompilation = compilation;
@@ -83,33 +89,6 @@ internal class SetupClassInfoSetup
          if (!assembly.IsDynamic)
             references.Add(MetadataReference.CreateFromFile(assembly.Location));
       return references;
-   }
-
-   private static (ImmutableArray<Diagnostic>, string) RunSourceGenerator(string source)
-   {
-      var syntaxTree = CSharpSyntaxTree.ParseText(source);
-      var FluentSetupsAssembly = typeof(FluentSetupAttribute).Assembly;
-      var references = new List<MetadataReference>();
-
-      Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-      foreach (var assembly in assemblies)
-      {
-         if (!assembly.IsDynamic)
-         {
-            references.Add(MetadataReference.CreateFromFile(assembly.Location));
-         }
-      }
-
-      var compilation = CSharpCompilation.Create("foo", new[] { syntaxTree }, references,
-         new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-      var generator = new FluentSetupSourceGenerator();
-
-      var driver = CSharpGeneratorDriver.Create(generator);
-      driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generateDiagnostics);
-
-      //// var immutableArray = compilation.GetDiagnostics();
-      return (generateDiagnostics, outputCompilation.SyntaxTrees.Last().ToString());
    }
 
    #endregion

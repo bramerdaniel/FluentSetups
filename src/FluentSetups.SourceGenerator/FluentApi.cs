@@ -14,6 +14,8 @@ namespace FluentSetups.SourceGenerator
 
    internal struct FluentApi
    {
+      public static string FluentEntryNamespaceAttributeName => "FluentSetups.FluentEntryNamespaceAttribute";
+
       public static string FluentSetupAttributeName => "FluentSetups.FluentSetupAttribute";
 
       public static string FluentPropertyAttributeName => "FluentSetups.FluentPropertyAttribute";
@@ -22,11 +24,14 @@ namespace FluentSetups.SourceGenerator
 
       public INamedTypeSymbol FluentPropertyAttribute { get; set; }
 
+      public INamedTypeSymbol FluentEntryNamespaceAttribute { get; set; }
+
       public static FluentApi FromCompilation(Compilation compilation)
       {
          return new FluentApi
          {
             Compilation = compilation,
+            FluentEntryNamespaceAttribute = compilation.GetTypeByMetadataName(FluentEntryNamespaceAttributeName),
             FluentSetupAttribute = compilation.GetTypeByMetadataName(FluentSetupAttributeName),
             FluentPropertyAttribute = compilation.GetTypeByMetadataName(FluentPropertyAttributeName)
          };

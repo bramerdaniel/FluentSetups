@@ -3,7 +3,7 @@
 		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
 		<TargetFrameworks>net461;net6.0;netstandard2.0</TargetFrameworks>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>0.0.1-dev.8</Version>
+		<Version>0.0.1-dev.9</Version>
 		<Authors>Daniel Bramer</Authors>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">

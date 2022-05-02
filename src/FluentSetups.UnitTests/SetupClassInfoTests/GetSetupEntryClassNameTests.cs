@@ -75,7 +75,7 @@ public class GetSetupEntryClassNameTests
    }
 
    [TestMethod]
-   public void EnsureSetupCustomEntryClassNameIsComputedCorrectly()
+   public void EnsureSetupCustomEntryClassNameIsComputedCorrectlyWithArguments()
    {
       string code = @"
                         using FluentSetups;                        
@@ -97,7 +97,7 @@ public class GetSetupEntryClassNameTests
    }
 
    [TestMethod]
-   public void EnsureSetupCustomEntryClassNameIsComputedCorrectly2()
+   public void EnsureSetupCustomEntryClassNameIsComputedCorrectlyWithInlineNamespace()
    {
       string code = @"
                         [FluentSetups.FluentSetup(""MyCustomSetup"")]
