@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FluentSetups.SourceGenerator\FluentSetups.SourceGenerator.csproj" />
-    <ProjectReference Include="..\FluentSetupTester\FluentSetupTester.csproj" />
+    <ProjectReference Include="..\FluentSetups\FluentSetups.csproj" />
   </ItemGroup>
 
   <ItemGroup>
