@@ -16,20 +16,31 @@ namespace FluentSetups.SourceGenerator
    {
       public GeneratorExecutionContext Context { get; }
 
-      public GenerationRun(GeneratorExecutionContext context)
+      public FluentApi FluentApi { get; }
+
+      public GenerationRun(GeneratorExecutionContext context, FluentApi fluentApi)
       {
          Context = context;
+         FluentApi = fluentApi;
       }
 
       public void Execute(SetupClassInfo[] fluentSetupClasses)
       {
          foreach (var fluentSetupClass in fluentSetupClasses)
          {
-            var generator = new FluentSetupClassGenerator(Context, fluentSetupClass.ClassSyntax);
+            var generator = new FluentSetupClassGenerator(Context, fluentSetupClass.ClassSyntax, FluentApi);
             generator.Execute();
          }
 
-         // GenerateSetupEntryClasses(fluentSetupClasses);
+         GenerateSetupEntryClasses(fluentSetupClasses);
+      }
+
+      private static string ComputeEntryMethodName(string className)
+      {
+         if (className.EndsWith("Setup"))
+            return className.Substring(0, className.Length - 5);
+
+         return className;
       }
 
       private void GenerateSetupEntryClasses(SetupClassInfo[] setupClassInfos)
@@ -52,7 +63,7 @@ namespace FluentSetups.SourceGenerator
                   entryBuilder.AppendLine("   {");
                   foreach (var classInfo in classInfos)
                   {
-                     entryBuilder.AppendLine($"      internal static {classInfo.ClassName} {classInfo.ClassName}() => new {classInfo.ClassName}();");
+                     entryBuilder.AppendLine($"      internal static {classInfo.ClassName} {ComputeEntryMethodName(classInfo.ClassName)}() => new {classInfo.ClassName}();");
                      entryBuilder.AppendLine();
                   }
 

@@ -37,7 +37,7 @@
          if (fluentSetupClasses.Length == 0)
             return;
 
-         var generationRun = new GenerationRun(context);
+         var generationRun = new GenerationRun(context, Api);
          generationRun.Execute(fluentSetupClasses);
       }
 
@@ -56,12 +56,6 @@
          title: "fluent setup class", messageFormat: "Starting generation for fluent setup class: '{0}'",
          category: nameof(FluentSetupSourceGenerator), DiagnosticSeverity.Info, isEnabledByDefault: true);
 
-      private void GenerateClass(GeneratorExecutionContext context, ClassDeclarationSyntax candidate)
-      {
-         // context.ReportDiagnostic(Diagnostic.Create(InvalidXmlWarning, Location.None, candidate.Identifier));
-         var generator = new FluentSetupClassGenerator(context, candidate);
-         generator.Execute();
-      }
 
    }
 }

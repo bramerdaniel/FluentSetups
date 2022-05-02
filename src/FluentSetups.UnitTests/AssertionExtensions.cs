@@ -1,23 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Setup.cs" company="KUKA Deutschland GmbH">
+// <copyright file="AssertionExtensions.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace FluentSetups.UnitTests.Setups;
+namespace FluentSetups.UnitTests;
 
-internal class Setup
+using FluentSetups.UnitTests.Setups;
+
+internal static class AssertionExtensions
 {
    #region Public Methods and Operators
 
-   public static SetupClassInfoSetup SetupClassInfo()
+   public static GenerationResultAssertion Should(this GenerationResult target)
    {
-      return new SetupClassInfoSetup();
-   }
-
-   public static SourceGeneratorTestSetup SourceGeneratorTest()
-   {
-      return new SourceGeneratorTestSetup();
+      return new GenerationResultAssertion(target);
    }
 
    #endregion
