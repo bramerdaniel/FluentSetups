@@ -15,12 +15,11 @@ namespace FluentSetups.SourceGenerator
    /// <summary>Data class containing all the required information along the generation process</summary>
    internal class SetupClassInfo
    {
+      #region Constants and Fields
+
       private readonly FluentApi fluentApi;
 
-      internal static void InitializeFromCompilation(Compilation compilation)
-      {
-
-      }
+      #endregion
 
       #region Constructors and Destructors
 
@@ -32,21 +31,6 @@ namespace FluentSetups.SourceGenerator
          SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
          ClassSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
          FluentSetupAttribute = ClassSymbol?.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
-      }
-
-      private bool IsFluentSetupAttribute(AttributeData attributeData)
-      {
-         if (fluentApi.FluentPropertyAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
-            return true;
-
-         var attributeName = attributeData.AttributeClass?.Name;
-         if (attributeName == "FluentSetupAttribute")
-            return true;
-
-         if (attributeName == "FluentSetup")
-            return true;
-
-         return false;
       }
 
       #endregion
@@ -66,26 +50,7 @@ namespace FluentSetups.SourceGenerator
 
       #endregion
 
-      #region Methods
-
-      internal string GetSetupEntryNameSpace()
-      {
-         var firstArgument = FluentSetupAttribute.NamedArguments.FirstOrDefault(x => x.Key == "EntryNamespace");
-         if (firstArgument.Value.Value is string value)
-            return value;
-         return ClassSymbol.ContainingNamespace.ToString();
-      }
-
-      internal string GetSetupEntryClassName()
-      {
-         var firstArgument = FluentSetupAttribute.ConstructorArguments.FirstOrDefault();
-         if (firstArgument.IsNull)
-            return "Setup";
-
-         return firstArgument.Value?.ToString() ?? "Setup";
-      }
-
-      #endregion
+      #region Public Methods and Operators
 
       public bool IsValidSetup()
       {
@@ -97,5 +62,48 @@ namespace FluentSetups.SourceGenerator
 
          return true;
       }
+
+      #endregion
+
+      #region Methods
+
+      internal static void InitializeFromCompilation(Compilation compilation)
+      {
+      }
+
+      internal string GetSetupEntryClassName()
+      {
+         if (FluentSetupAttribute == null)
+            return null;
+
+         var firstArgument = FluentSetupAttribute.ConstructorArguments.FirstOrDefault();
+         if (firstArgument.IsNull)
+            return "Setup";
+
+         return firstArgument.Value?.ToString() ?? "Setup";
+      }
+
+      internal string GetSetupEntryNameSpace()
+      {
+         if (FluentSetupAttribute == null)
+            return null;
+
+         var firstArgument = FluentSetupAttribute.NamedArguments.FirstOrDefault(x => x.Key == "EntryNamespace");
+         if (firstArgument.Value.Value is string value)
+            return value;
+         return ClassSymbol.ContainingNamespace.ToString();
+      }
+
+      private bool IsFluentSetupAttribute(AttributeData attributeData)
+      {
+         return IsFluentSetupAttribute(attributeData.AttributeClass);
+      }
+
+      private bool IsFluentSetupAttribute(INamedTypeSymbol attributeSymbol)
+      {
+         return fluentApi.FluentSetupAttribute.Equals(attributeSymbol, SymbolEqualityComparer.Default);
+      }
+
+      #endregion
    }
 }

@@ -56,16 +56,15 @@ public class GetSetupEntryClassNameTests
    [TestMethod]
    public void EnsureEntryClassNameIsComputedCorrectlyWithCorrectNamespace()
    {
-      string code = @"  
-                        using FluentSetups;   
+      string code = @"using FluentSetups;   
 
-                        [FluentSetup]
-                        public partial class PersonSetup : ISetup<Person>
-                        {
-                           [FluentProperty]
-                           public string Name { get; set; }
+                      [FluentSetup]
+                      public partial class PersonSetup : ISetup<Person>
+                      {
+                         [FluentProperty]
+                         public string Name { get; set; }
 
-                        }";
+                      }";
 
       var setupClassInfo = Setup.SetupClassInfo()
          .WithName("PersonSetup")
