@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: create file
       run: echo FromJob1  > theFile.txt
+    - name: create anoter file
+      run: echo otherContent  > secons.txt
 
     - name: dir
       run: dir
