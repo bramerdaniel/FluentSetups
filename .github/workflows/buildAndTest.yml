@@ -40,4 +40,3 @@ jobs:
     - name: run unit tests
       run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
   
-  
