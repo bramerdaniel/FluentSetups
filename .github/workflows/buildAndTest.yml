@@ -3,6 +3,8 @@ name: Build and Test
 on:
   push:
     branches-ignore: [ master ]
+    paths-ignore:
+      - '**.yml'
   pull_request:
     branches-ignore: [ master ]
   workflow_dispatch:

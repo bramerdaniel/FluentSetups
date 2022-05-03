@@ -1,12 +1,8 @@
-name: pass file between jobs
+name: please work
 
 on:
   workflow_dispatch:
 
-env:
-  SOLUTION_DIRECTORY : src
-  SOLUTION_PATH : src/FluentSetups.sln
-  
 jobs:
   create-file:
     runs-on: windows-latest
