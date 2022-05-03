@@ -1,6 +1,8 @@
-name: please work
+name: pass files
 
 on:
+  push:
+    branches-ignore: [ master ]
   workflow_dispatch:
 
 jobs:
