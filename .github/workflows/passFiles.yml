@@ -1,0 +1,27 @@
+name: pass file between jobs
+
+on:
+  workflow_dispatch:
+
+env:
+  SOLUTION_DIRECTORY : src
+  SOLUTION_PATH : src/FluentSetups.sln
+  
+jobs:
+  create-file:
+    runs-on: windows-latest
+
+    steps:
+    - name: checkout branch
+      uses: actions/checkout@v3
+      
+  use-file:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - name: checkout branch
+      uses: actions/checkout@v3
+
+
+  
