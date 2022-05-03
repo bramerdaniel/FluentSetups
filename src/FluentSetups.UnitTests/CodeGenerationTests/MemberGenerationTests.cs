@@ -18,12 +18,12 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
       [TestMethod]
       public void EnsureSetupMethodIsGeneratedCorrectly()
       {
-         string code = @"namespace RonnyTheRobber
+         var code = @"namespace RonnyTheRobber
                       {
                          [FluentSetups.FluentSetup]
                          public partial class PersonSetup
                          {
-                            [FluentSetups.FluentProperty]
+                            [FluentSetups.FluentMember]
                             public string Name { get; set; }
                          }
                       }";
@@ -45,7 +45,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
                          [FluentSetups.FluentSetup]
                          public partial class PersonSetup
                          {
-                            [FluentSetups.FluentProperty(""SetName"")]
+                            [FluentSetups.FluentMember(""SetName"")]
                             public string Name { get; set; }
 
                          }
@@ -68,7 +68,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
                          [FluentSetups.FluentSetup]
                          public partial class PersonSetup
                          {
-                            [FluentProperty]
+                            [FluentMember]
                             public string Name { get; set; }
 
                          }
@@ -100,6 +100,30 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
          result.Should().NotHaveErrors().And
             .HaveClass("RonnyTheRobber.PersonSetup")
             .WithoutMethod("WithName");
+      }
+
+      [TestMethod]
+      public void EnsureFieldsAreGeneratedCorrectly()
+      {
+         var code = @"namespace DonnyTheDagger
+                      {
+                         using FluentSetups;
+
+                         [FluentSetup]
+                         public partial class PersonSetup
+                         {
+                            [FluentMember]
+                            public int age;
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors().And
+            .HaveClass("DonnyTheDagger.PersonSetup")
+            .WithMethod("WithAge");
       }
 
       #endregion

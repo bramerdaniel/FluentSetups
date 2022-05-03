@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupClassModel.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SetupClassModel.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,8 +12,31 @@ namespace FluentSetups.SourceGenerator.Models
    using Microsoft.CodeAnalysis;
 
    /// <summary>Model describing a setup class</summary>
+   [System.Diagnostics.CodeAnalysis.SuppressMessage("sonar", "S3267:Loops should be simplified with \"LINQ\" expressions")]
    internal class SetupClassModel
    {
+      #region Public Properties
+
+      public string ClassName { get; private set; }
+
+      public string ContainingNamespace { get; private set; }
+
+      public FluentGeneratorContext Context { get; private set; }
+
+      public string EntryClassName { get; set; }
+
+      public string EntryClassNamespace { get; set; }
+
+      public IReadOnlyList<SetupFieldModel> Fields { get; set; }
+
+      public string Modifier { get; set; } = "public";
+
+      public IReadOnlyList<SetupPropertyModel> Properties { get; set; }
+
+      #endregion
+
+      #region Public Methods and Operators
+
       public static SetupClassModel Create(FluentGeneratorContext context, SetupClassInfo classInfo)
       {
          var classModel = new SetupClassModel
@@ -25,14 +48,31 @@ namespace FluentSetups.SourceGenerator.Models
             EntryClassName = classInfo.GetSetupEntryClassName()
          };
 
-         classModel.FillProperties(classInfo);
+         classModel.FillMembers(classInfo);
 
          return classModel;
       }
 
-      private void FillProperties(SetupClassInfo classInfo)
+      #endregion
+
+      #region Methods
+
+      private static string ComputeNamespace(SetupClassInfo classInfo)
       {
-         Properties = ComputePropertySetups(classInfo).ToArray();
+         var namespaceSymbol = classInfo.ClassSymbol.ContainingNamespace;
+         if (namespaceSymbol.IsGlobalNamespace)
+            return null;
+
+         return namespaceSymbol.ToString();
+      }
+
+      private IEnumerable<SetupFieldModel> ComputeFieldSetups(SetupClassInfo classInfo)
+      {
+         foreach (var propertySymbol in classInfo.ClassSymbol.GetMembers().OfType<IFieldSymbol>())
+         {
+            if (TryCreateField(propertySymbol, out var propertyModel))
+               yield return propertyModel;
+         }
       }
 
       private IEnumerable<SetupPropertyModel> ComputePropertySetups(SetupClassInfo classInfo)
@@ -42,6 +82,27 @@ namespace FluentSetups.SourceGenerator.Models
             if (TryCreateProperty(propertySymbol, out var propertyModel))
                yield return propertyModel;
          }
+      }
+
+      private void FillMembers(SetupClassInfo classInfo)
+      {
+         Fields = ComputeFieldSetups(classInfo).ToArray();
+         Properties = ComputePropertySetups(classInfo).ToArray();
+      }
+
+      private bool TryCreateField(IFieldSymbol fieldSymbol, out SetupFieldModel fieldModel)
+      {
+         foreach (var attribute in fieldSymbol.GetAttributes().Where(x => x.AttributeClass != null))
+         {
+            if (Context.FluentPropertyAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default))
+            {
+               fieldModel = SetupFieldModel.Create(this, fieldSymbol, attribute);
+               return true;
+            }
+         }
+
+         fieldModel = null;
+         return false;
       }
 
       private bool TryCreateProperty(IPropertySymbol propertySymbol, out SetupPropertyModel propertyModel)
@@ -59,27 +120,6 @@ namespace FluentSetups.SourceGenerator.Models
          return false;
       }
 
-      public IReadOnlyList<SetupPropertyModel> Properties { get; set; }
-
-      private static string ComputeNamespace(SetupClassInfo classInfo)
-      {
-         var namespaceSymbol = classInfo.ClassSymbol.ContainingNamespace;
-         if (namespaceSymbol.IsGlobalNamespace)
-            return null;
-
-         return namespaceSymbol.ToString();
-      }
-
-      public FluentGeneratorContext Context { get; private set; }
-
-      public string ClassName { get; private set; }
-
-      public string ContainingNamespace { get; private set; }
-
-      public string Modifier { get; set; } = "public";
-
-      public string EntryClassName { get; set; }
-
-      public string EntryClassNamespace { get; set; }
+      #endregion
    }
 }

@@ -82,6 +82,7 @@ namespace FluentSetups.SourceGenerator
          var sourceBuilder = new StringBuilder();
          sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
          sourceBuilder.AppendLine("{");
+         sourceBuilder.AppendLine("using System;");
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
 
          sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
@@ -99,20 +100,37 @@ namespace FluentSetups.SourceGenerator
 
       private void GenerateSetupMembers(SetupClassModel classModel, StringBuilder sourceBuilder)
       {
-         foreach (var propertyModel in classModel.Properties)
-         {
-            sourceBuilder.AppendLine($"public {classModel.ClassName} {propertyModel.SetupMethodName}({propertyModel.TypeName} value)");
-            sourceBuilder.AppendLine("{");
+         foreach (var member in classModel.Fields)
+            GenerateMemberSetup(classModel, sourceBuilder, member);
 
-            ////var validation = CreateParameterValidation(propertySymbol, "value");
-            ////if (!string.IsNullOrWhiteSpace(validation))
-            ////   sourceBuilder.AppendLine(validation);
+         foreach (var member in classModel.Properties)
+            GenerateMemberSetup(classModel, sourceBuilder, member);
 
-            sourceBuilder.AppendLine($"{propertyModel.PropertyName} = value;");
-            sourceBuilder.AppendLine("return this;");
-            sourceBuilder.AppendLine("}");
-         }
+      }
 
+      private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel)
+      {
+
+         sourceBuilder.AppendLine($"{classModel.Modifier} {classModel.ClassName} {memberModel.SetupMethodName}({memberModel.TypeName} value)");
+         sourceBuilder.AppendLine("{");
+
+         ////var validation = CreateParameterValidation(propertySymbol, "value");
+         ////if (!string.IsNullOrWhiteSpace(validation))
+         ////   sourceBuilder.AppendLine(validation);
+
+         sourceBuilder.AppendLine($"{memberModel.MemberName} = value;");
+         sourceBuilder.AppendLine($"{memberModel.MemberSetFieldName} = true;");
+         sourceBuilder.AppendLine("return this;");
+         sourceBuilder.AppendLine("}");
+         sourceBuilder.AppendLine();
+
+         sourceBuilder.AppendLine($"private bool {memberModel.MemberSetFieldName};");
+         sourceBuilder.AppendLine($"{classModel.Modifier} {memberModel.TypeName} Get{memberModel.UpperMemberName}OrThrow()");
+         sourceBuilder.AppendLine($"=> {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : throw new InvalidOperationException(\"The member {memberModel.MemberName} was not set.\");");
+
+         sourceBuilder.AppendLine();
+         sourceBuilder.AppendLine($"{classModel.Modifier} {memberModel.TypeName} Get{memberModel.UpperMemberName}OrDefault(Func<{memberModel.TypeName}> defaultValue)");
+         sourceBuilder.AppendLine($" => {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : defaultValue();");
       }
    }
 }

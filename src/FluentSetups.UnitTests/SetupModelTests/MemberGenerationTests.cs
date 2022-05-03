@@ -23,7 +23,7 @@ namespace FluentSetups.UnitTests.SetupModelTests
                          [FluentSetups.FluentSetup]
                          public partial class PersonSetup
                          {
-                            [FluentSetups.FluentProperty]
+                            [FluentSetups.FluentMember]
                             public string Name { get; set; }
                          }
                       }";
@@ -81,7 +81,7 @@ namespace FluentSetups.UnitTests.SetupModelTests
                          [FluentSetups.FluentSetup]
                          public partial class PersonSetup
                          {
-                            [FluentSetups.FluentProperty]
+                            [FluentSetups.FluentMember]
                             public string Name { get; set; }
                          }";
 
@@ -103,7 +103,7 @@ namespace FluentSetups.UnitTests.SetupModelTests
                          [FluentSetups.FluentSetup]
                          public partial class PersonSetup
                          {
-                            [FluentSetups.FluentProperty(""SpecifyName"")]
+                            [FluentSetups.FluentMember(""SpecifyName"")]
                             public string Name { get; set; }
                          }";
 
@@ -125,7 +125,7 @@ namespace FluentSetups.UnitTests.SetupModelTests
                          [FluentSetup]
                          public partial class PersonSetup
                          {
-                            [FluentProperty]
+                            [FluentMember]
                             public Thread Name { get; set; }
                          }";
 
@@ -135,6 +135,30 @@ namespace FluentSetups.UnitTests.SetupModelTests
 
          result.Should().HaveProperty("Name")
             .WithRequiredNamespace("System.Threading");
+      }
+
+      [TestMethod]
+      public void EnsureFieldAreComputedCorrectly()
+      {
+         string code = @"namespace GarryGreen;
+
+                         using FluentSetups;
+                         
+                         [FluentSetup]
+                         public partial class PersonSetup
+                         {
+                            [FluentMember]
+                            public int name;
+                         }";
+
+         var result = Setup.SetupClassModel()
+            .FromSource(code)
+            .Done();
+
+         result.Should().HaveField("name")
+            .WithTypeName("int").And
+            .WithRequiredNamespace("System").And
+            .WithSetupMethodName("WithName");
       }
 
       #endregion

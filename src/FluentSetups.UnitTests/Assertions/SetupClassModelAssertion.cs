@@ -46,21 +46,29 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<SetupClassMode
       return new AndConstraint<SetupClassModelAssertion>(this);
    }
 
-   public SetupPropertyModelAssertion HaveProperty(string expectedPropertyName)
+   public SetupMemberModelAssertion HaveProperty(string expectedPropertyName)
    {
-      var property = Subject.Properties.FirstOrDefault(p => p.PropertyName == expectedPropertyName);
+      var property = Subject.Properties.FirstOrDefault(p => p.MemberName == expectedPropertyName);
       Assert.IsNotNull(property);
 
-      return new SetupPropertyModelAssertion(property);
+      return new SetupMemberModelAssertion(property);
+   }
+
+   public SetupMemberModelAssertion HaveField(string expectedFieldName)
+   {
+      var property = Subject.Fields.FirstOrDefault(p => p.MemberName == expectedFieldName);
+      Assert.IsNotNull(property);
+
+      return new SetupMemberModelAssertion(property);
    }
 
    #endregion
 
-   internal class SetupPropertyModelAssertion : ReferenceTypeAssertions<SetupPropertyModel, SetupPropertyModelAssertion>
+   internal class SetupMemberModelAssertion : ReferenceTypeAssertions<SetupMemberModel, SetupMemberModelAssertion>
    {
       #region Constructors and Destructors
 
-      public SetupPropertyModelAssertion(SetupPropertyModel subject)
+      public SetupMemberModelAssertion(SetupMemberModel subject)
          : base(subject)
       {
       }
@@ -69,31 +77,33 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<SetupClassMode
 
       #region Properties
 
-      protected override string Identifier => nameof(SetupPropertyModelAssertion);
+      protected override string Identifier => nameof(SetupMemberModelAssertion);
 
       #endregion
 
       #region Public Methods and Operators
 
-      public AndConstraint<SetupPropertyModelAssertion> WithSetupMethodName(string expectedName)
+      public AndConstraint<SetupMemberModelAssertion> WithSetupMethodName(string expectedName)
       {
          Assert.AreEqual(expectedName, Subject.SetupMethodName);
-         return new AndConstraint<SetupPropertyModelAssertion>(this);
+         return new AndConstraint<SetupMemberModelAssertion>(this);
       }
 
       #endregion
 
-      public AndConstraint<SetupPropertyModelAssertion> WithTypeName(string expectedTypeName)
+      public AndConstraint<SetupMemberModelAssertion> WithTypeName(string expectedTypeName)
       {
          Assert.AreEqual(expectedTypeName, Subject.TypeName);
-         return new AndConstraint<SetupPropertyModelAssertion>(this);
+         return new AndConstraint<SetupMemberModelAssertion>(this);
       }
 
-      public AndConstraint<SetupPropertyModelAssertion> WithRequiredNamespace(string expectedNamespace)
+      public AndConstraint<SetupMemberModelAssertion> WithRequiredNamespace(string expectedNamespace)
       {
          Assert.AreEqual(expectedNamespace, Subject.RequiredNamespace);
-         return new AndConstraint<SetupPropertyModelAssertion>(this);
+         return new AndConstraint<SetupMemberModelAssertion>(this);
       }
 
    }
+
+
 }

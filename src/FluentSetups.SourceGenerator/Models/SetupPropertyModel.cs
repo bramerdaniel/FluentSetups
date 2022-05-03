@@ -6,36 +6,21 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
-   using System;
-   using System.Linq;
-
    using Microsoft.CodeAnalysis;
 
-   internal class SetupPropertyModel
+   internal class SetupPropertyModel : SetupMemberModel
    {
       #region Constructors and Destructors
 
       public SetupPropertyModel(SetupClassModel owningClass)
+         : base(owningClass)
       {
-         OwningClass = owningClass ?? throw new ArgumentNullException(nameof(owningClass));
       }
 
       #endregion
 
       #region Public Properties
-
-      /// <summary>Gets the owning class.</summary>
-      public SetupClassModel OwningClass { get; }
-
-      public string PropertyName { get; private set; }
-
-      /// <summary>Gets or sets the name of the setup method.</summary>
-      public string SetupMethodName { get; private set; }
-
-      public string TypeName { get; private set; }
-
-      public string RequiredNamespace { get; private set; }
-
+      
       #endregion
 
       #region Public Methods and Operators
@@ -44,7 +29,7 @@ namespace FluentSetups.SourceGenerator.Models
       {
          return new SetupPropertyModel(owningClass)
          {
-            PropertyName = propertySymbol.Name, 
+            MemberName = propertySymbol.Name, 
             TypeName = propertySymbol.Type.ToString(),
             SetupMethodName = ComputeSetupNameFromAttribute(attribute) ?? $"With{propertySymbol.Name}",
             RequiredNamespace = ComputeRequiredNamespace(propertySymbol)
@@ -59,11 +44,6 @@ namespace FluentSetups.SourceGenerator.Models
       #endregion
 
       #region Methods
-
-      private static string ComputeSetupNameFromAttribute(AttributeData attributeData)
-      {
-         return attributeData.ConstructorArguments.FirstOrDefault().Value?.ToString();
-      }
 
       #endregion
    }

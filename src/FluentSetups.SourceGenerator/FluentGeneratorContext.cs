@@ -23,7 +23,7 @@ namespace FluentSetups.SourceGenerator
 
       internal static string FluentEntryNamespaceAttributeName => "FluentSetups.FluentEntryNamespaceAttribute";
 
-      internal static string FluentPropertyAttributeName => "FluentSetups.FluentPropertyAttribute";
+      internal static string FluentMemberAttributeName => "FluentSetups.FluentMemberAttribute";
 
       internal static string FluentSetupAttributeName => "FluentSetups.FluentSetupAttribute";
 
@@ -44,7 +44,7 @@ namespace FluentSetups.SourceGenerator
             Compilation = compilation,
             FluentEntryNamespaceAttribute = compilation.GetTypeByMetadataName(FluentEntryNamespaceAttributeName),
             FluentSetupAttribute = compilation.GetTypeByMetadataName(FluentSetupAttributeName),
-            FluentPropertyAttribute = compilation.GetTypeByMetadataName(FluentPropertyAttributeName)
+            FluentPropertyAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName)
          };
       }
       
@@ -67,7 +67,7 @@ namespace FluentSetups.SourceGenerator
 
          if (FluentPropertyAttribute == null)
          {
-            missingType = FluentPropertyAttributeName;
+            missingType = FluentMemberAttributeName;
             return true;
          }
 
@@ -83,14 +83,6 @@ namespace FluentSetups.SourceGenerator
       {
          if (FluentSetupAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
             return true;
-
-         var attributeName = attributeData.AttributeClass?.Name;
-         if (attributeName == "FluentSetupAttribute")
-            return true;
-
-         if (attributeName == "FluentSetup")
-            return true;
-
          return false;
       }
 
