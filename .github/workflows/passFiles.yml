@@ -37,7 +37,7 @@ jobs:
       id: generate-uuid
       uses: filipstefansson/uuid-action@v1
       with:
-        name: ${{ gihub.sha }}
+        name: guidName
 
     - name: Cache file
       uses: actions/cache@v3
