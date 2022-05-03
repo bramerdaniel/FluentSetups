@@ -43,7 +43,11 @@ namespace FluentSetups.SourceGenerator
          {
             var name = namedTypeSymbol.Name;
             if (name == "IFluentSetup" && namedTypeSymbol.TypeArguments.Length == 1)
-               return namedTypeSymbol.TypeArguments[0];
+            {
+               var targetType = namedTypeSymbol.TypeArguments[0];
+               
+               return targetType;
+            }
             
          }
 
@@ -70,7 +74,6 @@ namespace FluentSetups.SourceGenerator
       {
          if (ClassSymbol == null)
             return;
-         
 
          string source = $@"
          namespace {ClassSymbol.ContainingNamespace}
@@ -79,22 +82,30 @@ namespace FluentSetups.SourceGenerator
 
             /// <summary>Automatic generated class part by fluent setups</summary>
             public partial class {ClassSymbol.Name}
-             {{
-                 {GenerateFluentMethods(ClassSymbol)}
-                 public {SetupTypeName} Done()
-                 {{
-                     var instance = CreateInstance();
-                     return instance;
-                 }}
-
-                 internal partial {SetupTypeName} CreateInstance();
-             }}
+            {{
+                {GenerateFluentMethods(ClassSymbol)}
+                {GenerateTargetFactoryMethods(SetupTypeName)}
+            }}
          }}";
 
          var syntaxTree = CSharpSyntaxTree.ParseText(source).GetRoot().NormalizeWhitespace();
          source = syntaxTree.ToString();
 
          GeneratorContext.AddSource($"{ClassSymbol.Name}.generated.cs", SourceText.From(source, Encoding.UTF8));
+      }
+
+      private string GenerateTargetFactoryMethods(ITypeSymbol setupTypeName)
+      {
+         if (setupTypeName == null)
+            return string.Empty;
+
+         return  $@"public {SetupTypeName} Done()
+                 {{
+                     var instance = CreateInstance();
+                     return instance;
+                 }}
+
+                 internal partial {SetupTypeName} CreateInstance();";
       }
 
       #endregion

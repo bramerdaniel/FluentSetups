@@ -8,8 +8,11 @@ namespace FluentSetups.UnitTests.Setups;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 internal class GenerationResult
 {
@@ -17,9 +20,17 @@ internal class GenerationResult
 
    public IList<SyntaxTree> SyntaxTrees { get; }
 
+   public ImmutableArray<Diagnostic> GeneratedDiagnostics { get; set; }
+   
    public GenerationResult(Compilation compilation, IList<SyntaxTree> syntaxTrees)
    {
       Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
       SyntaxTrees = syntaxTrees ?? throw new ArgumentNullException(nameof(syntaxTrees));
+   }
+
+   public void FailWith(string id, string hint)
+   {
+      if (!Compilation.GetDiagnostics().Any(d => d.Id == id))
+         Assert.Fail($"The expected diagnostic {id} was not found. Hint : {hint}");
    }
 }

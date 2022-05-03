@@ -29,7 +29,8 @@ public class EntryPointGenerationTests
          .AddSource(code)
          .Done();
 
-      result.Should().HaveClass("RonnyTheRobber.FSetup")
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.FSetup")
          .WithMethod("Person");
    }
    
@@ -51,9 +52,41 @@ public class EntryPointGenerationTests
          .AddSource(code)
          .Done();
 
-      result.Should().HaveClass("RonnyTheRobber.FSetup")
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.FSetup")
          .WithMethod("Person")
          .WithMethod("Ball");
+   }
+
+   [TestMethod]
+   public void EnsureUsingIsAddedCorrectly()
+   {
+      string target = @"namespace SomeOther.ModelNameSpace
+                      {
+                         public class Person
+                         { 
+                         }
+                      }";
+
+      string code = @"namespace SetupNameSpace
+                      {
+                         using SomeOther.ModelNameSpace;
+
+                         [FluentSetups.FluentSetup]
+                         public partial class PersonSetup : FluentSetups.IFluentSetup<Person>
+                         {
+                            internal partial Person CreateInstance() => new Person();
+                         }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .AddSource(target)
+         .AddSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("SetupNameSpace.Setup")
+         .WithMethod("Person");
    }
 
    #endregion

@@ -24,6 +24,8 @@ internal class SourceGeneratorTestSetup
 
    private string rootNamespace = "FluentSetups.UnitTests.Compilation";
 
+   private bool throwOnErrors = true;
+
    #endregion
 
    #region Public Properties
@@ -43,7 +45,8 @@ internal class SourceGeneratorTestSetup
    public SourceGeneratorTestSetup AddSource(string code)
    {
       var syntaxTree = CSharpSyntaxTree.ParseText(code);
-      ThrowOnErrors(syntaxTree.GetDiagnostics());
+
+
       syntaxTrees.Add(syntaxTree);
       return this;
    }
@@ -59,13 +62,15 @@ internal class SourceGeneratorTestSetup
    {
       var compilation = CSharpCompilation.Create(rootNamespace, syntaxTrees, ComputeReferences(),
          new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-      
+
       var generator = new FluentSetupSourceGenerator();
       var driver = CSharpGeneratorDriver.Create(generator);
       driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generatedDiagnostics);
       
-      ThrowOnErrors(generatedDiagnostics);
-      return new GenerationResult(outputCompilation, syntaxTrees);
+      return new GenerationResult(outputCompilation, syntaxTrees)
+      {
+         GeneratedDiagnostics = generatedDiagnostics,
+      };
    }
 
 
@@ -86,4 +91,10 @@ internal class SourceGeneratorTestSetup
    }
 
    #endregion
+
+   public SourceGeneratorTestSetup AllowErrors()
+   {
+      throwOnErrors = false;
+      return this;
+   }
 }

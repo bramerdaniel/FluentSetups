@@ -6,6 +6,11 @@
 
 namespace FluentSetups.UnitTests
 {
+   using System;
+   using System.Collections.Generic;
+   using System.Linq;
+   using System.Text;
+
    using FluentAssertions;
    using FluentAssertions.Primitives;
 
@@ -16,6 +21,8 @@ namespace FluentSetups.UnitTests
 
    internal class GenerationResultAssertion : ReferenceTypeAssertions<GenerationResult, GenerationResultAssertion>
    {
+      private string expectedError;
+
       #region Constructors and Destructors
 
       public GenerationResultAssertion(GenerationResult subject)
@@ -49,5 +56,30 @@ namespace FluentSetups.UnitTests
       }
 
       #endregion
+
+      public AndConstraint<GenerationResultAssertion> NotHaveErrors()
+      {
+         ThrowOnErrors(Subject.GeneratedDiagnostics);
+         ThrowOnErrors(Subject.Compilation.GetDiagnostics());
+
+         return new AndConstraint<GenerationResultAssertion>(this);
+      }
+
+      private void ThrowOnErrors(IEnumerable<Diagnostic> diagnostics)
+      {
+         var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity == DiagnosticSeverity.Error);
+         if (errorDiagnostic != null)
+            throw new AssertFailedException(CreateMessage(errorDiagnostic));
+      }
+
+      private static string CreateMessage(Diagnostic errorDiagnostic)
+      {
+         var builder = new StringBuilder();
+         builder.AppendLine("MESSAGE");
+         builder.AppendLine(errorDiagnostic.GetMessage());
+         builder.AppendLine("SOURCE");
+         builder.AppendLine(errorDiagnostic.Location?.SourceTree?.ToString());
+         return builder.ToString();
+      }
    }
 }

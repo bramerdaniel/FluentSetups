@@ -54,6 +54,8 @@ namespace FluentSetups.SourceGenerator
             entryBuilder.AppendLine($"namespace {entryNameSpace.Key}");
             entryBuilder.AppendLine("{");
 
+            entryBuilder.AppendLine("using System;");
+
             foreach (var classInfos in setupClassInfos.GroupBy(x => x.GetSetupEntryClassName()))
             {
                var existing = Context.Compilation.GetTypeByMetadataName(classInfos.Key);

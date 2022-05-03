@@ -32,7 +32,8 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .AddSource(code)
             .Done();
 
-         result.Should().HaveClass("RonnyTheRobber.PersonSetup")
+         result.Should().NotHaveErrors().And
+            .HaveClass("RonnyTheRobber.PersonSetup")
             .WithMethod("WithName");
       }
 
@@ -54,7 +55,8 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .AddSource(code)
             .Done();
 
-         result.Should().HaveClass("RonnyTheRobber.PersonSetup")
+         result.Should().NotHaveErrors().And
+            .HaveClass("RonnyTheRobber.PersonSetup")
             .WithMethod("SetName");
       }
 
@@ -76,8 +78,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .AddSource(code)
             .Done();
 
-         result.Should().HaveClass("RonnyTheRobber.PersonSetup")
-            .WithoutMethod("WithName");
+         result.FailWith("CS0246", "Type FluentProperty not found");
       }
       
       [TestMethod]
@@ -96,7 +97,8 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .AddSource(code)
             .Done();
 
-         result.Should().HaveClass("RonnyTheRobber.PersonSetup")
+         result.Should().NotHaveErrors().And
+            .HaveClass("RonnyTheRobber.PersonSetup")
             .WithoutMethod("WithName");
       }
 
