@@ -12,7 +12,11 @@ jobs:
     steps:
     - name: create file
       run: echo FromJob1  > theFile.txt
-      
+    - name: dir
+      run: dir
+
+# Now comes another machine
+
   use-file:
     needs: create-file
     runs-on: windows-latest
