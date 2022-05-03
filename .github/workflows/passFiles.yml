@@ -54,7 +54,8 @@ jobs:
     - name: Cache file
       uses: actions/cache@v3
       with:
-        path: theFile.txt
+        path: .
+        key:  ${{ runner.os }}-FluentSetups-${{ hashFiles('**/*.txt') }}
         restore-keys: ${{ runner.os }}-FluentSetup
 
     - name: open file
