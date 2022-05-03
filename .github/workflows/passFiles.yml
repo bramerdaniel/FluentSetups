@@ -12,16 +12,16 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: checkout branch
-      uses: actions/checkout@v3
+    - name: create file
+      run: echo FromJob1  > theFile.txt
       
   use-file:
-    needs: build
+    needs: create-file
     runs-on: windows-latest
 
     steps:
-    - name: checkout branch
-      uses: actions/checkout@v3
+    - name: open file
+      run: dir
 
 
   
