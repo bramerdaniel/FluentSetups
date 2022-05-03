@@ -18,11 +18,21 @@ jobs:
     - name: dir
       run: dir
 
+    - name: mkdir direc
+      run: mkdir direc
+
+    - name: cd direc
+      run: cd direc
+
+    - name: create anoter file
+      run: echo otherContent  > secons.txt
+
     - name: Cache file
       uses: actions/cache@v3
       with:
         path: theFile.txt
         key:  ${{ runner.os }}-FluentSetups-${{ hashFiles('**/*.txt') }}
+        restore-keys: ${{ runner.os }}-FluentSetup
 
 
 # Now comes another machine
@@ -39,7 +49,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: theFile.txt
-        key:  ${{ runner.os }}-FluentSetups-${{ hashFiles('**/*.txt') }}
+        restore-keys: ${{ runner.os }}-FluentSetup
 
     - name: open file
       run: dir
