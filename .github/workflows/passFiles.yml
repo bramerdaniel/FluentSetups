@@ -25,7 +25,7 @@ jobs:
       run: cd direc
 
     - name: create anoter file
-      run: echo otherContent  > secons.txt
+      run: echo changedTheContent  > secons.txt
 
     - name: cd ..
       run: cd ..
@@ -60,5 +60,7 @@ jobs:
 
     - name: open file
       run: dir
+    - name: open file
+      run: dir .
 
   
