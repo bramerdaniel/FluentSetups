@@ -39,4 +39,20 @@ jobs:
       
     - name: run unit tests
       run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
+
+    - name: dir src\Release
+      run: dir src\Release
+
+    - name: cache packages
+      uses: actions/cache@v2
+      with:
+        path: src\Release\*.nupkg
+        key: ${{ runner.os }}-fluentSetupPackage
+  
+  publish:
+    needs: build
+    runs-on: windows-latest
+    steps:
+    - name: dir src\Release
+      run: dir src\Releasee
   
