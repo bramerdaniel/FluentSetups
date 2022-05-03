@@ -27,6 +27,12 @@ jobs:
     - name: create anoter file
       run: echo otherContent  > secons.txt
 
+    - name: cd ..
+      run: cd ..
+
+    - name: dir
+      run: dir
+
     - name: Cache file
       uses: actions/cache@v3
       with:
