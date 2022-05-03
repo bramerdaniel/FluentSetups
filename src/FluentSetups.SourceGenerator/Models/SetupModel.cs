@@ -6,8 +6,6 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
-   using System;
-   using System.Collections;
    using System.Collections.Generic;
    using System.Linq;
 
@@ -15,9 +13,17 @@ namespace FluentSetups.SourceGenerator.Models
 
    internal class SetupModel
    {
-      public IList<SetupClassModel> SetupClasses { get; private set; }
+      #region Public Properties
+
+      public string DefaultEntryNamespace { get; set; }
 
       public IList<SetupEntryClassModel> EntryClasses { get; private set; }
+
+      public IList<SetupClassModel> SetupClasses { get; private set; }
+
+      #endregion
+
+      #region Public Methods and Operators
 
       public static SetupModel Create(FluentGeneratorContext context, SetupClassInfo[] fluentSetupClasses)
       {
@@ -36,26 +42,9 @@ namespace FluentSetups.SourceGenerator.Models
          };
       }
 
-      public string DefaultEntryNamespace { get; set; }
+      #endregion
 
-      private static IEnumerable<SetupEntryClassModel> CreateEntryClasses(IEnumerable<SetupClassModel> setupClasses, FluentGeneratorContext context)
-      {
-         foreach (var namespaceGroup in setupClasses.GroupBy(x => x.EntryClassNamespace))
-         {
-            var includingNamespace = namespaceGroup.Key;
-
-            foreach (var setupClassModel in namespaceGroup.GroupBy(x => x.EntryClassName))
-            {
-               yield return new SetupEntryClassModel
-               {
-                  ContainingNamespace = includingNamespace,
-                  ClassName = setupClassModel.Key,
-                  SetupClasses = setupClassModel.ToArray(),
-                  Modifier = ComputeModifier(includingNamespace, setupClassModel.Key, context)
-               };
-            }
-         }
-      }
+      #region Methods
 
       private static string ComputeModifier(string targetNamespace, string targetName, FluentGeneratorContext context)
       {
@@ -82,5 +71,26 @@ namespace FluentSetups.SourceGenerator.Models
 
          return "internal";
       }
+
+      private static IEnumerable<SetupEntryClassModel> CreateEntryClasses(IEnumerable<SetupClassModel> setupClasses, FluentGeneratorContext context)
+      {
+         foreach (var namespaceGroup in setupClasses.GroupBy(x => x.EntryClassNamespace))
+         {
+            var includingNamespace = namespaceGroup.Key;
+
+            foreach (var setupClassModel in namespaceGroup.GroupBy(x => x.EntryClassName))
+            {
+               yield return new SetupEntryClassModel
+               {
+                  ContainingNamespace = includingNamespace,
+                  ClassName = setupClassModel.Key,
+                  SetupClasses = setupClassModel.ToArray(),
+                  Modifier = ComputeModifier(includingNamespace, setupClassModel.Key, context)
+               };
+            }
+         }
+      }
+
+      #endregion
    }
 }

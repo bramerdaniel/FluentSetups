@@ -63,9 +63,6 @@ namespace FluentSetups.SourceGenerator
          var fluentSetupModel = SetupModel.Create(fluentContext, fluentSetupClasses);
          foreach (var generatedSource in new FluentModelGenerator().Execute(fluentSetupModel))
             context.AddSource(generatedSource.Name, SourceText.From(generatedSource.Code, Encoding.UTF8));
-
-         //var generationRun = new GenerationRun(context, fluentContext);
-         //generationRun.Execute(fluentSetupClasses);
       }
 
       #endregion

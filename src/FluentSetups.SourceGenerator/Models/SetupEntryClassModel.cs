@@ -12,12 +12,16 @@ namespace FluentSetups.SourceGenerator.Models
    [DebuggerDisplay("{Modifier} class {ClassName} int {ContainingNamespace}")]
    internal class SetupEntryClassModel
    {
+      /// <summary>Gets or sets the name of the fluent entry class.</summary>
       public string ClassName { get; set; }
 
+      /// <summary>Gets or sets the namespace the fluent entry class will be generated into.</summary>
       public string ContainingNamespace { get; set; }
 
-      public string Modifier { get; set; } = "public";
+      /// <summary>Gets or sets the modifier.</summary>
+      public string Modifier { get; set; }
 
-      public IList<SetupClassModel> SetupClasses { get; set; }
+      /// <summary>Gets or sets all the <see cref="SetupClassModel"/>s that will be accessible from this entry class.</summary>
+      public IReadOnlyList<SetupClassModel> SetupClasses { get; set; }
    }
 }
