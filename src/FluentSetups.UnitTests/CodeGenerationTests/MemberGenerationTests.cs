@@ -36,6 +36,29 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .HaveClass("RonnyTheRobber.PersonSetup")
             .WithMethod("WithName");
       }
+     
+      [TestMethod]
+      public void EnsureGetterMethodsForPropertiesAreGeneratedCorrectly()
+      {
+         var code = @"namespace RonnyTheRobber
+                      {
+                         [FluentSetups.FluentSetup]
+                         public partial class PersonSetup
+                         {
+                            [FluentSetups.FluentMember]
+                            public string Name { get; set; }
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors().And
+            .HaveClass("RonnyTheRobber.PersonSetup")
+            .WithMethod("GetNameOrDefault")
+            .WithMethod("GetNameOrThrow");
+      }
 
       [TestMethod]
       public void EnsureSetupMethodWithCustomNameIsGeneratedCorrectly()
@@ -124,6 +147,31 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
          result.Should().NotHaveErrors().And
             .HaveClass("DonnyTheDagger.PersonSetup")
             .WithMethod("WithAge");
+      }
+      
+      [TestMethod]
+      public void EnsureGetMethodsIsGeneratedCorrectly()
+      {
+         var code = @"namespace DonnyTheDagger
+                      {
+                         using FluentSetups;
+
+                         [FluentSetup]
+                         public partial class PersonSetup
+                         {
+                            [FluentMember]
+                            public int age;
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors().And
+            .HaveClass("DonnyTheDagger.PersonSetup")
+            .WithMethod("GetAgeOrDefault")
+            .WithMethod("GetAgeOrThrow");
       }
 
       #endregion
