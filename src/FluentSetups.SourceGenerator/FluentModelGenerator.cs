@@ -110,7 +110,6 @@ namespace FluentSetups.SourceGenerator
 
       private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel)
       {
-
          sourceBuilder.AppendLine($"{classModel.Modifier} {classModel.ClassName} {memberModel.SetupMethodName}({memberModel.TypeName} value)");
          sourceBuilder.AppendLine("{");
 

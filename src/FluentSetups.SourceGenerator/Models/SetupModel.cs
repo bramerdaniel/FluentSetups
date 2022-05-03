@@ -46,12 +46,11 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Methods
 
-      private static string ComputeModifier(string targetNamespace, string targetName, FluentGeneratorContext context)
+      internal static string ComputeModifier(INamedTypeSymbol typeSymbol)
       {
-         var existingType = context.Compilation.GetTypeByMetadataName($"{targetNamespace}.{targetName}");
-         if (existingType != null)
+         if (typeSymbol != null)
          {
-            switch (existingType.DeclaredAccessibility)
+            switch (typeSymbol.DeclaredAccessibility)
             {
                case Accessibility.NotApplicable:
                case Accessibility.Private:
@@ -70,6 +69,12 @@ namespace FluentSetups.SourceGenerator.Models
          }
 
          return "internal";
+      }
+
+      internal static string ComputeModifier(string targetNamespace, string targetName, FluentGeneratorContext context)
+      {
+         var existingType = context.Compilation.GetTypeByMetadataName($"{targetNamespace}.{targetName}");
+         return ComputeModifier(existingType);
       }
 
       private static IEnumerable<SetupEntryClassModel> CreateEntryClasses(IEnumerable<SetupClassModel> setupClasses, FluentGeneratorContext context)

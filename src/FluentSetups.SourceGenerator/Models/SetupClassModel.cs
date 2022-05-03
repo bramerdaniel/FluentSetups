@@ -29,7 +29,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public IReadOnlyList<SetupFieldModel> Fields { get; set; }
 
-      public string Modifier { get; set; } = "public";
+      public string Modifier { get; set; } = "internal";
 
       public IReadOnlyList<SetupPropertyModel> Properties { get; set; }
 
@@ -45,12 +45,38 @@ namespace FluentSetups.SourceGenerator.Models
             ClassName = classInfo.ClassName,
             ContainingNamespace = ComputeNamespace(classInfo),
             EntryClassNamespace = classInfo.GetSetupEntryNameSpace(),
-            EntryClassName = classInfo.GetSetupEntryClassName()
+            EntryClassName = classInfo.GetSetupEntryClassName(),
+            Modifier = ComputeModifier(classInfo.ClassSymbol)
          };
 
          classModel.FillMembers(classInfo);
 
          return classModel;
+      }
+
+      internal static string ComputeModifier(ITypeSymbol typeSymbol)
+      {
+         if (typeSymbol != null)
+         {
+            switch (typeSymbol.DeclaredAccessibility)
+            {
+               case Accessibility.NotApplicable:
+               case Accessibility.Private:
+                  return "private";
+               case Accessibility.ProtectedAndInternal:
+                  return "protected internal";
+               case Accessibility.Protected:
+                  return "protected";
+               case Accessibility.Internal:
+                  return "internal";
+               case Accessibility.ProtectedOrInternal:
+                  return "internal";
+               case Accessibility.Public:
+                  return "public";
+            }
+         }
+
+         return "internal";
       }
 
       #endregion

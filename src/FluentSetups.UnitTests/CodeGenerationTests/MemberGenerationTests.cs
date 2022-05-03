@@ -172,6 +172,26 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .HaveClass("DonnyTheDagger.PersonSetup")
             .WithMethod("GetAgeOrDefault")
             .WithMethod("GetAgeOrThrow");
+      }      
+     
+      [TestMethod]
+      public void EnsureMemberCanBeInternal()
+      {
+         var code = @"namespace DonnyTheDagger
+                      {
+                         using FluentSetups;
+
+                         [FluentSetup]
+                         internal partial class PersonSetup
+                         {
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors();
       }
 
       #endregion
