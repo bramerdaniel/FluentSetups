@@ -20,7 +20,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: theFile.txt
-        key:  thisIsTheKey
+        key:  ${{ runner.os }}-FluentSetups-${{ hashFiles('**/*.txt') }}
 
 
 # Now comes another machine
@@ -37,7 +37,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: theFile.txt
-        key:  thisIsTheKey
+        key:  ${{ runner.os }}-FluentSetups-${{ hashFiles('**/*.txt') }}
 
     - name: open file
       run: dir
