@@ -6,6 +6,7 @@
 
 namespace FluentSetups.SourceGenerator
 {
+   using System.Collections.Generic;
    using System.Linq;
    using System.Text;
 
@@ -48,30 +49,35 @@ namespace FluentSetups.SourceGenerator
          if (setupClassInfos.Length == 0)
             return;
 
-         foreach (var entryNameSpace in setupClassInfos.GroupBy(x => x.GetSetupEntryNameSpace()))
+         foreach (var entryNameSpace in setupClassInfos.GroupBy(x => x.ClassSymbol.ContainingNamespace, SymbolEqualityComparer.Default))
          {
             var entryBuilder = new StringBuilder();
             entryBuilder.AppendLine($"namespace {entryNameSpace.Key}");
             entryBuilder.AppendLine("{");
-
+            
             entryBuilder.AppendLine("using System;");
 
             foreach (var classInfos in setupClassInfos.GroupBy(x => x.GetSetupEntryClassName()))
             {
-               var existing = Context.Compilation.GetTypeByMetadataName(classInfos.Key);
-               if (existing == null)
+               entryBuilder.AppendLine($"   internal partial class {classInfos.Key}");
+               entryBuilder.AppendLine("   {");
+               foreach (var classInfo in classInfos)
                {
-                  entryBuilder.AppendLine($"   internal partial class {classInfos.Key}");
-                  entryBuilder.AppendLine("   {");
-                  foreach (var classInfo in classInfos)
+                  var classNamespace = classInfo.ClassSymbol.ContainingNamespace;
+                  if (entryNameSpace.Key.Equals(classNamespace, SymbolEqualityComparer.Default))
                   {
                      entryBuilder.AppendLine($"      internal static {classInfo.ClassName} {ComputeEntryMethodName(classInfo.ClassName)}() => new {classInfo.ClassName}();");
-                     entryBuilder.AppendLine();
+                  }
+                  else
+                  {
+                     entryBuilder.AppendLine($"      internal static {classNamespace}.{classInfo.ClassName} {ComputeEntryMethodName(classInfo.ClassName)}() => new {classNamespace}.{classInfo.ClassName}();");
                   }
 
-                  entryBuilder.AppendLine("   }");
                   entryBuilder.AppendLine();
                }
+
+               entryBuilder.AppendLine("   }");
+               entryBuilder.AppendLine();
             }
 
             entryBuilder.AppendLine("}");

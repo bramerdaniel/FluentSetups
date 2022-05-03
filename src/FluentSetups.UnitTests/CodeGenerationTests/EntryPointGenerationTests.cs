@@ -89,5 +89,38 @@ public class EntryPointGenerationTests
          .WithMethod("Person");
    }
 
+   [TestMethod]
+   public void EnsureSetupTypesFromDifferentNamespacesWorkCorrectly()
+   {
+      string target = @"namespace FirstNamespace
+                      {
+                         [FluentSetups.FluentSetup]
+                         public partial class FirstSetup : FluentSetups.IFluentSetup<string>
+                         {
+                            internal partial string CreateInstance() => """";
+                         }
+                      }";
+
+      string code = @"namespace SecondNamespace
+                      {
+                         [FluentSetups.FluentSetup]
+                         public partial class SecondSetup : FluentSetups.IFluentSetup<string>
+                         {
+                            internal partial string CreateInstance() => """";
+                         }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("RootNamespace")
+         .AddSource(target)
+         .AddSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("FirstNamespace.Setup")
+         .WithMethod("First")
+         .WithMethod("Second");
+   }
+
    #endregion
 }
