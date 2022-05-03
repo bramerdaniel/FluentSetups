@@ -12,8 +12,16 @@ jobs:
     steps:
     - name: create file
       run: echo FromJob1  > theFile.txt
+
     - name: dir
       run: dir
+
+    - name: Cache file
+      uses: actions/cache@v3
+      with:
+        path: theFile.txt
+        key:  thisIsTheKey
+
 
 # Now comes another machine
 
