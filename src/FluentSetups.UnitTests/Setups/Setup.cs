@@ -21,4 +21,9 @@ internal class Setup
    }
 
    #endregion
+
+   public static SetupClassModelSetup SetupClassModel()
+   {
+      return new SetupClassModelSetup();
+   }
 }

@@ -16,21 +16,42 @@ public class EntryPointGenerationTests
    #region Public Methods and Operators
 
    [TestMethod]
+   public void EnsureSetupEntryMethodIsGeneratedCorrectly()
+   {
+      string code = @"namespace MyUnitTests
+                      {  
+                         using FluentSetups;
+
+                         [FluentSetup]
+                         public partial class PersonSetup { }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("MyUnitTests")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyUnitTests.Setup")
+         .WithMethod("Person");
+   }
+
+   [TestMethod]
    public void EnsureSetupMethodIsGeneratedCorrectly()
    {
       string code = @"namespace RonnyTheRobber
                       {
                          [FluentSetups.FluentSetup(""FSetup"")]
-                         public partial class Person
-                         { }
+                         public partial class Person { }
                       }";
 
       var result = Setup.SourceGeneratorTest()
-         .AddSource(code)
+         .WithRootNamespace("MyRoot")
+         .WithSource(code)
          .Done();
 
       result.Should().NotHaveErrors().And
-         .HaveClass("RonnyTheRobber.FSetup")
+         .HaveClass("MyRoot.FSetup")
          .WithMethod("Person");
    }
    
@@ -49,7 +70,8 @@ public class EntryPointGenerationTests
                       }";
 
       var result = Setup.SourceGeneratorTest()
-         .AddSource(code)
+         .WithRootNamespace("RonnyTheRobber")
+         .WithSource(code)
          .Done();
 
       result.Should().NotHaveErrors().And
@@ -70,27 +92,30 @@ public class EntryPointGenerationTests
 
       string code = @"namespace SetupNameSpace
                       {
+                         using FluentSetups;
                          using SomeOther.ModelNameSpace;
 
-                         [FluentSetups.FluentSetup]
-                         public partial class PersonSetup : FluentSetups.IFluentSetup<Person>
+                         [FluentSetup]
+                         public partial class PersonSetup : IFluentSetup<Person>
                          {
-                            internal partial Person CreateInstance() => new Person();
+                            public Person Done() => new Person();
                          }
                       }";
 
       var result = Setup.SourceGeneratorTest()
-         .AddSource(target)
-         .AddSource(code)
+         .WithRootNamespace("DefaultAssemblyNamespace")
+         .WithSource(target)
+         .WithSource(code)
          .Done();
 
       result.Should().NotHaveErrors().And
-         .HaveClass("SetupNameSpace.Setup")
+         .HaveClass("DefaultAssemblyNamespace.Setup")
          .WithMethod("Person");
    }
 
    [TestMethod]
-   public void EnsureSetupTypesFromDifferentNamespacesWorkCorrectly()
+   [Ignore]
+   public void EnsureSetupTypesFromDifferentNamespacesWorkCorrectlyOld()
    {
       string target = @"namespace FirstNamespace
                       {
@@ -112,12 +137,43 @@ public class EntryPointGenerationTests
 
       var result = Setup.SourceGeneratorTest()
          .WithRootNamespace("RootNamespace")
-         .AddSource(target)
-         .AddSource(code)
+         .WithSource(target)
+         .WithSource(code)
          .Done();
 
       result.Should().NotHaveErrors().And
-         .HaveClass("FirstNamespace.Setup")
+         .HaveClass("RootNamespace.Setup")
+         .WithMethod("First")
+         .WithMethod("Second");
+   }
+
+   [TestMethod]
+   public void EnsureSetupTypesFromDifferentNamespacesWorkCorrectly()
+   {
+      string target = @"namespace FirstNamespace
+                      {
+                         [FluentSetups.FluentSetup]
+                         public partial class FirstSetup
+                         {
+                         }
+                      }";
+
+      string code = @"namespace SecondNamespace
+                      {
+                         [FluentSetups.FluentSetup]
+                         public partial class SecondSetup
+                         {
+                         }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("RootNamespace")
+         .WithSource(target)
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RootNamespace.Setup")
          .WithMethod("First")
          .WithMethod("Second");
    }

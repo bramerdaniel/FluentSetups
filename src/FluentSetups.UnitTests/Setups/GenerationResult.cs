@@ -18,11 +18,11 @@ internal class GenerationResult
 {
    public Compilation Compilation { get; }
 
-   public IList<SyntaxTree> SyntaxTrees { get; }
+   public IReadOnlyList<SyntaxTree> SyntaxTrees { get; }
 
    public ImmutableArray<Diagnostic> GeneratedDiagnostics { get; set; }
    
-   public GenerationResult(Compilation compilation, IList<SyntaxTree> syntaxTrees)
+   public GenerationResult(Compilation compilation, IReadOnlyList<SyntaxTree> syntaxTrees)
    {
       Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
       SyntaxTrees = syntaxTrees ?? throw new ArgumentNullException(nameof(syntaxTrees));

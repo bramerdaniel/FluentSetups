@@ -17,7 +17,7 @@ namespace FluentSetups.SourceGenerator
 
    internal class FluentSetupClassGenerator
    {
-      private readonly FluentApi fluentApi;
+      private readonly FluentGeneratorContext fluentApi;
 
       #region Constants and Fields
 
@@ -25,7 +25,7 @@ namespace FluentSetups.SourceGenerator
 
       #region Constructors and Destructors
 
-      public FluentSetupClassGenerator(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclarationSyntax, FluentApi fluentApi)
+      public FluentSetupClassGenerator(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclarationSyntax, FluentGeneratorContext fluentApi)
       {
          this.fluentApi = fluentApi;
          GeneratorContext = context;

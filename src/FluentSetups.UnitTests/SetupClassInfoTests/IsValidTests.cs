@@ -28,7 +28,7 @@ public class IsValidTests
 
       var setupClassInfo = Setup.SetupClassInfo()
          .WithName("PersonSetup")
-         .AddSource(code)
+         .WithSource(code)
          .Done();
 
       setupClassInfo.IsValidSetup().Should().BeTrue();
@@ -47,7 +47,7 @@ public class IsValidTests
 
       var setupClassInfo = Setup.SetupClassInfo()
          .WithName("CodeSetup")
-         .AddSource(code)
+         .WithSource(code)
          .Done();
 
       setupClassInfo.IsValidSetup().Should().BeFalse();

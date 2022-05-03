@@ -29,7 +29,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
                       }";
 
          var result = Setup.SourceGeneratorTest()
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          result.Should().NotHaveErrors().And
@@ -52,7 +52,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
                       }";
 
          var result = Setup.SourceGeneratorTest()
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          result.Should().NotHaveErrors().And
@@ -75,7 +75,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
                       }";
 
          var result = Setup.SourceGeneratorTest()
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          result.FailWith("CS0246", "Type FluentProperty not found");
@@ -94,7 +94,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
                       }";
 
          var result = Setup.SourceGeneratorTest()
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          result.Should().NotHaveErrors().And

@@ -28,7 +28,7 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
 
          var setupClassInfo = Setup.SetupClassInfo()
             .WithName("PersonSetup")
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          setupClassInfo.GetSetupEntryNameSpace().Should().BeNull();
@@ -47,7 +47,7 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
 
          var setupClassInfo = Setup.SetupClassInfo()
             .WithName("PersonSetup")
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          setupClassInfo.GetSetupEntryNameSpace().Should().BeNull();
@@ -69,14 +69,14 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
          var setupClassInfo = Setup.SetupClassInfo()
             .WithName("PersonSetup")
             .WithRootNamespace("MyRootNamespace")
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          setupClassInfo.GetSetupEntryNameSpace().Should().Be("MyRootNamespace");
       }
 
       [TestMethod]
-      public void EnsureSetupEntryNameSpaceIsUsedFromClassWhenNotSpecified()
+      public void EnsureRootNamespaceIsUsedWhenNotSpecifiedExplicitly()
       {
          string code = @"namespace Ronny.Balcony
                       {
@@ -92,33 +92,12 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
                       }";
 
          var setupClassInfo = Setup.SetupClassInfo()
+            .WithRootNamespace("My.Name.Space")
             .WithName("PersonSetup")
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
-         setupClassInfo.GetSetupEntryNameSpace().Should().Be("Ronny.Balcony");
+         setupClassInfo.GetSetupEntryNameSpace().Should().Be("My.Name.Space");
       }
-
-      [TestMethod]
-      public void EnsureSetupCustomEntryClassNameIsComputedCorrectlyWithInlineNamespace()
-      {
-         string code = @"namespace RonnyTheRobber
-                      {
-                           [FluentSetups.FluentSetup(""MyCustomSetup"")]
-                           public partial class PersonSetup : ISetup<Person>
-                           {
-                              [FluentProperty]
-                              public string Name { get; set; }
-                           }
-                      }";
-
-         var setupClassInfo = Setup.SetupClassInfo()
-            .WithName("PersonSetup")
-            .AddSource(code)
-            .Done();
-
-         setupClassInfo.GetSetupEntryNameSpace().Should().Be("RonnyTheRobber");
-      }
-
    }
 }

@@ -17,13 +17,13 @@ namespace FluentSetups.SourceGenerator
    {
       #region Constants and Fields
 
-      private readonly FluentApi fluentApi;
+      private readonly FluentGeneratorContext fluentApi;
 
       #endregion
 
       #region Constructors and Destructors
 
-      public SetupClassInfo(FluentApi fluentApi, ClassDeclarationSyntax candidate, SemanticModel semanticModel)
+      public SetupClassInfo(FluentGeneratorContext fluentApi, ClassDeclarationSyntax candidate, SemanticModel semanticModel)
       {
          this.fluentApi = fluentApi;
 
@@ -92,13 +92,8 @@ namespace FluentSetups.SourceGenerator
          if (firstArgument.Value.Value is string value)
             return value;
 
-         if (ClassSymbol.ContainingNamespace.IsGlobalNamespace)
-         {
-            // This should be the default namespace of the containing assembly
-            return ClassSymbol.ContainingAssembly.MetadataName;
-         }
-
-         return ClassSymbol.ContainingNamespace.ToString();
+         // This should be the default namespace of the containing assembly
+         return ClassSymbol.ContainingAssembly.MetadataName;
       }
 
       private bool IsFluentSetupAttribute(AttributeData attributeData)

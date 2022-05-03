@@ -1,13 +1,23 @@
-﻿namespace FluentSetups.SourceGenerator
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="FluentSetupSourceGenerator.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace FluentSetups.SourceGenerator
 {
    using System.Linq;
+   using System.Text;
+
+   using FluentSetups.SourceGenerator.Models;
 
    using Microsoft.CodeAnalysis;
-   using Microsoft.CodeAnalysis.CSharp.Syntax;
+   using Microsoft.CodeAnalysis.Text;
 
    [Generator]
    public class FluentSetupSourceGenerator : ISourceGenerator
    {
+      #region ISourceGenerator Members
 
       public void Initialize(GeneratorInitializationContext context)
       {
@@ -19,27 +29,19 @@
          if (!(context.SyntaxReceiver is FluentSetupSyntaxReceiver syntaxReceiver))
             return;
 
-         Api = FluentApi.FromCompilation(context.Compilation);
-         if (Api.TryGetMissingType(out string missingType))
+         var fluentContext = FluentGeneratorContext.FromCompilation(context.Compilation);
+         if (fluentContext.TryGetMissingType(out string missingType))
          {
             MissingReferenceDiagnostic(context, missingType);
             return;
          }
 
-         var fluentSetupClasses = Api.FindFluentSetups(syntaxReceiver.SetupCandidates).ToArray();
-         GenerateSetups(context, fluentSetupClasses);
+         RunSourceGeneration(context, fluentContext, syntaxReceiver);
       }
 
-      private FluentApi Api { get; set; }
+      #endregion
 
-      private void GenerateSetups(GeneratorExecutionContext context, SetupClassInfo[] fluentSetupClasses)
-      {
-         if (fluentSetupClasses.Length == 0)
-            return;
-
-         var generationRun = new GenerationRun(context, Api);
-         generationRun.Execute(fluentSetupClasses);
-      }
+      #region Methods
 
       private void MissingReferenceDiagnostic(GeneratorExecutionContext context, string attributeName)
       {
@@ -52,10 +54,26 @@
          context.ReportDiagnostic(Diagnostic.Create(missingReference, Location.None, attributeName));
       }
 
-      private static readonly DiagnosticDescriptor InvalidXmlWarning = new DiagnosticDescriptor(id: "FS0001",
-         title: "fluent setup class", messageFormat: "Starting generation for fluent setup class: '{0}'",
-         category: nameof(FluentSetupSourceGenerator), DiagnosticSeverity.Info, isEnabledByDefault: true);
+      private void RunSourceGeneration(GeneratorExecutionContext context, FluentGeneratorContext fluentContext, FluentSetupSyntaxReceiver syntaxReceiver)
+      {
+         var fluentSetupClasses = fluentContext.FindFluentSetups(syntaxReceiver.SetupCandidates).ToArray();
+         if (fluentSetupClasses.Length == 0)
+            return;
 
+         var fluentSetupModel = SetupModel.Create(fluentContext, fluentSetupClasses);
+         foreach (var generatedSource in new FluentModelGenerator().Execute(fluentSetupModel))
+            context.AddSource(generatedSource.Name, SourceText.From(generatedSource.Code, Encoding.UTF8));
 
+         //var generationRun = new GenerationRun(context, fluentContext);
+         //generationRun.Execute(fluentSetupClasses);
+      }
+
+      #endregion
+   }
+
+   internal class GeneratedSource
+   {
+      public string Name { get; set; }
+      public string Code { get; set; }
    }
 }

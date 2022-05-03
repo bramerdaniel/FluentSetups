@@ -6,25 +6,11 @@
 
 namespace FluentSetups.UnitTests.Setups;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
 using FluentSetups.SourceGenerator;
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-
-internal class SetupClassInfoSetup
+internal class SetupClassInfoSetup : SetupBase
 {
-   #region Constants and Fields
 
-   private readonly List<SyntaxTree> syntaxTrees = new(5);
-
-   private string rootNamespace = "FluentSetups.UnitTests.Compilation";
-
-   #endregion
 
    #region Public Properties
 
@@ -36,37 +22,26 @@ internal class SetupClassInfoSetup
 
    public SetupClassInfoSetup WithRootNamespace(string value)
    {
-      rootNamespace = value;
+      RootNamespace = value;
       return this;
    }
-   public SetupClassInfoSetup AddSource(string code)
-   {
-      var syntaxTree = CSharpSyntaxTree.ParseText(code);
-      var error = syntaxTree.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error).FirstOrDefault();
-      if (error != null)
-         throw new InvalidOperationException(error.GetMessage());
 
-      syntaxTrees.Add(syntaxTree);
+   public SetupClassInfoSetup WithSource(string code)
+   {
+      AddSource(code);
       return this;
    }
 
    public SetupClassInfo Done()
    {
-      var compilation = CSharpCompilation.Create(rootNamespace, syntaxTrees, ComputeReferences(),
-         new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-      var outputCompilation = compilation;
-      //var generator = new FluentSetupSourceGenerator();
-      //var driver = CSharpGeneratorDriver.Create(generator);
-      //driver.RunGeneratorsAndUpdateCompilation(compilation, out outputCompilation, out var generateDiagnostics);
-
-      var syntaxWalker = new HelperSyntaxWalker();
-      syntaxWalker.Visit(syntaxTrees[0].GetRoot());
-      var setupClass = syntaxWalker.GetSetupClasses()[0];
+      var compilation = CreateCompilation();
       
-      var api = FluentApi.FromCompilation(outputCompilation);
-      var semanticModel = outputCompilation.GetSemanticModel(syntaxTrees[0]);
-      return new SetupClassInfo(api, setupClass, semanticModel);
+      var syntaxWalker = new SyntaxHelper();
+      syntaxWalker.Visit(SyntaxTrees[0].GetRoot());
+      
+      var api = FluentGeneratorContext.FromCompilation(compilation);
+      var semanticModel = compilation.GetSemanticModel(SyntaxTrees[0]);
+      return new SetupClassInfo(api, FirstClassDeclarationSyntax(), semanticModel);
    }
 
    public SetupClassInfoSetup WithName(string className)
@@ -76,20 +51,5 @@ internal class SetupClassInfoSetup
    }
 
    #endregion
-
-   #region Methods
-
-   private static List<MetadataReference> ComputeReferences()
-   {
-      var fluentSetupsAssembly = typeof(FluentSetupAttribute).Assembly;
-
-      var references = new List<MetadataReference>();
-      Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-      foreach (var assembly in assemblies)
-         if (!assembly.IsDynamic)
-            references.Add(MetadataReference.CreateFromFile(assembly.Location));
-      return references;
-   }
-
-   #endregion
+   
 }

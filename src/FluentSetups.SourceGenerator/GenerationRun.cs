@@ -17,9 +17,9 @@ namespace FluentSetups.SourceGenerator
    {
       public GeneratorExecutionContext Context { get; }
 
-      public FluentApi FluentApi { get; }
+      public FluentGeneratorContext FluentApi { get; }
 
-      public GenerationRun(GeneratorExecutionContext context, FluentApi fluentApi)
+      public GenerationRun(GeneratorExecutionContext context, FluentGeneratorContext fluentApi)
       {
          Context = context;
          FluentApi = fluentApi;

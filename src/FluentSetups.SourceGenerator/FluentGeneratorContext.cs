@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentApi.cs" company="KUKA Deutschland GmbH">
+// <copyright file="FluentGeneratorContext.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -7,28 +7,39 @@
 namespace FluentSetups.SourceGenerator
 {
    using System.Collections.Generic;
-   using System.Linq;
 
    using Microsoft.CodeAnalysis;
    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-   internal struct FluentApi
+   internal struct FluentGeneratorContext
    {
-      public static string FluentEntryNamespaceAttributeName => "FluentSetups.FluentEntryNamespaceAttribute";
+      #region Public Properties
 
-      public static string FluentSetupAttributeName => "FluentSetups.FluentSetupAttribute";
+      public Compilation Compilation { get; set; }
+      
+      #endregion
 
-      public static string FluentPropertyAttributeName => "FluentSetups.FluentPropertyAttribute";
+      #region Properties
 
-      public INamedTypeSymbol FluentSetupAttribute { get; set; }
+      internal static string FluentEntryNamespaceAttributeName => "FluentSetups.FluentEntryNamespaceAttribute";
 
-      public INamedTypeSymbol FluentPropertyAttribute { get; set; }
+      internal static string FluentPropertyAttributeName => "FluentSetups.FluentPropertyAttribute";
 
-      public INamedTypeSymbol FluentEntryNamespaceAttribute { get; set; }
+      internal static string FluentSetupAttributeName => "FluentSetups.FluentSetupAttribute";
 
-      public static FluentApi FromCompilation(Compilation compilation)
+      internal INamedTypeSymbol FluentEntryNamespaceAttribute { get; set; }
+
+      internal INamedTypeSymbol FluentPropertyAttribute { get; set; }
+
+      internal INamedTypeSymbol FluentSetupAttribute { get; set; }
+
+      #endregion
+
+      #region Public Methods and Operators
+
+      public static FluentGeneratorContext FromCompilation(Compilation compilation)
       {
-         return new FluentApi
+         return new FluentGeneratorContext
          {
             Compilation = compilation,
             FluentEntryNamespaceAttribute = compilation.GetTypeByMetadataName(FluentEntryNamespaceAttributeName),
@@ -36,9 +47,15 @@ namespace FluentSetups.SourceGenerator
             FluentPropertyAttribute = compilation.GetTypeByMetadataName(FluentPropertyAttributeName)
          };
       }
-
-      public Compilation Compilation { get; set; }
-
+      
+      public IEnumerable<SetupClassInfo> FindFluentSetups(IEnumerable<ClassDeclarationSyntax> setupCandidates)
+      {
+         foreach (var setupCandidate in setupCandidates)
+         {
+            if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
+               yield return classInfo;
+         }
+      }
 
       public bool TryGetMissingType(out string missingType)
       {
@@ -58,22 +75,9 @@ namespace FluentSetups.SourceGenerator
          return false;
       }
 
-      public IEnumerable<SetupClassInfo> FindFluentSetups(IEnumerable<ClassDeclarationSyntax> setupCandidates)
-      {
-         foreach (var setupCandidate in setupCandidates)
-         {
-            if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
-               yield return classInfo;
-         }
-      }
+      #endregion
 
-      private bool TryGetSetupClass(ClassDeclarationSyntax candidate, out SetupClassInfo setupClassInfo)
-      {
-         var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
-         setupClassInfo = new SetupClassInfo(this, candidate, semanticModel);
-
-         return setupClassInfo.IsValidSetup();
-      }
+      #region Methods
 
       private bool IsFluentSetupAttribute(AttributeData attributeData)
       {
@@ -86,7 +90,7 @@ namespace FluentSetups.SourceGenerator
 
          if (attributeName == "FluentSetup")
             return true;
-         
+
          return false;
       }
 
@@ -113,5 +117,16 @@ namespace FluentSetups.SourceGenerator
 
          return false;
       }
+
+      private bool TryGetSetupClass(ClassDeclarationSyntax candidate, out SetupClassInfo setupClassInfo)
+      {
+         var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
+         setupClassInfo = new SetupClassInfo(this, candidate, semanticModel);
+
+         return setupClassInfo.IsValidSetup();
+      }
+
+      #endregion
+      
    }
 }

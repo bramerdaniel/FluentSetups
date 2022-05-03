@@ -25,7 +25,7 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
 
          var setupClassInfo = Setup.SetupClassInfo()
             .WithName("PersonSetup")
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          setupClassInfo.FluentSetupAttribute.Should().NotBeNull();
@@ -46,7 +46,7 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
 
          var setupClassInfo = Setup.SetupClassInfo()
             .WithName("PersonSetup")
-            .AddSource(code)
+            .WithSource(code)
             .Done();
 
          setupClassInfo.FluentSetupAttribute.Should().NotBeNull();

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HelperSyntaxWalker.cs" company="KUKA Deutschland GmbH">
+// <copyright file="SyntaxHelper.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -10,14 +10,15 @@ using System.Collections.Generic;
 
 using FluentSetups.SourceGenerator;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-public class HelperSyntaxWalker : CSharpSyntaxWalker
+public class SyntaxHelper : CSharpSyntaxWalker
 {
    private readonly FluentSetupSyntaxReceiver receiver;
 
-   public HelperSyntaxWalker()
+   public SyntaxHelper()
    {
       receiver = new FluentSetupSyntaxReceiver();
    }
@@ -31,5 +32,12 @@ public class HelperSyntaxWalker : CSharpSyntaxWalker
    internal IList<ClassDeclarationSyntax> GetSetupClasses()
    {
       return receiver.SetupCandidates;
+   }
+
+   internal static IEnumerable<ClassDeclarationSyntax> FindSetupClasses(SyntaxTree syntaxTree)
+   {
+      var syntaxWalker = new SyntaxHelper();
+      syntaxWalker.Visit(syntaxTree.GetRoot());
+      return syntaxWalker.GetSetupClasses();
    }
 }

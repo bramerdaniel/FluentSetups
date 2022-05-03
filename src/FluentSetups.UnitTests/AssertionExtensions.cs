@@ -6,6 +6,8 @@
 
 namespace FluentSetups.UnitTests;
 
+using FluentSetups.SourceGenerator.Models;
+using FluentSetups.UnitTests.Assertions;
 using FluentSetups.UnitTests.Setups;
 
 internal static class AssertionExtensions
@@ -15,6 +17,11 @@ internal static class AssertionExtensions
    public static GenerationResultAssertion Should(this GenerationResult target)
    {
       return new GenerationResultAssertion(target);
+   }
+
+   public static SetupClassModelAssertion Should(this SetupClassModel target)
+   {
+      return new SetupClassModelAssertion(target);
    }
 
    #endregion

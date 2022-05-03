@@ -28,7 +28,7 @@ public class GetSetupEntryClassNameTests
 
       var setupClassInfo = Setup.SetupClassInfo()
          .WithName("PersonSetup")
-         .AddSource(code)
+         .WithSource(code)
          .Done();
 
       setupClassInfo.GetSetupEntryClassName().Should().BeNull();
@@ -47,7 +47,7 @@ public class GetSetupEntryClassNameTests
 
       var setupClassInfo = Setup.SetupClassInfo()
          .WithName("PersonSetup")
-         .AddSource(code)
+         .WithSource(code)
          .Done();
 
       setupClassInfo.GetSetupEntryClassName().Should().BeNull();
@@ -68,7 +68,7 @@ public class GetSetupEntryClassNameTests
 
       var setupClassInfo = Setup.SetupClassInfo()
          .WithName("PersonSetup")
-         .AddSource(code)
+         .WithSource(code)
          .Done();
 
       setupClassInfo.GetSetupEntryClassName().Should().Be("Setup");
@@ -90,7 +90,7 @@ public class GetSetupEntryClassNameTests
 
       var setupClassInfo = Setup.SetupClassInfo()
          .WithName("PersonSetup")
-         .AddSource(code)
+         .WithSource(code)
          .Done();
 
       setupClassInfo.GetSetupEntryClassName().Should().Be("MyCustomSetup");
@@ -110,7 +110,7 @@ public class GetSetupEntryClassNameTests
 
       var setupClassInfo = Setup.SetupClassInfo()
          .WithName("PersonSetup")
-         .AddSource(code)
+         .WithSource(code)
          .Done();
 
       setupClassInfo.GetSetupEntryClassName().Should().Be("MyCustomSetup");
