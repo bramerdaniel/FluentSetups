@@ -33,5 +33,13 @@ jobs:
     - name: open file
       run: dir
 
+    - name: Cache file
+      uses: actions/cache@v3
+      with:
+        path: theFile.txt
+        key:  thisIsTheKey
+
+    - name: open file
+      run: dir
 
   
