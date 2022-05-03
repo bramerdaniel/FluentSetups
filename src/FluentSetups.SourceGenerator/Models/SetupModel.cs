@@ -6,9 +6,12 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
+   using System;
    using System.Collections;
    using System.Collections.Generic;
    using System.Linq;
+
+   using Microsoft.CodeAnalysis;
 
    internal class SetupModel
    {
@@ -24,18 +27,18 @@ namespace FluentSetups.SourceGenerator.Models
             var classModel = SetupClassModel.Create(context, setupClassInfo);
             classModels.Add(classModel);
          }
-         
+
          return new SetupModel
          {
             DefaultEntryNamespace = context.Compilation.Assembly.MetadataName,
             SetupClasses = classModels,
-            EntryClasses = CreateEntryClasses(classModels).ToArray()
+            EntryClasses = CreateEntryClasses(classModels, context).ToArray()
          };
       }
 
       public string DefaultEntryNamespace { get; set; }
 
-      private static IEnumerable<SetupEntryClassModel> CreateEntryClasses(IEnumerable<SetupClassModel> setupClasses)
+      private static IEnumerable<SetupEntryClassModel> CreateEntryClasses(IEnumerable<SetupClassModel> setupClasses, FluentGeneratorContext context)
       {
          foreach (var namespaceGroup in setupClasses.GroupBy(x => x.EntryClassNamespace))
          {
@@ -47,10 +50,37 @@ namespace FluentSetups.SourceGenerator.Models
                {
                   ContainingNamespace = includingNamespace,
                   ClassName = setupClassModel.Key,
-                  SetupClasses = setupClassModel.ToArray() 
+                  SetupClasses = setupClassModel.ToArray(),
+                  Modifier = ComputeModifier(includingNamespace, setupClassModel.Key, context)
                };
             }
          }
+      }
+
+      private static string ComputeModifier(string targetNamespace, string targetName, FluentGeneratorContext context)
+      {
+         var existingType = context.Compilation.GetTypeByMetadataName($"{targetNamespace}.{targetName}");
+         if (existingType != null)
+         {
+            switch (existingType.DeclaredAccessibility)
+            {
+               case Accessibility.NotApplicable:
+               case Accessibility.Private:
+                  return "private";
+               case Accessibility.ProtectedAndInternal:
+                  return "protected internal";
+               case Accessibility.Protected:
+                  return "protected";
+               case Accessibility.Internal:
+                  return "internal";
+               case Accessibility.ProtectedOrInternal:
+                  return "internal";
+               case Accessibility.Public:
+                  return "public";
+            }
+         }
+
+         return "internal";
       }
    }
 }

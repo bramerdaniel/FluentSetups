@@ -4,9 +4,11 @@
 		<TargetFramework>net6.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="Setup.cs" />
 	  <Compile Remove="ToolSetup.cs" />
 	</ItemGroup>
 	<ItemGroup>
+	  <EmbeddedResource Include="Setup.cs" />
 	  <EmbeddedResource Include="ToolSetup.cs" />
 	</ItemGroup>
 
@@ -25,5 +27,9 @@
 	<ItemGroup>
 		<ProjectReference Include="..\FluentSetups.SourceGenerator\FluentSetups.SourceGenerator.csproj" />
 		<ProjectReference Include="..\FluentSetups\FluentSetups.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="NewFolder\" />
 	</ItemGroup>
 </Project>

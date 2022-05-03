@@ -8,6 +8,7 @@ namespace FluentSetups.UnitTests;
 
 using System.Linq;
 
+using FluentAssertions;
 using FluentAssertions.Primitives;
 
 using Microsoft.CodeAnalysis;
@@ -39,6 +40,14 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
       return this;
    }
 
+   public ClassAssertion WithStaticMethod(string methodName)
+   {
+      var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
+      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found");
+      Assert.IsTrue(methodSymbol.IsStatic, $"The found method {methodName} is not static");
+      return this;
+   }
+
    public ClassAssertion WithoutMethod(string methodName)
    {
       var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
@@ -51,6 +60,18 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
    public ClassAssertion MustBePartial()
    {
       var namedTypeSymbol = Subject;
+      return this;
+   }
+
+   public ClassAssertion WithInternalModifier()
+   {
+      Subject.DeclaredAccessibility.Should().Be(Accessibility.Internal);
+      return this;
+   }
+
+   public ClassAssertion WithPublicModifier()
+   {
+      Subject.DeclaredAccessibility.Should().Be(Accessibility.Public);
       return this;
    }
 }

@@ -55,12 +55,9 @@ namespace FluentSetupTester
 
       static void Main()
       {
-         var resourceStream = typeof(Program).Assembly.GetManifestResourceStream("FluentSetupTester.ToolSetup.cs");
-         if (resourceStream == null)
-            return;
-
-         using var reader = new StreamReader(resourceStream);
-         var (diagnostics, output) = RunSourceGenerator(reader.ReadToEnd());
+         var syntaxTrees = ParseInput("FluentSetupTester.ToolSetup.cs", "FluentSetupTester.Setup.cs");
+         
+         var (diagnostics, output) = RunSourceGenerator(syntaxTrees);
          if (diagnostics.Length > 0)
          {
             ConsoleProxy.WriteLine("Diagnostics:");
@@ -75,9 +72,21 @@ namespace FluentSetupTester
          ConsoleProxy.ReadLine();
       }
 
-      private static (ImmutableArray<Diagnostic>, string) RunSourceGenerator(string source)
+      private static IEnumerable<SyntaxTree> ParseInput(params string[] fileNames)
       {
-         var syntaxTree = CSharpSyntaxTree.ParseText(source);
+         foreach (var fileName in fileNames)
+         {
+            var resourceStream = typeof(Program).Assembly.GetManifestResourceStream(fileName);
+            if (resourceStream == null)
+               throw new InvalidOperationException($"File {fileName} not found");
+
+            using (var reader = new StreamReader(resourceStream))
+               yield return CSharpSyntaxTree.ParseText(reader.ReadToEnd());
+         }
+      }
+
+      private static (ImmutableArray<Diagnostic>, string) RunSourceGenerator(IEnumerable<SyntaxTree> syntaxTrees)
+      {
          FluentSetupsAssembly = typeof(FluentSetupAttribute).Assembly;
          var references = new List<MetadataReference>();
 
@@ -90,7 +99,7 @@ namespace FluentSetupTester
             }
          }
 
-         var compilation = CSharpCompilation.Create("foo", new[] { syntaxTree }, references,
+         var compilation = CSharpCompilation.Create("RootNamespace", syntaxTrees, references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
          WriteDiagnosticsBeforeSourceGeneration(compilation);

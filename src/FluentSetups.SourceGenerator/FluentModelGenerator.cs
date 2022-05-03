@@ -62,7 +62,7 @@ namespace FluentSetups.SourceGenerator
          foreach (var setupClass in classModel.SetupClasses)
          {
             sourceBuilder.AppendLine($"/// <summary>Creates a new setup for the {setupClass.ClassName} class</summary>");
-            sourceBuilder.Append($"{classModel.Modifier} {setupClass.ClassName} {ComputeEntryMethodName(setupClass.ClassName)}()");
+            sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {ComputeEntryMethodName(setupClass.ClassName)}()");
             sourceBuilder.AppendLine($" => new {setupClass.ClassName}();");
             sourceBuilder.AppendLine();
          }

@@ -33,7 +33,8 @@ public class EntryPointGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("MyUnitTests.Setup")
-         .WithMethod("Person");
+         .WithInternalModifier()
+         .WithStaticMethod("Person");
    }
 
    [TestMethod]
@@ -52,7 +53,8 @@ public class EntryPointGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("MyRoot.FSetup")
-         .WithMethod("Person");
+         .WithInternalModifier()
+         .WithStaticMethod("Person");
    }
    
    [TestMethod]
@@ -76,8 +78,8 @@ public class EntryPointGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("RonnyTheRobber.FSetup")
-         .WithMethod("Person")
-         .WithMethod("Ball");
+         .WithStaticMethod("Person")
+         .WithStaticMethod("Ball");
    }
 
    [TestMethod]
@@ -110,7 +112,7 @@ public class EntryPointGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("DefaultAssemblyNamespace.Setup")
-         .WithMethod("Person");
+         .WithStaticMethod("Person");
    }
 
    [TestMethod]
@@ -143,8 +145,8 @@ public class EntryPointGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("RootNamespace.Setup")
-         .WithMethod("First")
-         .WithMethod("Second");
+         .WithStaticMethod("First")
+         .WithStaticMethod("Second");
    }
 
    [TestMethod]
@@ -174,8 +176,33 @@ public class EntryPointGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("RootNamespace.Setup")
-         .WithMethod("First")
-         .WithMethod("Second");
+         .WithStaticMethod("First")
+         .WithStaticMethod("Second");
+   }
+
+
+   [TestMethod]
+   public void EnsureExistingEntryClassWithDifferentModifierAdjustGeneratedModifier()
+   {
+      string code = @"namespace MyUnitTests
+                      {  
+                         using FluentSetups;
+
+                         public partial class Setup { }
+
+                         [FluentSetup]
+                         public partial class PersonSetup { }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("MyUnitTests")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyUnitTests.Setup")
+         .WithPublicModifier()
+         .WithStaticMethod("Person");
    }
 
    #endregion
