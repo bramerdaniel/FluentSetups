@@ -33,12 +33,18 @@ jobs:
     - name: dir
       run: dir
 
+    - name: Set UUID
+      id: generate-uuid
+      uses: filipstefansson/uuid-action@v1
+      with:
+        name: ${{ gihub.sha }}
+
     - name: Cache file
       uses: actions/cache@v3
       with:
         path: .
-        key:  ${{ runner.os }}-FluentSetups-${{ hashFiles('**/*.txt') }}
-        restore-keys: ${{ runner.os }}-FluentSetup
+        key:  ${{ steps.generate-uuid.outputs.uuid }}
+
 
 
 # Now comes another machine
@@ -55,8 +61,8 @@ jobs:
       uses: actions/cache@v3
       with:
         path: .
-        key:  ${{ runner.os }}-FluentSetups-${{ hashFiles('**/*.txt') }}
-        restore-keys: ${{ runner.os }}-FluentSetup
+        key:  ${{ jobs.create-file.steps.generate-uuid.outputs.uuid }}
+
 
     - name: open file
       run: dir
