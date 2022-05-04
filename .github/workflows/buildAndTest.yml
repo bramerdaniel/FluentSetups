@@ -1,26 +1,22 @@
-name: Build and Test
+name: build workflow
 
 on:
   push:
-    branches-ignore: [ master ]
-    # paths-ignore:
-    #  - '**.yml'
   pull_request:
-    branches-ignore: [ master ]
   workflow_dispatch:
 
 env:
   SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
+  PUBLISH : github.ref == 'refs/heads/master'
   
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: check branch
-      if: github.ref != 'refs/heads/master'  
-      run: echo we are not on master
+    - name: should publish   
+      run: PUBLISH = ${{ env.PUBLISH }}
 
     - name: checkout branch
       uses: actions/checkout@v3
@@ -48,7 +44,7 @@ jobs:
       run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
 
     - name: upload artifacts
-      #if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master'
       uses: actions/upload-artifact@v3.0.0
       with:
         name: nugetPackage
