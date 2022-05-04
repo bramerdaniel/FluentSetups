@@ -15,9 +15,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: should publish   
-      run: echo ON_MASTER_BRANCH = ${{ env.ON_MASTER_BRANCH }}
-
     - name: checkout branch
       uses: actions/checkout@v3
 
@@ -65,6 +62,12 @@ jobs:
     - name: show packages
       run: dir packages
       
+    - name: setup NuGet.exe
+      uses: NuGet/setup-nuget@v1.0.6
+      with:
+        nuget-version: latest
+        #nuget-api-key: ${{secrets.NUGET_API_KEY}} 
+      
     - name: push to nuget.org
-      run: nuget push packages\*.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }} -SkipDuplicate
+      run: nuget push packages\*.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}} -SkipDuplicate
   
