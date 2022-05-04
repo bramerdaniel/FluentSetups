@@ -3,8 +3,8 @@ name: Build and Test
 on:
   push:
     branches-ignore: [ master ]
-    paths-ignore:
-      - '**.yml'
+    # paths-ignore:
+    #  - '**.yml'
   pull_request:
     branches-ignore: [ master ]
   workflow_dispatch:
@@ -44,17 +44,11 @@ jobs:
 
     - name: dir src\Release
       run: dir src\Release
-
-    - name: cache packages
-      uses: actions/cache@v2
-      with:
-        path: src\Release\*.nupkg
-        key: ${{ runner.os }}-fluentSetupPackage
   
-  publish:
-    needs: build
-    runs-on: windows-latest
-    steps:
-    - name: dir src\Release
-      run: dir src\Releasee
+  #publish:
+  #  needs: build
+  #  runs-on: windows-latest
+  #  steps:
+  #  - name: dir src\Release
+  #    run: dir src\Releasee
   
