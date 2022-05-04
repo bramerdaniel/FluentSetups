@@ -18,6 +18,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: check branch
+      if: github.ref != 'refs/heads/master'  
+      run: echo we are not on master
+
     - name: checkout branch
       uses: actions/checkout@v3
 
@@ -45,6 +49,14 @@ jobs:
     - name: dir src\Release
       run: dir src\Release
   
+    - name: upload nuget package to build artifact
+      if: github.ref == 'refs/heads/master'
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: nugetPackage
+        path: src\Release\*.nupkg
+        retention-days: 1
+
   #publish:
   #  needs: build
   #  runs-on: windows-latest
