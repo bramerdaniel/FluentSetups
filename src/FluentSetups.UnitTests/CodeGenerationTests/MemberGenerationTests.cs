@@ -56,8 +56,8 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
 
          result.Should().NotHaveErrors().And
             .HaveClass("RonnyTheRobber.PersonSetup")
-            .WithMethod("GetNameOrDefault")
-            .WithMethod("GetNameOrThrow");
+            .WithProtectedMethod("GetNameOrDefault")
+            .WithProtectedMethod("GetNameOrThrow");
       }
 
       [TestMethod]
@@ -170,8 +170,8 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
 
          result.Should().NotHaveErrors().And
             .HaveClass("DonnyTheDagger.PersonSetup")
-            .WithMethod("GetAgeOrDefault")
-            .WithMethod("GetAgeOrThrow");
+            .WithProtectedMethod("GetAgeOrDefault")
+            .WithProtectedMethod("GetAgeOrThrow");
       }      
      
       [TestMethod]

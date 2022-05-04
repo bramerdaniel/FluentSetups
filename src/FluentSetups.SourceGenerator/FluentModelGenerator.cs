@@ -124,11 +124,11 @@ namespace FluentSetups.SourceGenerator
          sourceBuilder.AppendLine();
 
          sourceBuilder.AppendLine($"private bool {memberModel.MemberSetFieldName};");
-         sourceBuilder.AppendLine($"{classModel.Modifier} {memberModel.TypeName} Get{memberModel.UpperMemberName}OrThrow()");
+         sourceBuilder.AppendLine($"protected {memberModel.TypeName} Get{memberModel.UpperMemberName}OrThrow()");
          sourceBuilder.AppendLine($"=> {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : throw new InvalidOperationException(\"The member {memberModel.MemberName} was not set.\");");
 
          sourceBuilder.AppendLine();
-         sourceBuilder.AppendLine($"{classModel.Modifier} {memberModel.TypeName} Get{memberModel.UpperMemberName}OrDefault(Func<{memberModel.TypeName}> defaultValue)");
+         sourceBuilder.AppendLine($"protected {memberModel.TypeName} Get{memberModel.UpperMemberName}OrDefault(Func<{memberModel.TypeName}> defaultValue)");
          sourceBuilder.AppendLine($" => {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : defaultValue();");
       }
    }
