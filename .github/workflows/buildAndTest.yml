@@ -54,15 +54,17 @@ jobs:
   publish:
     needs: build
     runs-on: windows-latest
-    #if: github.ref == 'refs/heads/master'
+    if: ${{ env.ON_MASTER_BRANCH }}
     steps:
-    - name: download nuget
-      #if: github.ref == 'refs/heads/master'
+    - name: download artifacts
       uses: actions/download-artifact@v3.0.0
       with:
         name: nugetPackage
-        path: downloads
+        path: packages
         
-    - name: show download
-      run: dir downloads
+    - name: show packages
+      run: dir packages
+      
+    - name: push to nuget.org
+      run: nuget push packages\*.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_API_KEY }} -SkipDuplicate
   
