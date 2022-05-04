@@ -30,12 +30,12 @@ jobs:
       with:
         nuget-version: latest
         nuget-api-key: ${{secrets.NUGET_API_KEY}}
-
-    - name: setup MSBuild
-      uses: microsoft/setup-msbuild@v1.1
-
+    
     - name: restore NuGet packages
       run: nuget restore ${{ env.SOLUTION_PATH }}
+    
+    - name: setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
 
     - name: build solution
       run: msbuild ${{ env.SOLUTION_PATH }} -property:Configuration=Release
@@ -43,14 +43,12 @@ jobs:
     - name: setup VSTest.console.exe
       uses: darenm/Setup-VSTest@v1
       
+      #TODO create matrix for all platforms
     - name: run unit tests
       run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
 
-    - name: dir src\Release
-      run: dir src\Release
-  
-    - name: upload nuget package to build artifact
-      if: github.ref == 'refs/heads/master'
+    - name: upload artifacts
+      #if: github.ref == 'refs/heads/master'
       uses: actions/upload-artifact@v3.0.0
       with:
         name: nugetPackage
@@ -60,8 +58,15 @@ jobs:
   publish:
     needs: build
     runs-on: windows-latest
-    if: github.ref == 'refs/heads/master'
+    #if: github.ref == 'refs/heads/master'
     steps:
-    - name: UPLOAD
-      run: echo now i would upload
+    - name: download nuget
+      if: github.ref == 'refs/heads/master'
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: nugetPackage
+        path: downloads
+        
+    - name: show download
+      run: dir downloads
   
