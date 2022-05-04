@@ -61,7 +61,7 @@ jobs:
     #if: github.ref == 'refs/heads/master'
     steps:
     - name: download nuget
-      if: github.ref == 'refs/heads/master'
+      #if: github.ref == 'refs/heads/master'
       uses: actions/download-artifact@v3.0.0
       with:
         name: nugetPackage
