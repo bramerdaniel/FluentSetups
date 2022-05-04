@@ -8,7 +8,7 @@ on:
 env:
   SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
-  PUBLISH : ${{ github.ref }} == 'refs/heads/master'
+  PUBLISH : ${{ github.ref == 'refs/heads/master' }} 
   
 jobs:
   build:
