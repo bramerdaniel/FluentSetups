@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: should publish   
-      run: PUBLISH = ${{ env.PUBLISH }}
+      run: echo PUBLISH = ${{ env.PUBLISH }}
 
     - name: checkout branch
       uses: actions/checkout@v3
