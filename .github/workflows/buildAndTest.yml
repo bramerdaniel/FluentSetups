@@ -8,7 +8,6 @@ on:
 env:
   SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
-  ON_MASTER_BRANCH : ${{ github.ref == 'refs/heads/master' }} 
   
 jobs:
   build:
@@ -41,7 +40,7 @@ jobs:
       run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
 
     - name: upload artifacts
-      if: ${{ env.ON_MASTER_BRANCH }}
+      if: ${{ github.ref == 'refs/heads/master' }}
       uses: actions/upload-artifact@v3.0.0
       with:
         name: nugetPackage
