@@ -57,10 +57,11 @@ jobs:
         path: src\Release\*.nupkg
         retention-days: 1
 
-  #publish:
-  #  needs: build
-  #  runs-on: windows-latest
-  #  steps:
-  #  - name: dir src\Release
-  #    run: dir src\Releasee
+  publish:
+    needs: build
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - name: UPLOAD
+      run: echo now i would upload
   
