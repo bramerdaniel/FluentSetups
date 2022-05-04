@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: should publish   
-      run: echo PUBLISH = ${{ env.PUBLISH }}
+      run: echo ON_MASTER_BRANCH = ${{ env.ON_MASTER_BRANCH }}
 
     - name: checkout branch
       uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
       run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
 
     - name: upload artifacts
-      if: github.ref == 'refs/heads/master'
+      if: ${{ env.ON_MASTER_BRANCH }}
       uses: actions/upload-artifact@v3.0.0
       with:
         name: nugetPackage
