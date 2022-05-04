@@ -54,7 +54,7 @@ jobs:
   publish:
     needs: build
     runs-on: windows-latest
-    if: ${{ env.ON_MASTER_BRANCH }}
+    if: ${{ github.ref == 'refs/heads/master' }}
     steps:
     - name: download artifacts
       uses: actions/download-artifact@v3.0.0
