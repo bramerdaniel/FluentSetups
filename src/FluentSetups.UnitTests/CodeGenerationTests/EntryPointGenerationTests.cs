@@ -116,40 +116,6 @@ public class EntryPointGenerationTests
    }
 
    [TestMethod]
-   [Ignore]
-   public void EnsureSetupTypesFromDifferentNamespacesWorkCorrectlyOld()
-   {
-      string target = @"namespace FirstNamespace
-                      {
-                         [FluentSetups.FluentSetup]
-                         public partial class FirstSetup : FluentSetups.IFluentSetup<string>
-                         {
-                            internal partial string CreateInstance() => """";
-                         }
-                      }";
-
-      string code = @"namespace SecondNamespace
-                      {
-                         [FluentSetups.FluentSetup]
-                         public partial class SecondSetup : FluentSetups.IFluentSetup<string>
-                         {
-                            internal partial string CreateInstance() => """";
-                         }
-                      }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("RootNamespace")
-         .WithSource(target)
-         .WithSource(code)
-         .Done();
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("RootNamespace.Setup")
-         .WithStaticMethod("First")
-         .WithStaticMethod("Second");
-   }
-
-   [TestMethod]
    public void EnsureSetupTypesFromDifferentNamespacesWorkCorrectly()
    {
       string target = @"namespace FirstNamespace

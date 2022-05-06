@@ -57,7 +57,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string TargetTypeNamespace { get; set; }
 
-      public TargetMode TargetMode { get; set; }
+      public TargetGenerationMode TargetMode { get; set; }
 
       internal static string ComputeModifier(ITypeSymbol typeSymbol)
       {
@@ -128,9 +128,7 @@ namespace FluentSetups.SourceGenerator.Models
             return;
 
          if (classInfo.TargetMode.Value is int enumValue)
-         {
-            TargetMode = (TargetMode)enumValue;
-         }
+            TargetMode = (TargetGenerationMode)enumValue;
 
          if (classInfo.TargetType.Value is INamedTypeSymbol typeSymbol)
          {

@@ -6,6 +6,7 @@
 
 namespace FluentSetups.UnitTests.SetupModelTests;
 
+using FluentSetups.SourceGenerator.Models;
 using FluentSetups.UnitTests.Setups;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -36,7 +37,7 @@ public class TargetModeTests
          .FromSource(code)
          .Done();
 
-      result.Should().HaveTargetMode(TargetMode.Disabled);
+      result.Should().HaveTargetMode(TargetGenerationMode.Disabled);
    }
 
    #endregion

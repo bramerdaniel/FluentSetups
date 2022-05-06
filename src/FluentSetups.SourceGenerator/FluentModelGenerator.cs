@@ -130,7 +130,7 @@ namespace FluentSetups.SourceGenerator
 
       private static bool TargetCreationPossible(SetupClassModel classModel)
       {
-         if (classModel.TargetMode == TargetMode.Disabled)
+         if (classModel.TargetMode == TargetGenerationMode.Disabled)
             return false;
 
          return !string.IsNullOrWhiteSpace(classModel.TargetTypeName);

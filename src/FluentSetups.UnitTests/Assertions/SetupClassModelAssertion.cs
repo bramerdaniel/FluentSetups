@@ -58,7 +58,7 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<SetupClassMode
       return new AndConstraint<SetupClassModelAssertion>(this);
    }
 
-   public AndConstraint<SetupClassModelAssertion> HaveTargetMode(TargetMode expectedMode)
+   public AndConstraint<SetupClassModelAssertion> HaveTargetMode(TargetGenerationMode expectedMode)
    {
       Assert.AreEqual(expectedMode, Subject.TargetMode);
       return new AndConstraint<SetupClassModelAssertion>(this);
