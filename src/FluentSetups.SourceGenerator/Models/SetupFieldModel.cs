@@ -10,15 +10,6 @@ namespace FluentSetups.SourceGenerator.Models
 
    internal class SetupFieldModel : SetupMemberModel
    {
-      #region Constructors and Destructors
-
-      public SetupFieldModel(SetupClassModel owningClass)
-         : base(owningClass)
-      {
-      }
-
-      #endregion
-
       #region Public Properties
       
 
@@ -26,9 +17,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
-      public static SetupFieldModel Create(SetupClassModel owningClass, IFieldSymbol fieldSymbol, AttributeData attribute)
+      public static SetupFieldModel Create(IFieldSymbol fieldSymbol, AttributeData attribute)
       {
-         return new SetupFieldModel(owningClass)
+         return new SetupFieldModel
          {
             MemberName = fieldSymbol.Name, 
             TypeName = fieldSymbol.Type.ToString(),

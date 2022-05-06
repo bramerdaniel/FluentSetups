@@ -10,24 +10,15 @@ namespace FluentSetups.SourceGenerator.Models
 
    internal class SetupPropertyModel : SetupMemberModel
    {
-      #region Constructors and Destructors
-
-      public SetupPropertyModel(SetupClassModel owningClass)
-         : base(owningClass)
-      {
-      }
-
-      #endregion
-
       #region Public Properties
       
       #endregion
 
       #region Public Methods and Operators
 
-      public static SetupPropertyModel Create(SetupClassModel owningClass, IPropertySymbol propertySymbol, AttributeData attribute)
+      public static SetupPropertyModel Create(IPropertySymbol propertySymbol, AttributeData attribute)
       {
-         return new SetupPropertyModel(owningClass)
+         return new SetupPropertyModel
          {
             MemberName = propertySymbol.Name, 
             TypeName = propertySymbol.Type.ToString(),

@@ -171,5 +171,26 @@ public class EntryPointGenerationTests
          .WithStaticMethod("Person");
    }
 
+
+   [TestMethod]
+   public void EnsureSetupInRootNamespaceIsGeneratedCorrectly()
+   {
+      string code = @"
+                      public class Person{ }
+                      
+                      [FluentSetups.FluentSetup(typeof(Person))]
+                      internal partial class PersonSetup { }
+                      ";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("MyRoot")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyRoot.Setup")
+         .WithInternalModifier()
+         .WithStaticMethod("Person");
+   }
    #endregion
 }

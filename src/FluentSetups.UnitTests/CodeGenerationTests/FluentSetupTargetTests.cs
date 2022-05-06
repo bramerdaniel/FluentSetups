@@ -121,7 +121,59 @@ public class FluentSetupTargetTests
       result.Should().NotHaveErrors().And
          .HaveClass("MyTests.PersonSetup")
          .WithoutMethod("Done");
-   } 
+   }   
+   
+   [TestMethod]
+   public void EnsurePublicTargetPropertiesAreGeneratedCorrectly()
+   {
+      var code = @"namespace Root
+{
+                   using FluentSetups;
+
+                   public class Person
+                   {
+                       public string Name { get; set; }
+                   }
+
+                   [FluentSetup(typeof(Person))]
+                   public partial class PersonSetup
+                   {
+                   }
+}";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("Root.PersonSetup")
+         .WithMethod("WithName");
+   }
+
+   [TestMethod]
+   public void EnsurePrivateTargetPropertiesAreNotGeneratedCorrectly()
+   {
+      var code = @"using FluentSetups;
+
+                   public class Person
+                   {
+                       private string Name { get; set; }
+                   }
+
+                   [FluentSetup(typeof(Person))]
+                   public partial class PersonSetup
+                   {
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("Root")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("PersonSetup")
+         .WithoutMethod("WithName");
+   }
 
    #endregion
 }

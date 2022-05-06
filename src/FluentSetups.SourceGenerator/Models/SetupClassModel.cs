@@ -23,15 +23,23 @@ namespace FluentSetups.SourceGenerator.Models
 
       public FluentGeneratorContext Context { get; private set; }
 
-      public string EntryClassName { get; set; }
+      public string EntryClassName { get; private set; }
 
-      public string EntryClassNamespace { get; set; }
+      public string EntryClassNamespace { get; private set; }
 
       public IReadOnlyList<SetupFieldModel> Fields { get; set; }
 
       public string Modifier { get; set; } = "internal";
 
       public IReadOnlyList<SetupPropertyModel> Properties { get; set; }
+
+      public SetupTargetModel Target { get; private set; }
+
+      public TargetGenerationMode TargetMode { get; set; }
+
+      public string TargetTypeName { get; set; }
+
+      public string TargetTypeNamespace { get; set; }
 
       #endregion
 
@@ -48,16 +56,14 @@ namespace FluentSetups.SourceGenerator.Models
             EntryClassName = classInfo.GetSetupEntryClassName(),
             Modifier = ComputeModifier(classInfo.ClassSymbol),
          };
-         
+
          classModel.FillMembers(classInfo);
          return classModel;
       }
 
-      public string TargetTypeName { get; set; }
+      #endregion
 
-      public string TargetTypeNamespace { get; set; }
-
-      public TargetGenerationMode TargetMode { get; set; }
+      #region Methods
 
       internal static string ComputeModifier(ITypeSymbol typeSymbol)
       {
@@ -83,10 +89,6 @@ namespace FluentSetups.SourceGenerator.Models
 
          return "internal";
       }
-
-      #endregion
-
-      #region Methods
 
       private static string ComputeNamespace(SetupClassInfo classInfo)
       {
@@ -133,7 +135,8 @@ namespace FluentSetups.SourceGenerator.Models
          if (classInfo.TargetType.Value is INamedTypeSymbol typeSymbol)
          {
             TargetTypeName = typeSymbol.Name;
-            TargetTypeNamespace = typeSymbol.ContainingNamespace.ToString();
+            TargetTypeNamespace = typeSymbol.ContainingNamespace.IsGlobalNamespace ? null : typeSymbol.ContainingNamespace.ToString();
+            Target = SetupTargetModel.Create(this, typeSymbol);
          }
       }
 
@@ -143,7 +146,7 @@ namespace FluentSetups.SourceGenerator.Models
          {
             if (Context.FluentPropertyAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default))
             {
-               fieldModel = SetupFieldModel.Create(this, fieldSymbol, attribute);
+               fieldModel = SetupFieldModel.Create(fieldSymbol, attribute);
                return true;
             }
          }
@@ -158,7 +161,7 @@ namespace FluentSetups.SourceGenerator.Models
          {
             if (Context.FluentPropertyAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default))
             {
-               propertyModel = SetupPropertyModel.Create(this, propertySymbol, attribute);
+               propertyModel = SetupPropertyModel.Create(propertySymbol, attribute);
                return true;
             }
          }

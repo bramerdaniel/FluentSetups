@@ -52,7 +52,7 @@ namespace FluentSetups.SourceGenerator
       {
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
 
-         var enumerable = classModel.SetupClasses.Select(x => x.ContainingNamespace);
+         var enumerable = classModel.SetupClasses.Where(x => !string.IsNullOrWhiteSpace(x.ContainingNamespace)).Select(x => x.ContainingNamespace);
          foreach (var requiredNamespace in enumerable)
             sourceBuilder.AppendLine($"using {requiredNamespace};");
       }
@@ -89,8 +89,12 @@ namespace FluentSetups.SourceGenerator
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
          var sourceBuilder = new StringBuilder();
-         sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
-         sourceBuilder.AppendLine("{");
+         if (!string.IsNullOrWhiteSpace(classModel.ContainingNamespace))
+         {
+            sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
+            sourceBuilder.AppendLine("{");
+         }
+
          GenerateRequiredNamespaces(classModel, sourceBuilder);
 
          sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
@@ -100,7 +104,8 @@ namespace FluentSetups.SourceGenerator
          GenerateSetupMembers(classModel, sourceBuilder);
          sourceBuilder.AppendLine("}");
 
-         sourceBuilder.AppendLine("}");
+         if (!string.IsNullOrWhiteSpace(classModel.ContainingNamespace))
+            sourceBuilder.AppendLine("}");
          var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
          source.Code = syntaxTree.ToString();
          return source;
@@ -109,10 +114,14 @@ namespace FluentSetups.SourceGenerator
       private void GenerateSetupMembers(SetupClassModel classModel, StringBuilder sourceBuilder)
       {
          foreach (var member in classModel.Fields)
-            GenerateMemberSetup(classModel, sourceBuilder, member);
+            GenerateMemberSetup(classModel, sourceBuilder, member, false);
 
          foreach (var member in classModel.Properties)
-            GenerateMemberSetup(classModel, sourceBuilder, member);
+            GenerateMemberSetup(classModel, sourceBuilder, member, false);
+
+         if (classModel.Target != null)
+            foreach (var member in classModel.Target.Members)
+               GenerateMemberSetup(classModel, sourceBuilder, member, true);
 
          GenerateTargetCreation(classModel, sourceBuilder);
       }
@@ -124,7 +133,8 @@ namespace FluentSetups.SourceGenerator
 
          sourceBuilder.AppendLine($"public {classModel.TargetTypeName} Done()");
          sourceBuilder.AppendLine("{");
-         sourceBuilder.AppendLine($"   return new {classModel.TargetTypeName}();");
+         sourceBuilder.AppendLine($"   var target = new {classModel.TargetTypeName}();");
+         sourceBuilder.AppendLine($"   return target;");
          sourceBuilder.AppendLine("}");
       }
 
@@ -136,8 +146,11 @@ namespace FluentSetups.SourceGenerator
          return !string.IsNullOrWhiteSpace(classModel.TargetTypeName);
       }
 
-      private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel)
+      private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel, bool createMember)
       {
+         if (createMember)
+            sourceBuilder.AppendLine($"private {memberModel.TypeName} {memberModel.MemberName};");
+
          sourceBuilder.AppendLine($"{classModel.Modifier} {classModel.ClassName} {memberModel.SetupMethodName}({memberModel.TypeName} value)");
          sourceBuilder.AppendLine("{");
 
