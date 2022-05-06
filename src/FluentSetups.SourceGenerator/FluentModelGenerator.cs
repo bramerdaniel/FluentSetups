@@ -60,8 +60,10 @@ namespace FluentSetups.SourceGenerator
       {
          sourceBuilder.AppendLine("using System;");
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
-         if (!string.IsNullOrWhiteSpace(classModel.TargetTypeNamespace))
+         if (TargetCreationPossible(classModel) && !string.IsNullOrWhiteSpace(classModel.TargetTypeNamespace))
+         {
             sourceBuilder.AppendLine($"using {classModel.TargetTypeNamespace};");
+         }
       }
 
       private void GenerateEntryPoints(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
@@ -89,7 +91,6 @@ namespace FluentSetups.SourceGenerator
          var sourceBuilder = new StringBuilder();
          sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
          sourceBuilder.AppendLine("{");
-
          GenerateRequiredNamespaces(classModel, sourceBuilder);
 
          sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
@@ -118,13 +119,21 @@ namespace FluentSetups.SourceGenerator
 
       private void GenerateTargetCreation(SetupClassModel classModel, StringBuilder sourceBuilder)
       {
-         if (classModel.TargetMode == TargetMode.Disabled || string.IsNullOrWhiteSpace(classModel.TargetTypeName))
+         if (!TargetCreationPossible(classModel))
             return;
 
          sourceBuilder.AppendLine($"public {classModel.TargetTypeName} Done()");
          sourceBuilder.AppendLine("{");
          sourceBuilder.AppendLine($"   return new {classModel.TargetTypeName}();");
          sourceBuilder.AppendLine("}");
+      }
+
+      private static bool TargetCreationPossible(SetupClassModel classModel)
+      {
+         if (classModel.TargetMode == TargetMode.Disabled)
+            return false;
+
+         return !string.IsNullOrWhiteSpace(classModel.TargetTypeName);
       }
 
       private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel)

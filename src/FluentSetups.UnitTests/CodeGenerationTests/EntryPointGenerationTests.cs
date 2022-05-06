@@ -98,7 +98,7 @@ public class EntryPointGenerationTests
                          using SomeOther.ModelNameSpace;
 
                          [FluentSetup]
-                         public partial class PersonSetup : IFluentSetup<Person>
+                         public partial class PersonSetup
                          {
                             public Person Done() => new Person();
                          }

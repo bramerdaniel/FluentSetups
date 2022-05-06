@@ -1,7 +1,7 @@
-﻿namespace FluentSetups
-{
-   public interface IFluentSetup<out T>
-   {
-      T Done();
-   }
-}
+﻿//namespace FluentSetups
+//{
+//   //public interface IFluentSetup<out T>
+//   //{
+//   //   T Done();
+//   //}
+//}
