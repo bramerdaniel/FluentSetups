@@ -6,6 +6,8 @@
 
 namespace FluentSetups.UnitTests.SetupClassInfoTests
 {
+   using System;
+
    using FluentAssertions;
 
    using FluentSetups.UnitTests.Setups;
@@ -19,38 +21,34 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
       public void EnsureSetupEntryNameSpaceIsNullWhenFluentSetupsNamespaceIsMissing()
       {
          string code = @"[FluentSetup]
-                         public partial class PersonSetup : ISetup<Person>
+                         public partial class PersonSetup
                          {
                             [FluentProperty]
                             public string Name { get; set; }
 
                          }";
 
-         var setupClassInfo = Setup.SetupClassInfo()
-            .WithName("PersonSetup")
+         Setup.SetupClassInfo()
             .WithSource(code)
-            .Done();
-
-         setupClassInfo.GetSetupEntryNameSpace().Should().BeNull();
+            .Invoking(x => x.Done())
+            .Should().Throw<ArgumentException>();
       }
 
       [TestMethod]
       public void EnsureSetupEntryNameSpaceIsNullWhenWrongNamespaceIsUsed()
       {
          string code = @"[AnyOtherName.FluentSetup]
-                      public partial class PersonSetup : ISetup<Person>
-                      {
-                         [FluentProperty]
-                         public string Name { get; set; }
+                         public partial class PersonSetup
+                         {
+                            [FluentProperty]
+                            public string Name { get; set; }
 
-                      }";
+                         }";
 
-         var setupClassInfo = Setup.SetupClassInfo()
-            .WithName("PersonSetup")
+         Setup.SetupClassInfo()
             .WithSource(code)
-            .Done();
-
-         setupClassInfo.GetSetupEntryNameSpace().Should().BeNull();
+            .Invoking(x => x.Done())
+            .Should().Throw<ArgumentException>();
       }
 
       [TestMethod]
@@ -67,7 +65,6 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
                       }";
 
          var setupClassInfo = Setup.SetupClassInfo()
-            .WithName("PersonSetup")
             .WithRootNamespace("MyRootNamespace")
             .WithSource(code)
             .Done();
@@ -93,7 +90,6 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
 
          var setupClassInfo = Setup.SetupClassInfo()
             .WithRootNamespace("My.Name.Space")
-            .WithName("PersonSetup")
             .WithSource(code)
             .Done();
 

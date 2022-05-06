@@ -6,6 +6,8 @@
 
 namespace FluentSetups.UnitTests.SetupClassInfoTests;
 
+using System;
+
 using FluentAssertions;
 
 using FluentSetups.UnitTests.Setups;
@@ -27,7 +29,6 @@ public class IsValidTests
                       }";
 
       var setupClassInfo = Setup.SetupClassInfo()
-         .WithName("PersonSetup")
          .WithSource(code)
          .Done();
 
@@ -45,12 +46,10 @@ public class IsValidTests
 
                       }";
 
-      var setupClassInfo = Setup.SetupClassInfo()
-         .WithName("CodeSetup")
+      Setup.SetupClassInfo()
          .WithSource(code)
-         .Done();
-
-      setupClassInfo.IsValidSetup().Should().BeFalse();
+         .Invoking(x => x.Done())
+         .Should().Throw<ArgumentException>();
    }
 
 }

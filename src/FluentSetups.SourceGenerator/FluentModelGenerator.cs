@@ -56,6 +56,13 @@ namespace FluentSetups.SourceGenerator
          foreach (var requiredNamespace in enumerable)
             sourceBuilder.AppendLine($"using {requiredNamespace};");
       }
+      private void GenerateRequiredNamespaces(SetupClassModel classModel, StringBuilder sourceBuilder)
+      {
+         sourceBuilder.AppendLine("using System;");
+         sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
+         if (!string.IsNullOrWhiteSpace(classModel.TargetTypeNamespace))
+            sourceBuilder.AppendLine($"using {classModel.TargetTypeNamespace};");
+      }
 
       private void GenerateEntryPoints(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
       {
@@ -82,8 +89,8 @@ namespace FluentSetups.SourceGenerator
          var sourceBuilder = new StringBuilder();
          sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
          sourceBuilder.AppendLine("{");
-         sourceBuilder.AppendLine("using System;");
-         sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
+
+         GenerateRequiredNamespaces(classModel, sourceBuilder);
 
          sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
          sourceBuilder.AppendLine("[CompilerGenerated]");
@@ -106,6 +113,18 @@ namespace FluentSetups.SourceGenerator
          foreach (var member in classModel.Properties)
             GenerateMemberSetup(classModel, sourceBuilder, member);
 
+         GenerateTargetCreation(classModel, sourceBuilder);
+      }
+
+      private void GenerateTargetCreation(SetupClassModel classModel, StringBuilder sourceBuilder)
+      {
+         if (string.IsNullOrWhiteSpace(classModel.TargetTypeName))
+            return;
+
+         sourceBuilder.AppendLine($"public {classModel.TargetTypeName} Done()");
+         sourceBuilder.AppendLine("{");
+         sourceBuilder.AppendLine($"   return new {classModel.TargetTypeName}();");
+         sourceBuilder.AppendLine("}");
       }
 
       private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel)

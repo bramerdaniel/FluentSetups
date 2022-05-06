@@ -46,13 +46,16 @@ namespace FluentSetups.SourceGenerator.Models
             ContainingNamespace = ComputeNamespace(classInfo),
             EntryClassNamespace = classInfo.GetSetupEntryNameSpace(),
             EntryClassName = classInfo.GetSetupEntryClassName(),
-            Modifier = ComputeModifier(classInfo.ClassSymbol)
+            Modifier = ComputeModifier(classInfo.ClassSymbol),
          };
-
+         
          classModel.FillMembers(classInfo);
-
          return classModel;
       }
+
+      public string TargetTypeName { get; set; }
+
+      public string TargetTypeNamespace { get; set; }
 
       internal static string ComputeModifier(ITypeSymbol typeSymbol)
       {
@@ -112,8 +115,24 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void FillMembers(SetupClassInfo classInfo)
       {
+         FillTargetTypeProperties(classInfo);
          Fields = ComputeFieldSetups(classInfo).ToArray();
          Properties = ComputePropertySetups(classInfo).ToArray();
+      }
+
+      private void FillTargetTypeProperties(SetupClassInfo classInfo)
+      {
+         if (classInfo.TargetType.IsNull)
+            return;
+
+         if(classInfo.TargetMode.Value is INamedTypeSymbol enumValue)
+            return;
+
+         if (classInfo.TargetType.Value is INamedTypeSymbol typeSymbol)
+         {
+            TargetTypeName = typeSymbol.Name;
+            TargetTypeNamespace = typeSymbol.ContainingNamespace.ToString();
+         }
       }
 
       private bool TryCreateField(IFieldSymbol fieldSymbol, out SetupFieldModel fieldModel)

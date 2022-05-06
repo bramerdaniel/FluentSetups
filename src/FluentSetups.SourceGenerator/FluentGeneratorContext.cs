@@ -6,7 +6,9 @@
 
 namespace FluentSetups.SourceGenerator
 {
+   using System;
    using System.Collections.Generic;
+   using System.Linq;
 
    using Microsoft.CodeAnalysis;
    using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -55,6 +57,14 @@ namespace FluentSetups.SourceGenerator
             if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
                yield return classInfo;
          }
+      }    
+      
+      public SetupClassInfo CreateFluentSetupInfo(ClassDeclarationSyntax setupCandidate)
+      {
+         if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
+            return classInfo;
+
+         throw new ArgumentException($"The specified {nameof(ClassDeclarationSyntax)} is not a fluent setup class", nameof(setupCandidate));
       }
 
       public bool TryGetMissingType(out string missingType)
@@ -112,10 +122,18 @@ namespace FluentSetups.SourceGenerator
 
       private bool TryGetSetupClass(ClassDeclarationSyntax candidate, out SetupClassInfo setupClassInfo)
       {
+         setupClassInfo = null;
          var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
-         setupClassInfo = new SetupClassInfo(this, candidate, semanticModel);
 
-         return setupClassInfo.IsValidSetup();
+         if (!(semanticModel.GetDeclaredSymbol(candidate) is ITypeSymbol classSymbol))
+            return false;
+
+         var fluentAttribute = classSymbol.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
+         if (fluentAttribute == null)
+            return false;
+
+         setupClassInfo = new SetupClassInfo(this, candidate, semanticModel, classSymbol, fluentAttribute);
+         return true;
       }
 
       #endregion

@@ -22,8 +22,8 @@ internal class SetupClassModelSetup : SetupBase
       var setupClass = FirstClassDeclarationSyntax();
       if (setupClass == null)
          throw new InvalidOperationException("The parsed syntax was not a class");
-
-      var classInfo = new SetupClassInfo(context, setupClass, compilation.GetSemanticModel(setupClass.SyntaxTree));
+      
+      var classInfo = context.CreateFluentSetupInfo(setupClass);
       return SetupClassModel.Create(context, classInfo);
    }
 

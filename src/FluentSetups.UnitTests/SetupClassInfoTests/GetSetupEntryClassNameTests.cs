@@ -6,6 +6,8 @@
 
 namespace FluentSetups.UnitTests.SetupClassInfoTests;
 
+using System;
+
 using FluentAssertions;
 
 using FluentSetups.UnitTests.Setups;
@@ -19,19 +21,17 @@ public class GetSetupEntryClassNameTests
    public void EnsureSetupEntryClassNameIsNullWhenFluentSetupsNamespaceIsMissing()
    {
       string code = @"[FluentSetup]
-                      public partial class PersonSetup : ISetup<Person>
+                      public partial class PersonSetup
                       {
                          [FluentProperty]
                          public string Name { get; set; }
 
                       }";
 
-      var setupClassInfo = Setup.SetupClassInfo()
-         .WithName("PersonSetup")
+      Setup.SetupClassInfo()
          .WithSource(code)
-         .Done();
-
-      setupClassInfo.GetSetupEntryClassName().Should().BeNull();
+         .Invoking(x => x.Done())
+         .Should().Throw<ArgumentException>();
    }
 
    [TestMethod]
@@ -45,12 +45,10 @@ public class GetSetupEntryClassNameTests
 
                       }";
 
-      var setupClassInfo = Setup.SetupClassInfo()
-         .WithName("PersonSetup")
+      Setup.SetupClassInfo()
          .WithSource(code)
-         .Done();
-
-      setupClassInfo.GetSetupEntryClassName().Should().BeNull();
+         .Invoking(x => x.Done())
+         .Should().Throw<ArgumentException>();
    }
 
    [TestMethod]
@@ -67,7 +65,6 @@ public class GetSetupEntryClassNameTests
                       }";
 
       var setupClassInfo = Setup.SetupClassInfo()
-         .WithName("PersonSetup")
          .WithSource(code)
          .Done();
 
@@ -89,7 +86,6 @@ public class GetSetupEntryClassNameTests
                         }";
 
       var setupClassInfo = Setup.SetupClassInfo()
-         .WithName("PersonSetup")
          .WithSource(code)
          .Done();
 
@@ -109,7 +105,6 @@ public class GetSetupEntryClassNameTests
                         }";
 
       var setupClassInfo = Setup.SetupClassInfo()
-         .WithName("PersonSetup")
          .WithSource(code)
          .Done();
 

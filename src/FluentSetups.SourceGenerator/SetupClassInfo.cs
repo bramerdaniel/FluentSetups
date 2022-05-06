@@ -7,6 +7,7 @@
 namespace FluentSetups.SourceGenerator
 {
    using System;
+   using System.Collections.Generic;
    using System.Linq;
 
    using Microsoft.CodeAnalysis;
@@ -17,20 +18,21 @@ namespace FluentSetups.SourceGenerator
    {
       #region Constants and Fields
 
-      private readonly FluentGeneratorContext fluentApi;
+      private FluentGeneratorContext Context { get; }
 
       #endregion
 
       #region Constructors and Destructors
 
-      public SetupClassInfo(FluentGeneratorContext fluentApi, ClassDeclarationSyntax candidate, SemanticModel semanticModel)
+      public SetupClassInfo(FluentGeneratorContext context, ClassDeclarationSyntax candidate, SemanticModel semanticModel, ITypeSymbol classSymbol, AttributeData fluentSetupAttribute)
       {
-         this.fluentApi = fluentApi;
-
+         Context = context;
          ClassSyntax = candidate ?? throw new ArgumentNullException(nameof(candidate));
          SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
-         ClassSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
-         FluentSetupAttribute = ClassSymbol?.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
+         ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
+         FluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
+         TargetType = GetTargetType();
+         TargetMode= GetTargetMode();
       }
 
       #endregion
@@ -47,7 +49,11 @@ namespace FluentSetups.SourceGenerator
       public AttributeData FluentSetupAttribute { get; }
 
       public SemanticModel SemanticModel { get; }
+      
+      public TypedConstant TargetType { get; }
 
+      public TypedConstant TargetMode{ get; }
+      
       #endregion
 
       #region Public Methods and Operators
@@ -67,33 +73,70 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
-      internal static void InitializeFromCompilation(Compilation compilation)
-      {
-      }
-
       internal string GetSetupEntryClassName()
       {
-         if (FluentSetupAttribute == null)
-            return null;
+         if (TryGetConstructorArgument(TypedConstantKind.Primitive, out var targetType))
+            return targetType.Value.ToString();
 
-         var firstArgument = FluentSetupAttribute.ConstructorArguments.FirstOrDefault();
-         if (firstArgument.IsNull)
-            return "Setup";
+         if (TryGetNamedArgument("EntryClassName", out targetType) && targetType.Kind == TypedConstantKind.Primitive)
+            return targetType.Value.ToString();
 
-         return firstArgument.Value?.ToString() ?? "Setup";
+         // TODO return default atttibute value
+         return "Setup";
       }
 
       internal string GetSetupEntryNameSpace()
       {
-         if (FluentSetupAttribute == null)
-            return null;
-
-         var firstArgument = FluentSetupAttribute.NamedArguments.FirstOrDefault(x => x.Key == "EntryNamespace");
-         if (firstArgument.Value.Value is string value)
-            return value;
+         if (TryGetNamedArgument("EntryNamespace", out var targetType) && targetType.Kind == TypedConstantKind.Primitive)
+            return targetType.Value?.ToString();
 
          // This should be the default namespace of the containing assembly
          return ClassSymbol.ContainingAssembly.MetadataName;
+      }
+
+      private TypedConstant GetTargetType()
+      {
+         if (TryGetConstructorArgument(TypedConstantKind.Type, out var targetType))
+            return targetType;
+         if (TryGetNamedArgument("TargetType", out targetType) && targetType.Kind == TypedConstantKind.Type)
+            return targetType;
+         return default;
+      }
+      private TypedConstant GetTargetMode()
+      {
+         if (TryGetNamedArgument("TargetMode", out var targetType) && targetType.Kind == TypedConstantKind.Enum)
+            return targetType;
+         return default;
+      }
+
+      private bool TryGetConstructorArgument(TypedConstantKind type, out TypedConstant targetType)
+      {
+         var attribute = FluentSetupAttribute;
+         if (attribute != null && attribute.ConstructorArguments.Length > 0)
+         {
+            targetType = attribute.ConstructorArguments.FirstOrDefault(x => x.Kind == type);
+            return !targetType.IsNull;
+         }
+
+         targetType = default;
+         return false;
+      }
+
+      private bool TryGetNamedArgument(string argumentName, out TypedConstant typedConstant)
+      {
+         var attribute = FluentSetupAttribute;
+         if (attribute != null && attribute.NamedArguments.Length > 0)
+         {
+            var match = attribute.NamedArguments.FirstOrDefault(x => x.Key == argumentName);
+            if (match.Key != null)
+            {
+               typedConstant = match.Value;
+               return true;
+            }
+         }
+
+         typedConstant = default;
+         return false;
       }
 
       private bool IsFluentSetupAttribute(AttributeData attributeData)
@@ -103,7 +146,7 @@ namespace FluentSetups.SourceGenerator
 
       private bool IsFluentSetupAttribute(INamedTypeSymbol attributeSymbol)
       {
-         return fluentApi.FluentSetupAttribute.Equals(attributeSymbol, SymbolEqualityComparer.Default);
+         return Context.FluentSetupAttribute.Equals(attributeSymbol, SymbolEqualityComparer.Default);
       }
 
       #endregion

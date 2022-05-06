@@ -161,6 +161,54 @@ namespace FluentSetups.UnitTests.SetupModelTests
             .WithSetupMethodName("WithName");
       }
 
+      [TestMethod]
+      public void EnsureTargetTypeNameIsCorrect()
+      {
+         string code = @"namespace RonnyTheRobber
+                      {
+                         [FluentSetups.FluentSetup(typeof(Person))]
+                         public partial class PersonSetup
+                         {
+                            [FluentSetups.FluentMember]
+                            public string Name { get; set; }
+                         }
+
+                         public class Person
+                         {
+                         }
+                      }";
+
+         var result = Setup.SetupClassModel()
+            .FromSource(code)
+            .Done();
+
+         result.Should().HaveTargetTypeName("Person");
+      }
+
+      [TestMethod]
+      public void EnsureTargetTypeNamespaceIsCorrect()
+      {
+         string code = @"namespace RonnyTheRobber
+                      {
+                         [FluentSetups.FluentSetup(typeof(Person))]
+                         public partial class PersonSetup
+                         {
+                            [FluentSetups.FluentMember]
+                            public string Name { get; set; }
+                         }
+
+                         public class Person
+                         {
+                         }
+                      }";
+
+         var result = Setup.SetupClassModel()
+            .FromSource(code)
+            .Done();
+
+         result.Should().HaveTargetTypeNamespace("RonnyTheRobber");
+      }
+
       #endregion
    }
 }

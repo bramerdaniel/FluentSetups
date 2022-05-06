@@ -10,14 +10,6 @@ using FluentSetups.SourceGenerator;
 
 internal class SetupClassInfoSetup : SetupBase
 {
-
-
-   #region Public Properties
-
-   public string ClassName { get; private set; }
-
-   #endregion
-
    #region Public Methods and Operators
 
    public SetupClassInfoSetup WithRootNamespace(string value)
@@ -31,7 +23,7 @@ internal class SetupClassInfoSetup : SetupBase
       AddSource(code);
       return this;
    }
-
+   
    public SetupClassInfo Done()
    {
       var compilation = CreateCompilation();
@@ -39,15 +31,8 @@ internal class SetupClassInfoSetup : SetupBase
       var syntaxWalker = new SyntaxHelper();
       syntaxWalker.Visit(SyntaxTrees[0].GetRoot());
       
-      var api = FluentGeneratorContext.FromCompilation(compilation);
-      var semanticModel = compilation.GetSemanticModel(SyntaxTrees[0]);
-      return new SetupClassInfo(api, FirstClassDeclarationSyntax(), semanticModel);
-   }
-
-   public SetupClassInfoSetup WithName(string className)
-   {
-      ClassName = className;
-      return this;
+      var context = FluentGeneratorContext.FromCompilation(compilation);
+      return context.CreateFluentSetupInfo(FirstClassDeclarationSyntax());
    }
 
    #endregion
