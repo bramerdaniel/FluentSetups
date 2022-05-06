@@ -118,7 +118,7 @@ namespace FluentSetups.SourceGenerator
 
       private void GenerateTargetCreation(SetupClassModel classModel, StringBuilder sourceBuilder)
       {
-         if (string.IsNullOrWhiteSpace(classModel.TargetTypeName))
+         if (classModel.TargetMode == TargetMode.Disabled || string.IsNullOrWhiteSpace(classModel.TargetTypeName))
             return;
 
          sourceBuilder.AppendLine($"public {classModel.TargetTypeName} Done()");

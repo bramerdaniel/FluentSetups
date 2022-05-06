@@ -58,6 +58,12 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<SetupClassMode
       return new AndConstraint<SetupClassModelAssertion>(this);
    }
 
+   public AndConstraint<SetupClassModelAssertion> HaveTargetMode(TargetMode expectedMode)
+   {
+      Assert.AreEqual(expectedMode, Subject.TargetMode);
+      return new AndConstraint<SetupClassModelAssertion>(this);
+   }
+
    public SetupMemberModelAssertion HaveProperty(string expectedPropertyName)
    {
       var property = Subject.Properties.FirstOrDefault(p => p.MemberName == expectedPropertyName);
