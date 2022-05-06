@@ -48,6 +48,15 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
       return this;
    }
 
+   public ClassAssertion WithInternalMethod(string methodName)
+   {
+      var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
+      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found");
+
+      methodSymbol.DeclaredAccessibility.Should().Be(Accessibility.Internal);
+      return this;
+   }
+
    public ClassAssertion WithStaticMethod(string methodName)
    {
       var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();

@@ -6,6 +6,7 @@
 
 namespace FluentSetups.SourceGenerator
 {
+   using System;
    using System.Collections.Generic;
    using System.Linq;
    using System.Text;
@@ -149,7 +150,15 @@ namespace FluentSetups.SourceGenerator
       private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel, bool createMember)
       {
          if (createMember)
+         {
+            if (classModel.Properties.Any(f => f.MemberName == memberModel.MemberName))
+               return;
+
+            if (classModel.Fields.Any(f => f.MemberName.Equals(memberModel.MemberName, StringComparison.InvariantCultureIgnoreCase)))
+               return;
+
             sourceBuilder.AppendLine($"private {memberModel.TypeName} {memberModel.MemberName};");
+         }
 
          sourceBuilder.AppendLine($"{classModel.Modifier} {classModel.ClassName} {memberModel.SetupMethodName}({memberModel.TypeName} value)");
          sourceBuilder.AppendLine("{");

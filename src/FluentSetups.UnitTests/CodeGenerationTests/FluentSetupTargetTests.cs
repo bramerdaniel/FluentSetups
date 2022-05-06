@@ -175,5 +175,108 @@ public class FluentSetupTargetTests
          .WithoutMethod("WithName");
    }
 
+   [TestMethod]
+   public void EnsureTargetPropertiesWithPrivateSetterAreNotGeneratedCorrectly()
+   {
+      var code = @"using FluentSetups;
+
+                   public class Person
+                   {
+                       public string Name { get; private set; }
+                   }
+
+                   [FluentSetup(typeof(Person))]
+                   public partial class PersonSetup
+                   {
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("Root")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("PersonSetup")
+         .WithoutMethod("WithName");
+   }
+
+   [TestMethod]
+   public void EnsureTargetPropertiesWithoutSetterAreNotGeneratedCorrectly()
+   {
+      var code = @"using FluentSetups;
+
+                   public class Person
+                   {
+                       public string Name => ""Robert"";
+                   }
+
+                   [FluentSetup(typeof(Person))]
+                   public partial class PersonSetup
+                   {
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("Root")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("PersonSetup")
+         .WithoutMethod("WithName");
+   }
+   
+   [TestMethod]
+   public void EnsureNoTargetPropertiesIsGeneratedWhenAlsoDefined()
+   {
+      var code = @"using FluentSetups;
+
+                   public class Person
+                   {
+                       public string Name { get; set; }
+                   }
+
+                   [FluentSetup(typeof(Person))]
+                   internal partial class PersonSetup
+                   {
+                       [FluentMember]
+                       internal string Name { get; set; }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("Root")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("PersonSetup")
+         .WithInternalMethod("WithName");
+   }
+
+   [TestMethod]
+   public void EnsureNoTargetSetupMethodIsGeneratedWhenAFieldAlsoDefined()
+   {
+      var code = @"using FluentSetups;
+
+                   public class Person
+                   {
+                       public string Name { get; set; }
+                   }
+
+                   [FluentSetup(typeof(Person))]
+                   internal partial class PersonSetup
+                   {
+                       [FluentMember]
+                       private string name;
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("Root")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("PersonSetup")
+         .WithInternalMethod("WithName");
+   }
    #endregion
 }
