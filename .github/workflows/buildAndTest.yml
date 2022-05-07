@@ -46,7 +46,7 @@ jobs:
         name: nugetPackage
         path: src\Release\*.nupkg
         retention-days: 1
-
+  # test
   publish:
     needs: build
     runs-on: windows-latest
