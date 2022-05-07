@@ -8,6 +8,7 @@ on:
 env:
   SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
+  INTEGRATION_TEST_SOLUTION : src/FluentSetups.IntegrationTests/FluentSetups.IntegrationTests.sln
   
 jobs:
   build:
@@ -70,3 +71,29 @@ jobs:
     - name: push to nuget.org
       run: nuget push packages\*.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}} -SkipDuplicate
   
+  integration-tests:
+    runs-on: windows-latest
+    steps:
+    - name: checkout branch
+      uses: actions/checkout@v3
+
+    - name: setup NuGet.exe
+      uses: NuGet/setup-nuget@v1.0.6
+      with:
+        nuget-version: latest
+        nuget-api-key: ${{secrets.NUGET_API_KEY}}
+    
+    - name: restore NuGet packages
+      run: nuget restore ${{ env.INTEGRATION_TEST_SOLUTION }}
+    
+    - name: setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: build solution
+      run: msbuild ${{ env.INTEGRATION_TEST_SOLUTION }} -property:Configuration=Release
+   
+    - name: setup VSTest.console.exe
+      uses: darenm/Setup-VSTest@v1
+
+    - name: run unit tests
+      run: vstest.console.exe ${{ env.INTEGRATION_TEST_SOLUTION }}\*.dll
