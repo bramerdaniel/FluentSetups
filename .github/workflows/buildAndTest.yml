@@ -38,7 +38,21 @@ jobs:
       
       #TODO create matrix for all platforms
     - name: run unit tests
-      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
+      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll  /logger:trx;LogFileName=result.trx
+    
+    - name: upload unit test results
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: unitTestResults
+        path: '*.trx' 
+        retention-days: 1
+
+    - uses: dorny/test-reporter@v1
+      with:
+        artifact: unitTestResults            # artifact name
+        name: MSTest Results                  # Name of the check run which will be created
+        path: '*.trx'                     # Path to test results (inside artifact .zip)
+        reporter: dotnet-trx              # Format of test results
 
     - name: upload artifacts
       #if: ${{ github.ref == 'refs/heads/master' }}
@@ -105,5 +119,9 @@ jobs:
     - name: setup VSTest.console.exe
       uses: darenm/Setup-VSTest@v1
 
-    - name: run unit tests
-      run: vstest.console.exe src/FluentSetups.IntegrationTests/Release/net6.0/FluentSetups.IntegrationTests.dll
+    - name: run integration tests
+      run: vstest.console.exe src/FluentSetups.IntegrationTests/Release/net6.0/FluentSetups.IntegrationTests.dll /logger:trx;LogFileName=result.trx
+
+    - name: show working dir
+      run: dir
+
