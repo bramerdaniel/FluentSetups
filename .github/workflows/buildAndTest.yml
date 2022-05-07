@@ -38,13 +38,13 @@ jobs:
       
       #TODO create matrix for all platforms
     - name: run unit tests
-      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll  /logger:trx
+      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll  /logger:trx /ResultsDirectory:unitTestResults
     
     - name: upload unit test results
       uses: actions/upload-artifact@v3.0.0
       with:
         name: unitTestResults
-        path: '*.trx' 
+        path: 'unitTestResults\*.trx' 
         retention-days: 1
 
     - uses: dorny/test-reporter@v1
