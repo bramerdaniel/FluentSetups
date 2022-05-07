@@ -47,12 +47,13 @@ jobs:
         path: 'unitTestResults\*.trx' 
         retention-days: 1
 
+
     - uses: dorny/test-reporter@v1
       with:
-        artifact: unitTestResults            # artifact name
+        artifact: unitTestResults             # artifact name
         name: MSTest Results                  # Name of the check run which will be created
-        path: '*.trx'                     # Path to test results (inside artifact .zip)
-        reporter: dotnet-trx              # Format of test results
+        path: '*.trx'                         # Path to test results (inside artifact .zip)
+        reporter: dotnet-trx                  # Format of test results
 
     - name: upload artifacts
       #if: ${{ github.ref == 'refs/heads/master' }}
