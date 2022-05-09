@@ -61,16 +61,24 @@ namespace FluentSetups.SourceGenerator
             return;
 
          var fluentSetupModel = SetupModel.Create(fluentContext, fluentSetupClasses);
-         foreach (var generatedSource in new FluentModelGenerator().Execute(fluentSetupModel))
+         var modelGenerator = new FluentModelGenerator();
+
+         foreach (var generatedSource in modelGenerator.Execute(fluentSetupModel))
+            AddSourceOrReportError(context, generatedSource);
+      }
+
+      private static void AddSourceOrReportError(GeneratorExecutionContext context, GeneratedSource generatedSource)
+      {
+         if (generatedSource.Error == null)
+         {
             context.AddSource(generatedSource.Name, SourceText.From(generatedSource.Code, Encoding.UTF8));
+         }
+         else
+         {
+            context.ReportDiagnostic(generatedSource.Error);
+         }
       }
 
       #endregion
-   }
-
-   internal class GeneratedSource
-   {
-      public string Name { get; set; }
-      public string Code { get; set; }
    }
 }

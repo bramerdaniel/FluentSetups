@@ -30,21 +30,28 @@ namespace FluentSetups.SourceGenerator
       private GeneratedSource GenerateEntryClass(SetupEntryClassModel classModel)
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
-         var sourceBuilder = new StringBuilder();
-         sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
-         sourceBuilder.AppendLine("{");
-         GenerateRequiredNamespaces(classModel, sourceBuilder);
+         try
+         {
+            var sourceBuilder = new StringBuilder();
+            sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
+            sourceBuilder.AppendLine("{");
+            GenerateRequiredNamespaces(classModel, sourceBuilder);
 
-         sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
-         sourceBuilder.AppendLine("[CompilerGenerated]");
-         sourceBuilder.AppendLine($"{classModel.Modifier} partial class {classModel.ClassName}");
-         sourceBuilder.AppendLine("{");
-         GenerateEntryPoints(classModel, sourceBuilder);
-         sourceBuilder.AppendLine("}");
+            sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
+            sourceBuilder.AppendLine("[CompilerGenerated]");
+            sourceBuilder.AppendLine($"{classModel.Modifier} partial class {classModel.ClassName}");
+            sourceBuilder.AppendLine("{");
+            GenerateEntryPoints(classModel, sourceBuilder);
+            sourceBuilder.AppendLine("}");
 
-         sourceBuilder.AppendLine("}");
-         var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
-         source.Code = syntaxTree.ToString();
+            sourceBuilder.AppendLine("}");
+            var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
+            source.Code = syntaxTree.ToString();
+         }
+         catch (Exception e)
+         {
+            ReportError(source, e);
+         }
 
          return source;
       }
@@ -89,27 +96,46 @@ namespace FluentSetups.SourceGenerator
       private GeneratedSource GenerateSetupClass(SetupClassModel classModel)
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
-         var sourceBuilder = new StringBuilder();
-         if (!string.IsNullOrWhiteSpace(classModel.ContainingNamespace))
+         try
          {
-            sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
+            var sourceBuilder = new StringBuilder();
+            if (!string.IsNullOrWhiteSpace(classModel.ContainingNamespace))
+            {
+               sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
+               sourceBuilder.AppendLine("{");
+            }
+
+            GenerateRequiredNamespaces(classModel, sourceBuilder);
+
+            sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
+            sourceBuilder.AppendLine("[CompilerGenerated]");
+            sourceBuilder.AppendLine($"{classModel.Modifier} partial class {classModel.ClassName}");
             sourceBuilder.AppendLine("{");
+            GenerateSetupMembers(classModel, sourceBuilder);
+            sourceBuilder.AppendLine("}");
+
+            if (!string.IsNullOrWhiteSpace(classModel.ContainingNamespace))
+               sourceBuilder.AppendLine("}");
+            var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
+            source.Code = syntaxTree.ToString();
+         }
+         catch (Exception e)
+         {
+            ReportError(source, e);
          }
 
-         GenerateRequiredNamespaces(classModel, sourceBuilder);
-
-         sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
-         sourceBuilder.AppendLine("[CompilerGenerated]");
-         sourceBuilder.AppendLine($"{classModel.Modifier} partial class {classModel.ClassName}");
-         sourceBuilder.AppendLine("{");
-         GenerateSetupMembers(classModel, sourceBuilder);
-         sourceBuilder.AppendLine("}");
-
-         if (!string.IsNullOrWhiteSpace(classModel.ContainingNamespace))
-            sourceBuilder.AppendLine("}");
-         var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
-         source.Code = syntaxTree.ToString();
          return source;
+      }
+
+      private static void ReportError(GeneratedSource source, Exception e)
+      {
+         var missingReference = new DiagnosticDescriptor(id: "FS0002", title: "fluent source generator failed",
+            messageFormat: "Error while generating source '{0}'. Message: {1}",
+            category: nameof(FluentSetupSourceGenerator),
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+         source.Error = Diagnostic.Create(missingReference, Location.None, source.Name, e.Message);
       }
 
       private void GenerateSetupMembers(SetupClassModel classModel, StringBuilder sourceBuilder)

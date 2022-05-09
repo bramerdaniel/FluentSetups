@@ -4,13 +4,13 @@
 
    [FluentSetup(EntryNamespace = "MySetups")]
    // [FluentSetup("Hubert", EntryNamespace = "MySetups")]
-   public partial class ToolSetup : IFluentSetup<string>
+   public partial class ToolSetup
    {
       #region Public Properties
 
-      [FluentProperty] public string Name { get; set; }
+      [FluentMember] public string Name { get; set; }
 
-      [FluentProperty] public int Number { get; set; }
+      [FluentMember] public int Number { get; set; }
 
       #endregion
 
