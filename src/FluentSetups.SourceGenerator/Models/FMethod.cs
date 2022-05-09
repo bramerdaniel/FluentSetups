@@ -6,6 +6,8 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
+   using System.Linq;
+
    using Microsoft.CodeAnalysis;
 
    internal class FMethod : FMember
@@ -22,7 +24,7 @@ namespace FluentSetups.SourceGenerator.Models
          {
             MemberName = methodSymbol.Name, 
             SetupMethodName = methodSymbol.Name,
-            TypeName = methodSymbol.Parameters[0].Type.ToString()
+            TypeName = methodSymbol.Parameters.FirstOrDefault()?.Type.ToString()
          };
       }
 

@@ -158,11 +158,19 @@ namespace FluentSetups.SourceGenerator
          if (!TargetCreationPossible(classModel))
             return;
 
+         if (ContainsUserDefinedTargetBuilder(classModel))
+            return;
+
          sourceBuilder.AppendLine($"public {classModel.TargetTypeName} Done()");
          sourceBuilder.AppendLine("{");
          sourceBuilder.AppendLine($"   var target = new {classModel.TargetTypeName}();");
          sourceBuilder.AppendLine($"   return target;");
          sourceBuilder.AppendLine("}");
+      }
+
+      private bool ContainsUserDefinedTargetBuilder(SetupClassModel classModel)
+      {
+         return classModel.Methods.Any(m => m.MemberName == "Done" && m.TypeName == null);
       }
 
       private static bool TargetCreationPossible(SetupClassModel classModel)

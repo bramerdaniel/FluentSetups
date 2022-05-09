@@ -121,8 +121,7 @@ namespace FluentSetups.SourceGenerator.Models
       private IEnumerable<FMethod> ComputeMethodSetups(SetupClassInfo classInfo)
       {
          foreach (var methodSymbol in classInfo.ClassSymbol.GetMembers().OfType<IMethodSymbol>())
-            if (methodSymbol.Parameters.Length == 1)
-               yield return FMethod.Create(methodSymbol);
+            yield return FMethod.Create(methodSymbol);
       }
 
       private void FillMembers(SetupClassInfo classInfo)

@@ -225,118 +225,12 @@ public class FluentSetupTargetTests
          .WithoutMethod("WithName");
    }
    
-   [TestMethod]
-   public void EnsureNoTargetPropertiesIsGeneratedWhenAlsoDefined()
-   {
-      var code = @"using FluentSetups;
 
-                   public class Person
-                   {
-                       public string Name { get; set; }
-                   }
 
-                   [FluentSetup(typeof(Person))]
-                   internal partial class PersonSetup
-                   {
-                       [FluentMember]
-                       internal string Name { get; set; }
-                   }";
 
-      var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("Root")
-         .WithSource(code)
-         .Done();
 
-      result.Should().NotHaveErrors().And
-         .HaveClass("PersonSetup")
-         .WithInternalMethod("WithName");
-   }
-
-   [TestMethod]
-   public void EnsureNoTargetSetupMethodIsGeneratedWhenAFieldAlsoDefined()
-   {
-      var code = @"using FluentSetups;
-
-                   public class Person
-                   {
-                       public string Name { get; set; }
-                   }
-
-                   [FluentSetup(typeof(Person))]
-                   internal partial class PersonSetup
-                   {
-                       [FluentMember]
-                       private string name;
-                   }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("Root")
-         .WithSource(code)
-         .Done();
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("PersonSetup")
-         .WithInternalMethod("WithName");
-   }
-
-   [TestMethod]
-   public void EnsureNoTargetSetupMethodIsGeneratedWhenAlreadyDefined()
-   {
-      var code = @"using FluentSetups;
-
-                   public class Person
-                   {
-                       public string Name { get; set; }
-                   }
-
-                   [FluentSetup(typeof(Person))]
-                   internal partial class PersonSetup
-                   {
-                       internal PersonSetup WithName(string value)
-                       {
-                           return this;
-                       }
-                   }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("Root")
-         .WithSource(code)
-         .Done();
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("PersonSetup")
-         .WithInternalMethod("WithName");
-   }
    
-   [TestMethod]
-   public void EnsureSetupIsCreatedCorrectlyWhenOverloadExists()
-   {
-      var code = @"using FluentSetups;
 
-                   public class Person
-                   {
-                       public string Name { get; set; }
-                   }
-
-                   [FluentSetup(typeof(Person))]
-                   internal partial class PersonSetup
-                   {
-                       internal PersonSetup WithName(int value)
-                       {
-                           return this;
-                       }
-                   }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("Root")
-         .WithSource(code)
-         .Done();
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("PersonSetup")
-         .WithMethod("WithName", "int")
-         .WithMethod("WithName", "string");
-   }
 
    #endregion
 }
