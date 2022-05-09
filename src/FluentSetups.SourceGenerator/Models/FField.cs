@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupFieldModel.cs" company="consolovers">
+// <copyright file="FField.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,7 +8,7 @@ namespace FluentSetups.SourceGenerator.Models
 {
    using Microsoft.CodeAnalysis;
 
-   internal class SetupFieldModel : SetupMemberModel
+   internal class FField : FMember
    {
       #region Public Properties
       
@@ -17,9 +17,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
-      public static SetupFieldModel Create(IFieldSymbol fieldSymbol, AttributeData attribute)
+      public static FField Create(IFieldSymbol fieldSymbol, AttributeData attribute)
       {
-         return new SetupFieldModel
+         return new FField
          {
             MemberName = fieldSymbol.Name, 
             TypeName = fieldSymbol.Type.ToString(),

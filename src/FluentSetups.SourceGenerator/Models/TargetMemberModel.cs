@@ -10,7 +10,7 @@ namespace FluentSetups.SourceGenerator.Models
 
    using Microsoft.CodeAnalysis;
 
-   internal class TargetMemberModel : SetupMemberModel
+   internal class TargetMemberModel : FMember
    {
       public IPropertySymbol PropertySymbol { get; }
 

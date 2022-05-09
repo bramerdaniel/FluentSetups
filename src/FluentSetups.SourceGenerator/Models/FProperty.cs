@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupPropertyModel.cs" company="KUKA Deutschland GmbH">
+// <copyright file="FProperty.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,7 +8,7 @@ namespace FluentSetups.SourceGenerator.Models
 {
    using Microsoft.CodeAnalysis;
 
-   internal class SetupPropertyModel : SetupMemberModel
+   internal class FProperty : FMember
    {
       #region Public Properties
       
@@ -16,9 +16,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
-      public static SetupPropertyModel Create(IPropertySymbol propertySymbol, AttributeData attribute)
+      public static FProperty Create(IPropertySymbol propertySymbol, AttributeData attribute)
       {
-         return new SetupPropertyModel
+         return new FProperty
          {
             MemberName = propertySymbol.Name, 
             TypeName = propertySymbol.Type.ToString(),

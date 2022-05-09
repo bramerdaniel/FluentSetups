@@ -12,6 +12,7 @@ using FluentAssertions;
 using FluentAssertions.Primitives;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassAssertion>
@@ -55,6 +56,33 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
 
       methodSymbol.DeclaredAccessibility.Should().Be(Accessibility.Internal);
       return this;
+   }
+
+   public ClassAssertion WithMethod(string methodName, params string[] parameterTypes)
+   {
+      var methods = Subject.GetMembers(methodName).OfType<IMethodSymbol>()
+         .Where(x => x.Parameters.Length == parameterTypes.Length).ToArray();
+
+      Assert.IsTrue(methods.Length > 0, $"The method {methodName} with {parameterTypes.Length} parameters could not be found");
+
+      if (methods.Any(x => HasSignature(x, parameterTypes)))
+         return this;
+
+      Assert.Fail("Could not find a method with matching signature");
+      return null;
+   }
+
+   private bool HasSignature(IMethodSymbol methodSymbol, string[] parameterTypes)
+   {
+      var typeNames = methodSymbol.Parameters.Select(x => x.Type.ToString()).ToArray();
+      for (var i = 0; i < parameterTypes.Length; i++)
+      {
+         var expectedType = parameterTypes[i];
+         if (!string.Equals(expectedType, typeNames[i]))
+            return false;
+      }
+
+      return true;
    }
 
    public ClassAssertion WithStaticMethod(string methodName)

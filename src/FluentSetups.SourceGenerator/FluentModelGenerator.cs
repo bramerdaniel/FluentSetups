@@ -173,7 +173,7 @@ namespace FluentSetups.SourceGenerator
          return !string.IsNullOrWhiteSpace(classModel.TargetTypeName);
       }
 
-      private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel, bool createMember)
+      private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, FMember memberModel, bool createMember)
       {
          if (createMember)
          {
@@ -181,6 +181,9 @@ namespace FluentSetups.SourceGenerator
                return;
 
             if (classModel.Fields.Any(f => f.MemberName.Equals(memberModel.MemberName, StringComparison.InvariantCultureIgnoreCase)))
+               return;
+
+            if (ContainsUserdefinedMethod(classModel, memberModel))
                return;
 
             sourceBuilder.AppendLine($"private {memberModel.TypeName} {memberModel.MemberName};");
@@ -201,11 +204,26 @@ namespace FluentSetups.SourceGenerator
 
          sourceBuilder.AppendLine($"private bool {memberModel.MemberSetFieldName};");
          sourceBuilder.AppendLine($"protected {memberModel.TypeName} Get{memberModel.UpperMemberName}OrThrow()");
-         sourceBuilder.AppendLine($"=> {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : throw new InvalidOperationException(\"The member {memberModel.MemberName} was not set.\");");
+         sourceBuilder.AppendLine("{");
+         sourceBuilder.AppendLine($"return {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : throw new InvalidOperationException(\"The member {memberModel.MemberName} was not set.\");");
+         sourceBuilder.AppendLine("}");
 
          sourceBuilder.AppendLine();
          sourceBuilder.AppendLine($"protected {memberModel.TypeName} Get{memberModel.UpperMemberName}OrDefault(Func<{memberModel.TypeName}> defaultValue)");
-         sourceBuilder.AppendLine($" => {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : defaultValue();");
+         sourceBuilder.AppendLine("{");
+         sourceBuilder.AppendLine($"return {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : defaultValue();");
+         sourceBuilder.AppendLine("}");
+      }
+
+      private static bool ContainsUserdefinedMethod(SetupClassModel classModel, FMember memberModel)
+      {
+         foreach (var method in classModel.Methods)
+         {
+            if (method.SetupMethodName == memberModel.SetupMethodName && method.TypeName == memberModel.TypeName)
+               return true;
+         }
+
+         return false;
       }
    }
 }

@@ -82,11 +82,11 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<SetupClassMode
 
    #endregion
 
-   internal class SetupMemberModelAssertion : ReferenceTypeAssertions<SetupMemberModel, SetupMemberModelAssertion>
+   internal class SetupMemberModelAssertion : ReferenceTypeAssertions<FMember, SetupMemberModelAssertion>
    {
       #region Constructors and Destructors
 
-      public SetupMemberModelAssertion(SetupMemberModel subject)
+      public SetupMemberModelAssertion(FMember subject)
          : base(subject)
       {
       }

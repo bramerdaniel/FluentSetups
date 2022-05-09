@@ -27,11 +27,13 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string EntryClassNamespace { get; private set; }
 
-      public IReadOnlyList<SetupFieldModel> Fields { get; set; }
+      public IReadOnlyList<FField> Fields { get; set; }
 
       public string Modifier { get; set; } = "internal";
 
-      public IReadOnlyList<SetupPropertyModel> Properties { get; set; }
+      public IReadOnlyList<FProperty> Properties { get; set; }
+
+      public IReadOnlyList<FMethod> Methods { get; set; }
 
       public SetupTargetModel Target { get; private set; }
 
@@ -99,7 +101,7 @@ namespace FluentSetups.SourceGenerator.Models
          return namespaceSymbol.ToString();
       }
 
-      private IEnumerable<SetupFieldModel> ComputeFieldSetups(SetupClassInfo classInfo)
+      private IEnumerable<FField> ComputeFieldSetups(SetupClassInfo classInfo)
       {
          foreach (var propertySymbol in classInfo.ClassSymbol.GetMembers().OfType<IFieldSymbol>())
          {
@@ -108,7 +110,7 @@ namespace FluentSetups.SourceGenerator.Models
          }
       }
 
-      private IEnumerable<SetupPropertyModel> ComputePropertySetups(SetupClassInfo classInfo)
+      private IEnumerable<FProperty> ComputePropertySetups(SetupClassInfo classInfo)
       {
          foreach (var propertySymbol in classInfo.ClassSymbol.GetMembers().OfType<IPropertySymbol>())
          {
@@ -116,12 +118,19 @@ namespace FluentSetups.SourceGenerator.Models
                yield return propertyModel;
          }
       }
+      private IEnumerable<FMethod> ComputeMethodSetups(SetupClassInfo classInfo)
+      {
+         foreach (var methodSymbol in classInfo.ClassSymbol.GetMembers().OfType<IMethodSymbol>())
+            if (methodSymbol.Parameters.Length == 1)
+               yield return FMethod.Create(methodSymbol);
+      }
 
       private void FillMembers(SetupClassInfo classInfo)
       {
          FillTargetTypeProperties(classInfo);
          Fields = ComputeFieldSetups(classInfo).ToArray();
          Properties = ComputePropertySetups(classInfo).ToArray();
+         Methods = ComputeMethodSetups(classInfo).ToArray();
       }
 
       private void FillTargetTypeProperties(SetupClassInfo classInfo)
@@ -140,13 +149,13 @@ namespace FluentSetups.SourceGenerator.Models
          }
       }
 
-      private bool TryCreateField(IFieldSymbol fieldSymbol, out SetupFieldModel fieldModel)
+      private bool TryCreateField(IFieldSymbol fieldSymbol, out FField fieldModel)
       {
          foreach (var attribute in fieldSymbol.GetAttributes().Where(x => x.AttributeClass != null))
          {
             if (Context.FluentPropertyAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default))
             {
-               fieldModel = SetupFieldModel.Create(fieldSymbol, attribute);
+               fieldModel = FField.Create(fieldSymbol, attribute);
                return true;
             }
          }
@@ -155,13 +164,13 @@ namespace FluentSetups.SourceGenerator.Models
          return false;
       }
 
-      private bool TryCreateProperty(IPropertySymbol propertySymbol, out SetupPropertyModel propertyModel)
+      private bool TryCreateProperty(IPropertySymbol propertySymbol, out FProperty propertyModel)
       {
          foreach (var attribute in propertySymbol.GetAttributes().Where(x => x.AttributeClass != null))
          {
             if (Context.FluentPropertyAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default))
             {
-               propertyModel = SetupPropertyModel.Create(propertySymbol, attribute);
+               propertyModel = FProperty.Create(propertySymbol, attribute);
                return true;
             }
          }
