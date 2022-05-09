@@ -153,4 +153,33 @@ public class HidingGeneratedMembersTests
          .HaveClass("PersonSetup")
          .WithMethod("Done");
    }
+   
+   [TestMethod]
+   public void EnsureDoneMethodOverloadIsPossible()
+   {
+      var code = @"using FluentSetups;
+
+                   public class Person
+                   {
+                   }
+
+                   [FluentSetup(typeof(Person))]
+                   internal partial class PersonSetup
+                   {
+                       internal Person Done(bool forOverload)
+                       {
+                           return new Person();
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("Root")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("PersonSetup")
+         .WithMethod("Done")
+         .WithMethod("Done", "bool");
+   }
 }
