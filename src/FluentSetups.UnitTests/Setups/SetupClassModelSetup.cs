@@ -24,7 +24,7 @@ internal class SetupClassModelSetup : SetupBase
          throw new InvalidOperationException("The parsed syntax was not a class");
       
       var classInfo = context.CreateFluentSetupInfo(setupClass);
-      return FClass.Create(context, classInfo);
+      return new FClass(context, classInfo.ClassSymbol, classInfo.FluentSetupAttribute);
    }
 
    public SetupClassModelSetup FromSource(string code)

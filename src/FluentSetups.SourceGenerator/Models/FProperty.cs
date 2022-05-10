@@ -11,7 +11,7 @@ namespace FluentSetups.SourceGenerator.Models
 
    using Microsoft.CodeAnalysis;
 
-   internal class FProperty : IFluentMember
+   internal class FProperty : IFluentTypedMember
    {
       private readonly IPropertySymbol propertySymbol;
 
@@ -21,10 +21,7 @@ namespace FluentSetups.SourceGenerator.Models
       {
          this.propertySymbol = propertySymbol ?? throw new ArgumentNullException(nameof(propertySymbol));
          this.memberAttribute = memberAttribute;
-         MemberName = propertySymbol.Name;
-
-         //SetupMethodName = ComputeSetupNameFromAttribute(memberAttribute) ?? $"With{propertySymbol.Name}";
-         //RequiredNamespace = ComputeRequiredNamespace(propertySymbol);
+         Name = propertySymbol.Name;
       }
 
       protected static string ComputeSetupNameFromAttribute(AttributeData attributeData)
@@ -43,7 +40,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
-      public string MemberName { get; set; }
+      public string Name { get; set; }
 
       private static string ComputeRequiredNamespace(IPropertySymbol propertySymbol)
       {

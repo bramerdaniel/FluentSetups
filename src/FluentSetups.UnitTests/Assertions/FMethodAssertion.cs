@@ -35,7 +35,7 @@ internal class FMethodAssertion : ReferenceTypeAssertions<FMethod, FMethodAssert
 
    public AndConstraint<FMethodAssertion> WithTypeName(string expectedTypeName)
    {
-      Assert.AreEqual(expectedTypeName, Subject.TypeName);
+      Assert.AreEqual(expectedTypeName, Subject.ParameterTypeName);
       return new AndConstraint<FMethodAssertion>(this);
    }
 

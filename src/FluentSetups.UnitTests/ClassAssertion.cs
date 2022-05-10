@@ -60,6 +60,13 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
       return builder.ToString();
    }
 
+   public MethodAssertion WhereMethod(string methodName)
+   {
+      var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
+      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found.{GetGeneratedCode()}");
+      return new MethodAssertion(generationResult, methodSymbol);
+   }
+
    public ClassAssertion WithMethod(string methodName)
    {
       var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
@@ -143,6 +150,13 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
    public ClassAssertion WithPublicModifier()
    {
       Subject.DeclaredAccessibility.Should().Be(Accessibility.Public);
+      return this;
+   }
+
+   public ClassAssertion WithField(string expectedFieldName)
+   {
+      var fieldSymbol = Subject.GetMembers(expectedFieldName).OfType<IFieldSymbol>().FirstOrDefault();
+      Assert.IsNotNull(fieldSymbol, $"The field {expectedFieldName} could not be found.{GetGeneratedCode()}");
       return this;
    }
 }

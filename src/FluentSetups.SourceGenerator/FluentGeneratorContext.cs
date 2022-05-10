@@ -35,6 +35,8 @@ namespace FluentSetups.SourceGenerator
 
       internal INamedTypeSymbol FluentSetupAttribute { get; set; }
 
+      public ITypeSymbol BooleanType { get; set; }
+
       #endregion
 
       #region Public Methods and Operators
@@ -46,7 +48,8 @@ namespace FluentSetups.SourceGenerator
             Compilation = compilation,
             FluentEntryNamespaceAttribute = compilation.GetTypeByMetadataName(FluentEntryNamespaceAttributeName),
             FluentSetupAttribute = compilation.GetTypeByMetadataName(FluentSetupAttributeName),
-            FluentMemberAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName)
+            FluentMemberAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName),
+            BooleanType = compilation.GetTypeByMetadataName("System.Boolean")
          };
       }
       

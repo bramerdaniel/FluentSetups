@@ -1,18 +1,16 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IFluentMember.cs" company="consolovers">
+// <copyright file="IFluentTypedMember.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.SourceGenerator.Models
 {
-   internal interface IFluentMember
+   using Microsoft.CodeAnalysis;
+
+   interface IFluentTypedMember : IFluentMember
    {
-      /// <summary>Gets the name.</summary>
-      string Name { get; }
-
-      string ToCode();
-
-      bool IsUserDefined { get; }
+      /// <summary>Gets the type of the member.</summary>
+      ITypeSymbol Type { get;  }
    }
 }

@@ -13,7 +13,7 @@ namespace FluentSetups.SourceGenerator.Models
    using Microsoft.CodeAnalysis;
 
    [DebuggerDisplay("private {TypeName} {Name}")]
-   internal class FField : IFluentMember
+   internal class FField : IFluentTypedMember
    {
       #region Constants and Fields
 
@@ -68,7 +68,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string SetupMethodName { get; set; }
 
-      public ITypeSymbol Type { get; set; }
+      public ITypeSymbol Type { get;  }
 
       public string TypeName { get; set; }
 

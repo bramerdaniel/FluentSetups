@@ -66,7 +66,7 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<FClass, SetupC
 
    public FPropertyAssertion HaveProperty(string expectedPropertyName)
    {
-      var property = Subject.Properties.FirstOrDefault(p => p.MemberName == expectedPropertyName);
+      var property = Subject.Properties.FirstOrDefault(p => p.Name == expectedPropertyName);
       Assert.IsNotNull(property);
 
       return new FPropertyAssertion(property);
@@ -74,10 +74,10 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<FClass, SetupC
 
    public FMethodAssertion HaveMethod(string expectedFieldName)
    {
-      var method = Subject.Methods.FirstOrDefault(p => p.MemberName == expectedFieldName);
+      var method = Subject.Methods.FirstOrDefault(p => p.Name == expectedFieldName);
       Assert.IsNotNull(method, $"The class {Subject.ClassName} did not have the expected method '{expectedFieldName}'.");
 
-      return new FMethodAssertion(method);
+      return new FMethodAssertion((FMethod)method);
    }
    public FFieldAssertion HaveField(string expectedFieldName)
    {

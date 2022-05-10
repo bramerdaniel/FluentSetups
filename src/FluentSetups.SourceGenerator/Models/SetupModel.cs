@@ -30,7 +30,7 @@ namespace FluentSetups.SourceGenerator.Models
          var classModels = new List<FClass>(fluentSetupClasses.Length);
          foreach (var setupClassInfo in fluentSetupClasses)
          {
-            var classModel = FClass.Create(context, setupClassInfo);
+            var classModel = new FClass(context, setupClassInfo.ClassSymbol, setupClassInfo.FluentSetupAttribute);
             classModels.Add(classModel);
          }
 

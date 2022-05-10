@@ -6,8 +6,11 @@
 
 namespace FluentSetups.UnitTests.CodeGenerationTests
 {
+   using System.Linq;
+
    using FluentSetups.UnitTests.Setups;
 
+   using Microsoft.CodeAnalysis;
    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
    [TestClass]
@@ -37,28 +40,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .WithMethod("WithName");
       }
      
-      [TestMethod]
-      public void EnsureGetterMethodsForPropertiesAreGeneratedCorrectly()
-      {
-         var code = @"namespace RonnyTheRobber
-                      {
-                         [FluentSetups.FluentSetup]
-                         public partial class PersonSetup
-                         {
-                            [FluentSetups.FluentMember]
-                            public string Name { get; set; }
-                         }
-                      }";
 
-         var result = Setup.SourceGeneratorTest()
-            .WithSource(code)
-            .Done();
-
-         result.Should().NotHaveErrors().And
-            .HaveClass("RonnyTheRobber.PersonSetup")
-            .WithProtectedMethod("GetNameOrDefault")
-            .WithProtectedMethod("GetNameOrThrow");
-      }
 
       [TestMethod]
       public void EnsureSetupMethodWithCustomNameIsGeneratedCorrectly()
@@ -149,30 +131,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .WithMethod("WithAge");
       }
       
-      [TestMethod]
-      public void EnsureGetMethodsIsGeneratedCorrectly()
-      {
-         var code = @"namespace DonnyTheDagger
-                      {
-                         using FluentSetups;
 
-                         [FluentSetup]
-                         public partial class PersonSetup
-                         {
-                            [FluentMember]
-                            public int age;
-                         }
-                      }";
-
-         var result = Setup.SourceGeneratorTest()
-            .WithSource(code)
-            .Done();
-
-         result.Should().NotHaveErrors().And
-            .HaveClass("DonnyTheDagger.PersonSetup")
-            .WithProtectedMethod("GetAgeOrDefault")
-            .WithProtectedMethod("GetAgeOrThrow");
-      }      
      
       [TestMethod]
       public void EnsureMemberCanBeInternal()
@@ -194,6 +153,91 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
          result.Should().NotHaveErrors();
       }
 
+      [TestMethod]
+      public void EnsureFieldIsSetInFluentSetupMethod()
+      {
+         var code = @"namespace DonnyTheDagger
+                      {
+                         using FluentSetups;
+
+                         [FluentSetup]
+                         public partial class PersonSetup
+                         {
+                            [FluentMember]
+                            public int age;
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors().And
+            .HaveClass("DonnyTheDagger.PersonSetup")
+            .WhereMethod("WithAge")
+            .Contains("age = value")
+            .Contains("ageWasSet = true;")
+            .Contains("return this;");
+      }
+
+      [TestMethod]
+      public void EnsurePropertyIsSetInFluentSetupMethod()
+      {
+         var code = @"namespace DonnyTheDagger
+                      {
+                         using FluentSetups;
+
+                         [FluentSetup]
+                         public partial class PersonSetup
+                         {
+                            [FluentMember]
+                            public int Age { get ;set; }
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors().And
+            .HaveClass("DonnyTheDagger.PersonSetup")
+            .WhereMethod("WithAge")
+            .Contains("Age = value")
+            .Contains("ageWasSet = true;")
+            .Contains("return this;");
+      }
+      
+      [TestMethod]
+      public void EnsureGeneratedFieldIsSetInFluentSetupMethod()
+      {
+         var code = @"namespace DonnyTheDagger
+                      {
+                         using FluentSetups;
+
+                         public class Person
+                         {
+                            public int Age { get ;set; }
+                         }
+
+                         [FluentSetup(typeof(Person))]
+                         public partial class PersonSetup
+                         {
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors().And
+            .HaveClass("DonnyTheDagger.PersonSetup")
+            .WhereMethod("WithAge")
+            .Contains("age = value")
+            .Contains("ageWasSet = true;")
+            .Contains("return this;");
+      }
+
       #endregion
    }
+
 }
