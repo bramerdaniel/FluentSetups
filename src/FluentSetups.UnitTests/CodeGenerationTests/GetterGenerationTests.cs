@@ -34,7 +34,7 @@ public class GetterGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("DonnyTheDagger.PersonSetup")
-         .WithProtectedMethod("GetAgeOrDefault");
+         .WithProtectedMethod("GetAge");
    }
 
    [TestMethod]
@@ -80,7 +80,7 @@ public class GetterGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("RonnyTheRobber.PersonSetup")
-         .WithProtectedMethod("GetNameOrDefault");
+         .WithProtectedMethod("GetName");
    }
 
    [TestMethod]

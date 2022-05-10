@@ -207,6 +207,9 @@ namespace FluentSetups.SourceGenerator.Models
 
             var fGetOrThrow = new FGetOrThrow(field ,method.SetupIndicatorField);
             AddMethod(fGetOrThrow);
+            
+            var getMember = new FGetValueMethod(field ,method.SetupIndicatorField);
+            AddMethod(getMember);
          }
       }
 
@@ -223,6 +226,9 @@ namespace FluentSetups.SourceGenerator.Models
 
             var fGetOrThrow = new FGetOrThrow(property, method.SetupIndicatorField);
             AddMethod(fGetOrThrow);
+
+            var getMember = new FGetValueMethod(property, method.SetupIndicatorField);
+            AddMethod(getMember);
          }
       }
 
