@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentGeneratorContext.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FluentGeneratorContext.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,8 +17,10 @@ namespace FluentSetups.SourceGenerator
    {
       #region Public Properties
 
+      public ITypeSymbol BooleanType { get; set; }
+
       public Compilation Compilation { get; set; }
-      
+
       #endregion
 
       #region Properties
@@ -35,8 +37,6 @@ namespace FluentSetups.SourceGenerator
 
       internal INamedTypeSymbol FluentSetupAttribute { get; set; }
 
-      public ITypeSymbol BooleanType { get; set; }
-
       #endregion
 
       #region Public Methods and Operators
@@ -52,7 +52,15 @@ namespace FluentSetups.SourceGenerator
             BooleanType = compilation.GetTypeByMetadataName("System.Boolean")
          };
       }
-      
+
+      public SetupClassInfo CreateFluentSetupInfo(ClassDeclarationSyntax setupCandidate)
+      {
+         if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
+            return classInfo;
+
+         throw new ArgumentException($"The specified {nameof(ClassDeclarationSyntax)} is not a fluent setup class", nameof(setupCandidate));
+      }
+
       public IEnumerable<SetupClassInfo> FindFluentSetups(IEnumerable<ClassDeclarationSyntax> setupCandidates)
       {
          foreach (var setupCandidate in setupCandidates)
@@ -60,14 +68,6 @@ namespace FluentSetups.SourceGenerator
             if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
                yield return classInfo;
          }
-      }    
-      
-      public SetupClassInfo CreateFluentSetupInfo(ClassDeclarationSyntax setupCandidate)
-      {
-         if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
-            return classInfo;
-
-         throw new ArgumentException($"The specified {nameof(ClassDeclarationSyntax)} is not a fluent setup class", nameof(setupCandidate));
       }
 
       public bool TryGetMissingType(out string missingType)
@@ -140,6 +140,5 @@ namespace FluentSetups.SourceGenerator
       }
 
       #endregion
-      
    }
 }

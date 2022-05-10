@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentSetupSyntaxReceiver.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FluentSetupSyntaxReceiver.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace FluentSetups.SourceGenerator
    /// <summary>Created on demand before each generation pass</summary>
    internal class FluentSetupSyntaxReceiver : ISyntaxReceiver
    {
-      #region ISyntaxReceiver Properties
+      #region ISyntaxReceiver Members
 
       /// <summary>Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation</summary>
       public void OnVisitSyntaxNode(SyntaxNode syntaxNode)

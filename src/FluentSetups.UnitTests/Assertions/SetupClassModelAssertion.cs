@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupClassModelAssertion.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SetupClassModelAssertion.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -40,9 +40,39 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<FClass, SetupC
       return new AndConstraint<SetupClassModelAssertion>(this);
    }
 
+   public FFieldAssertion HaveField(string expectedFieldName)
+   {
+      var field = Subject.Fields.FirstOrDefault(p => p.Name == expectedFieldName);
+      Assert.IsNotNull(field, $"The class {Subject.ClassName} did not have the expected field {expectedFieldName}.");
+
+      return new FFieldAssertion(field);
+   }
+
+   public FMethodAssertion HaveMethod(string expectedFieldName)
+   {
+      var method = Subject.Methods.FirstOrDefault(p => p.Name == expectedFieldName);
+      Assert.IsNotNull(method, $"The class {Subject.ClassName} did not have the expected method '{expectedFieldName}'.");
+
+      return new FMethodAssertion((FMethod)method);
+   }
+
    public AndConstraint<SetupClassModelAssertion> HaveName(string expectedName)
    {
       Assert.AreEqual(expectedName, Subject.ClassName);
+      return new AndConstraint<SetupClassModelAssertion>(this);
+   }
+
+   public FPropertyAssertion HaveProperty(string expectedPropertyName)
+   {
+      var property = Subject.Properties.FirstOrDefault(p => p.Name == expectedPropertyName);
+      Assert.IsNotNull(property);
+
+      return new FPropertyAssertion(property);
+   }
+
+   public AndConstraint<SetupClassModelAssertion> HaveTargetMode(TargetGenerationMode expectedMode)
+   {
+      Assert.AreEqual(expectedMode, Subject.TargetMode);
       return new AndConstraint<SetupClassModelAssertion>(this);
    }
 
@@ -58,37 +88,5 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<FClass, SetupC
       return new AndConstraint<SetupClassModelAssertion>(this);
    }
 
-   public AndConstraint<SetupClassModelAssertion> HaveTargetMode(TargetGenerationMode expectedMode)
-   {
-      Assert.AreEqual(expectedMode, Subject.TargetMode);
-      return new AndConstraint<SetupClassModelAssertion>(this);
-   }
-
-   public FPropertyAssertion HaveProperty(string expectedPropertyName)
-   {
-      var property = Subject.Properties.FirstOrDefault(p => p.Name == expectedPropertyName);
-      Assert.IsNotNull(property);
-
-      return new FPropertyAssertion(property);
-   }
-
-   public FMethodAssertion HaveMethod(string expectedFieldName)
-   {
-      var method = Subject.Methods.FirstOrDefault(p => p.Name == expectedFieldName);
-      Assert.IsNotNull(method, $"The class {Subject.ClassName} did not have the expected method '{expectedFieldName}'.");
-
-      return new FMethodAssertion((FMethod)method);
-   }
-   public FFieldAssertion HaveField(string expectedFieldName)
-   {
-      var field = Subject.Fields.FirstOrDefault(p => p.Name == expectedFieldName);
-      Assert.IsNotNull(field, $"The class {Subject.ClassName} did not have the expected field {expectedFieldName}.");
-
-      return new FFieldAssertion(field);
-   }
-
    #endregion
-
-
-
 }

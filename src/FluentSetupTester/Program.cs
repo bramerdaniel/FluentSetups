@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="Program.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ namespace FluentSetupTester
       static void Main()
       {
          var syntaxTrees = ParseInput("FluentSetupTester.ToolSetup.cs", "FluentSetupTester.Setup.cs");
-         
+
          var (diagnostics, output) = RunSourceGenerator(syntaxTrees);
          if (diagnostics.Length > 0)
          {

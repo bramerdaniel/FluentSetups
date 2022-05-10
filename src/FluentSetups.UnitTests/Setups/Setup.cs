@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Setup.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="Setup.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,15 +15,15 @@ internal class Setup
       return new SetupClassInfoSetup();
    }
 
+   public static SetupClassModelSetup SetupClassModel()
+   {
+      return new SetupClassModelSetup();
+   }
+
    public static SourceGeneratorTestSetup SourceGeneratorTest()
    {
       return new SourceGeneratorTestSetup();
    }
 
    #endregion
-
-   public static SetupClassModelSetup SetupClassModel()
-   {
-      return new SetupClassModelSetup();
-   }
 }

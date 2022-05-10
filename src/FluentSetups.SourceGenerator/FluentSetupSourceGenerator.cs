@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentSetupSourceGenerator.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FluentSetupSourceGenerator.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace FluentSetups.SourceGenerator
    [Generator]
    public class FluentSetupSourceGenerator : ISourceGenerator
    {
-      #region ISourceGenerator Properties
+      #region ISourceGenerator Members
 
       public void Initialize(GeneratorInitializationContext context)
       {
@@ -43,6 +43,18 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
+      private static void AddSourceOrReportError(GeneratorExecutionContext context, GeneratedSource generatedSource)
+      {
+         if (generatedSource.Error == null)
+         {
+            context.AddSource(generatedSource.Name, SourceText.From(generatedSource.Code, Encoding.UTF8));
+         }
+         else
+         {
+            context.ReportDiagnostic(generatedSource.Error);
+         }
+      }
+
       private void MissingReferenceDiagnostic(GeneratorExecutionContext context, string attributeName)
       {
          var missingReference = new DiagnosticDescriptor(id: "FS0001", title: "fluent source generator failed",
@@ -54,7 +66,8 @@ namespace FluentSetups.SourceGenerator
          context.ReportDiagnostic(Diagnostic.Create(missingReference, Location.None, attributeName));
       }
 
-      private void RunSourceGeneration(GeneratorExecutionContext context, FluentGeneratorContext fluentContext, FluentSetupSyntaxReceiver syntaxReceiver)
+      private void RunSourceGeneration(GeneratorExecutionContext context, FluentGeneratorContext fluentContext,
+         FluentSetupSyntaxReceiver syntaxReceiver)
       {
          var fluentSetupClasses = fluentContext.FindFluentSetups(syntaxReceiver.SetupCandidates).ToArray();
          if (fluentSetupClasses.Length == 0)
@@ -65,18 +78,6 @@ namespace FluentSetups.SourceGenerator
 
          foreach (var generatedSource in modelGenerator.Execute(fluentSetupModel))
             AddSourceOrReportError(context, generatedSource);
-      }
-
-      private static void AddSourceOrReportError(GeneratorExecutionContext context, GeneratedSource generatedSource)
-      {
-         if (generatedSource.Error == null)
-         {
-            context.AddSource(generatedSource.Name, SourceText.From(generatedSource.Code, Encoding.UTF8));
-         }
-         else
-         {
-            context.ReportDiagnostic(generatedSource.Error);
-         }
       }
 
       #endregion
