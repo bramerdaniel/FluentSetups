@@ -12,7 +12,7 @@
 		<PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
 		<PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
 		<PackageReference Include="coverlet.collector" Version="3.1.0" />
-		<PackageReference Include="FluentSetups" Version="0.2.0-dev.8" />
+		<PackageReference Include="FluentSetups" Version="0.2.0-rc.1" />
 	</ItemGroup>
 
 
