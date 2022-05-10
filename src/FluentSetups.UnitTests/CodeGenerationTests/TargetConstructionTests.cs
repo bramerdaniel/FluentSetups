@@ -16,7 +16,6 @@ public class TargetConstructionTests
    #region Public Methods and Operators
 
    [TestMethod]
-   [Ignore]
    public void EnsureConstructorCallIsGeneratedCorrectly()
    {
       var code = @"namespace MyTests
@@ -49,7 +48,6 @@ public class TargetConstructionTests
    }
    
    [TestMethod]
-   [Ignore]
    public void EnsureConstructorCallWithTwoArgumentsIsGeneratedCorrectly()
    {
       var code = @"namespace MyTests
@@ -86,7 +84,6 @@ public class TargetConstructionTests
 
 
    [TestMethod]
-   [Ignore]
    public void EnsureConstructorCallIsGeneratedCorrectlyForPrivateSetterProperties()
    {
       var code = @"namespace MyTests

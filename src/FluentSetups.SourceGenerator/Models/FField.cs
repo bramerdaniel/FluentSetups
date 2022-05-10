@@ -21,6 +21,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       private readonly AttributeData memberAttribute;
 
+      private bool generateFluentSetup;
+
       #endregion
 
       #region Constructors and Destructors
@@ -49,7 +51,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #endregion
 
-      #region IFluentMember Members
+      #region IFluentTypedMember Members
 
       public bool IsUserDefined => fieldSymbol != null;
 
@@ -58,17 +60,30 @@ namespace FluentSetups.SourceGenerator.Models
          return $"private {TypeName} {Name};";
       }
 
+      public string Name { get; set; }
+
+      public ITypeSymbol Type { get; }
+
       #endregion
 
       #region Public Properties
 
-      public string Name { get; set; }
+      public bool GenerateFluentSetup
+      {
+         get
+         {
+            if (generateFluentSetup)
+               return true;
+
+            if (memberAttribute == null)
+               return false;
+            return true;
+         }
+      }
 
       public string RequiredNamespace { get; set; }
 
       public string SetupMethodName { get; set; }
-
-      public ITypeSymbol Type { get;  }
 
       public string TypeName { get; set; }
 
@@ -76,16 +91,14 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
+      public static FField ForConstructorParameter(IParameterSymbol parameterSymbol)
+      {
+         return new FField(parameterSymbol.Type, parameterSymbol.Name.ToFirstLower()) { generateFluentSetup = true };
+      }
+
       public static FField ForProperty(FTargetProperty property)
       {
          return new FField(property.Type, property.Name.ToFirstLower());
-      }
-
-      public bool RequiredSetupGeneration()
-      {
-         if (memberAttribute == null)
-            return false;
-         return true;
       }
 
       #endregion

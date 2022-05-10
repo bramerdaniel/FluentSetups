@@ -140,15 +140,16 @@ namespace FluentSetups.SourceGenerator.Models
          return !string.IsNullOrWhiteSpace(classModel.TargetTypeName);
       }
 
-      private void AddField(FField field)
+      private bool AddField(FField field)
       {
          if (field == null)
             throw new ArgumentNullException(nameof(field));
 
          if (fields.Contains(field))
-            return;
+            return false;
 
          fields.Add(field);
+         return true;
       }
 
       private void AddMember(ISymbol member)
@@ -190,7 +191,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void AddMethodFromField(FField field)
       {
-         if (!field.RequiredSetupGeneration())
+         if (!field.GenerateFluentSetup)
             return;
 
          if (string.IsNullOrWhiteSpace(field.SetupMethodName))
@@ -205,10 +206,10 @@ namespace FluentSetups.SourceGenerator.Models
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetOrThrow(field ,method.SetupIndicatorField);
+            var fGetOrThrow = new FGetOrThrow(field, method.SetupIndicatorField);
             AddMethod(fGetOrThrow);
-            
-            var getMember = new FGetValueMethod(field ,method.SetupIndicatorField);
+
+            var getMember = new FGetValueMethod(field, method.SetupIndicatorField);
             AddMethod(getMember);
          }
       }
@@ -332,9 +333,16 @@ namespace FluentSetups.SourceGenerator.Models
 
          sourceBuilder.AppendLine($"public {TargetTypeName} Done()");
          sourceBuilder.AppendLine("{");
-         sourceBuilder.AppendLine($"   var target = new {TargetTypeName}();");
+         sourceBuilder.AppendLine($"   var target = {CreateConstructorCall()};");
          sourceBuilder.AppendLine($"   return target;");
          sourceBuilder.AppendLine("}");
+      }
+
+      private string CreateConstructorCall()
+      {
+         var arguments = string.Join(", ", Target.ConstructorParameters.Select(p => $"Get{p.Name.ToFirstUpper()}(null)"));
+         var builder = new StringBuilder($"new {Target.TypeName}({arguments})");
+         return builder.ToString();
       }
 
       private void OpenClass(StringBuilder sourceBuilder)
@@ -367,6 +375,8 @@ namespace FluentSetups.SourceGenerator.Models
          if (Target == null)
             return;
 
+         UpdateFromConstructor();
+
          foreach (var property in Target.Properties)
          {
             var method = new FMethod(property.SetupMethodName, property.Type, classSymbol);
@@ -379,6 +389,32 @@ namespace FluentSetups.SourceGenerator.Models
                method.SetupIndicatorField = new FField(Context.BooleanType, $"{property.Name.ToFirstLower()}WasSet");
                AddField(method.SetupIndicatorField);
             }
+         }
+      }
+
+      private void UpdateFromConstructor()
+      {
+         if (Target?.Constructor == null)
+            return;
+
+         foreach (var constructorParameter in Target.Constructor.Parameters)
+         {
+            var backingField = FField.ForConstructorParameter(constructorParameter);
+            if (AddField(backingField))
+            {
+               AddMethodFromField(backingField);
+            }
+
+            //var method = new FMethod($"With{constructorParameter.Name.ToFirstUpper()}", constructorParameter.Type, classSymbol);
+            //if (AddMethod(method))
+            //{
+            //   var backingField = new FField(constructorParameter.Type, constructorParameter.Name);
+            //   method.Source = backingField;
+            //   AddField(backingField);
+
+            //   method.SetupIndicatorField = new FField(Context.BooleanType, $"{constructorParameter.Name.ToFirstLower()}WasSet");
+            //   AddField(method.SetupIndicatorField);
+            //}
          }
       }
 

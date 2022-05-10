@@ -6,6 +6,7 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
+   using System;
    using System.Collections.Generic;
    using System.Linq;
 
@@ -19,13 +20,42 @@ namespace FluentSetups.SourceGenerator.Models
 
       internal FTarget(FClass setupClass, INamedTypeSymbol typeSymbol)
       {
-         SetupClass = setupClass;
-         TypeSymbol = typeSymbol;
+         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
+         TypeSymbol = typeSymbol ?? throw new ArgumentNullException(nameof(typeSymbol));
+         Constructor = GetAccessibleConstructorWithLeastParameters();
+         ConstructorParameters = SelectBest().ToArray();
          Properties = ComputeMembers().ToArray();
+      }
+
+      /// <summary>Gets the constructor that will be used to create the target object.</summary>
+      public IMethodSymbol Constructor { get; }
+
+      public IReadOnlyList<IFluentTypedMember> ConstructorParameters { get; set; }
+
+      private IEnumerable<IFluentTypedMember> SelectBest()
+      {
+         if (Constructor == null)
+            yield break;
+         
+         foreach (var parameter in Constructor.Parameters)
+            yield return new FConstructorParameter(parameter);
+      }
+
+      private IMethodSymbol GetAccessibleConstructorWithLeastParameters()
+      {
+         foreach (var candidate in TypeSymbol.Constructors.OrderBy(x => x.Parameters.Length))
+         {
+            if (candidate.DeclaredAccessibility == Accessibility.Public)
+               return candidate;
+         }
+
+         return null;
       }
 
       private IEnumerable<FTargetProperty> ComputeMembers()
       {
+
+
          foreach (var targetMember in TypeSymbol.GetMembers().OfType<IPropertySymbol>())
          {
             if (CanBeSet(targetMember))
