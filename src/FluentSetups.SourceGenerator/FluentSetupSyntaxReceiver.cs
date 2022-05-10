@@ -14,7 +14,7 @@ namespace FluentSetups.SourceGenerator
    /// <summary>Created on demand before each generation pass</summary>
    internal class FluentSetupSyntaxReceiver : ISyntaxReceiver
    {
-      #region ISyntaxReceiver Members
+      #region ISyntaxReceiver Properties
 
       /// <summary>Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation</summary>
       public void OnVisitSyntaxNode(SyntaxNode syntaxNode)

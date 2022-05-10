@@ -17,7 +17,7 @@ namespace FluentSetups.SourceGenerator
    [Generator]
    public class FluentSetupSourceGenerator : ISourceGenerator
    {
-      #region ISourceGenerator Members
+      #region ISourceGenerator Properties
 
       public void Initialize(GeneratorInitializationContext context)
       {

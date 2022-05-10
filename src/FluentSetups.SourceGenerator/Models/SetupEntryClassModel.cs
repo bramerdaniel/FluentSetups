@@ -21,7 +21,7 @@ namespace FluentSetups.SourceGenerator.Models
       /// <summary>Gets or sets the modifier.</summary>
       public string Modifier { get; set; }
 
-      /// <summary>Gets or sets all the <see cref="SetupClassModel"/>s that will be accessible from this entry class.</summary>
-      public IReadOnlyList<SetupClassModel> SetupClasses { get; set; }
+      /// <summary>Gets or sets all the <see cref="FClass"/>s that will be accessible from this entry class.</summary>
+      public IReadOnlyList<FClass> SetupClasses { get; set; }
    }
 }

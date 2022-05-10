@@ -31,7 +31,7 @@ namespace FluentSetups.SourceGenerator
 
       internal INamedTypeSymbol FluentEntryNamespaceAttribute { get; set; }
 
-      internal INamedTypeSymbol FluentPropertyAttribute { get; set; }
+      internal INamedTypeSymbol FluentMemberAttribute { get; set; }
 
       internal INamedTypeSymbol FluentSetupAttribute { get; set; }
 
@@ -46,7 +46,7 @@ namespace FluentSetups.SourceGenerator
             Compilation = compilation,
             FluentEntryNamespaceAttribute = compilation.GetTypeByMetadataName(FluentEntryNamespaceAttributeName),
             FluentSetupAttribute = compilation.GetTypeByMetadataName(FluentSetupAttributeName),
-            FluentPropertyAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName)
+            FluentMemberAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName)
          };
       }
       
@@ -75,7 +75,7 @@ namespace FluentSetups.SourceGenerator
             return true;
          }
 
-         if (FluentPropertyAttribute == null)
+         if (FluentMemberAttribute == null)
          {
             missingType = FluentMemberAttributeName;
             return true;

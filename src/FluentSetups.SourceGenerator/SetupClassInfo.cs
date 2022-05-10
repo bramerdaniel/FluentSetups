@@ -31,15 +31,12 @@ namespace FluentSetups.SourceGenerator
          SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
          ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
          FluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
-         TargetType = GetTargetType();
-         TargetMode= GetTargetMode();
       }
 
       #endregion
 
       #region Public Properties
-
-      public string ClassName => ClassSyntax.Identifier.Text;
+      
 
       /// <summary>Gets or sets the class symbol.</summary>
       public ITypeSymbol ClassSymbol { get; }
@@ -49,11 +46,11 @@ namespace FluentSetups.SourceGenerator
       public AttributeData FluentSetupAttribute { get; }
 
       public SemanticModel SemanticModel { get; }
-      
-      public TypedConstant TargetType { get; }
 
-      public TypedConstant TargetMode{ get; }
-      
+      public TypedConstant TargetType => FluentSetupAttribute.GetTargetType();
+
+      public TypedConstant TargetMode => FluentSetupAttribute.GetTargetMode();
+
       #endregion
 
       #region Public Methods and Operators

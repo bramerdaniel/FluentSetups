@@ -6,26 +6,44 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
+   using System;
+   using System.Linq;
+
    using Microsoft.CodeAnalysis;
 
-   internal class FProperty : FMember
+   internal class FProperty : IFluentMember
    {
+      private readonly IPropertySymbol propertySymbol;
+
+      private readonly AttributeData memberAttribute;
+
+      public FProperty(IPropertySymbol propertySymbol, AttributeData memberAttribute)
+      {
+         this.propertySymbol = propertySymbol ?? throw new ArgumentNullException(nameof(propertySymbol));
+         this.memberAttribute = memberAttribute;
+         MemberName = propertySymbol.Name;
+
+         //SetupMethodName = ComputeSetupNameFromAttribute(memberAttribute) ?? $"With{propertySymbol.Name}";
+         //RequiredNamespace = ComputeRequiredNamespace(propertySymbol);
+      }
+
+      protected static string ComputeSetupNameFromAttribute(AttributeData attributeData)
+      {
+         if (attributeData == null)
+            return null;
+
+         return attributeData.ConstructorArguments.FirstOrDefault().Value?.ToString();
+      }
+
+      public ITypeSymbol Type => propertySymbol.Type;
+
       #region Public Properties
-      
+
       #endregion
 
       #region Public Methods and Operators
 
-      public static FProperty Create(IPropertySymbol propertySymbol, AttributeData attribute)
-      {
-         return new FProperty
-         {
-            MemberName = propertySymbol.Name, 
-            TypeName = propertySymbol.Type.ToString(),
-            SetupMethodName = ComputeSetupNameFromAttribute(attribute) ?? $"With{propertySymbol.Name}",
-            RequiredNamespace = ComputeRequiredNamespace(propertySymbol)
-         };
-      }
+      public string MemberName { get; set; }
 
       private static string ComputeRequiredNamespace(IPropertySymbol propertySymbol)
       {
@@ -37,5 +55,28 @@ namespace FluentSetups.SourceGenerator.Models
       #region Methods
 
       #endregion
+
+      public bool RequiredSetupGeneration()
+      {
+         if (memberAttribute == null)
+            return false;
+         return true;
+      }
+
+      public string ToCode()
+      {
+         return "// NOT IMPLEMENTED";
+      }
+
+      public bool IsUserDefined => propertySymbol != null;
+
+      public string TypeName => Type.ToString();
+
+      public string RequiredNamespace => ComputeRequiredNamespace(propertySymbol);
+
+      public string GetSetupMethodName()
+      {
+         return ComputeSetupNameFromAttribute(memberAttribute) ?? $"With{propertySymbol.Name}";
+      }
    }
 }

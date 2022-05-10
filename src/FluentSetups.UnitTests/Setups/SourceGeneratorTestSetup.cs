@@ -6,6 +6,8 @@
 
 namespace FluentSetups.UnitTests.Setups;
 
+using System.Linq;
+
 using FluentSetups.SourceGenerator;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -35,7 +37,7 @@ internal class SourceGeneratorTestSetup : SetupBase
       var driver = CSharpGeneratorDriver.Create(generator);
       driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generatedDiagnostics);
       
-      return new GenerationResult(outputCompilation, SyntaxTrees)
+      return new GenerationResult(outputCompilation, outputCompilation.SyntaxTrees.ToArray())
       {
          GeneratedDiagnostics = generatedDiagnostics,
       };

@@ -6,10 +6,14 @@
 
 namespace FluentSetups.UnitTests;
 
+using System;
 using System.Linq;
+using System.Text;
 
 using FluentAssertions;
 using FluentAssertions.Primitives;
+
+using FluentSetups.UnitTests.Setups;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,11 +21,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassAssertion>
 {
+   private readonly GenerationResult generationResult;
+
    #region Constructors and Destructors
 
-   public ClassAssertion(INamedTypeSymbol subject)
+   public ClassAssertion(GenerationResult generationResult, INamedTypeSymbol subject)
       : base(subject)
    {
+      this.generationResult = generationResult;
    }
 
    #endregion
@@ -34,17 +41,36 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
 
    #region Public Methods and Operators
 
+   string GetGeneratedCode()
+   {
+      var builder = new StringBuilder();
+      builder.AppendLine();
+      builder.AppendLine("### INPUT ###");
+      builder.AppendLine(generationResult.SyntaxTrees.First().ToString());
+      builder.AppendLine();
+      builder.AppendLine("### OUTPUT ###");
+
+      foreach (var resultSyntaxTree in generationResult.SyntaxTrees.Skip(1))
+      {
+         builder.AppendLine(resultSyntaxTree.ToString());
+         builder.AppendLine();
+         builder.AppendLine("".PadRight(50, '-'));
+      }
+
+      return builder.ToString();
+   }
+
    public ClassAssertion WithMethod(string methodName)
    {
       var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
-      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found");
+      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found.{GetGeneratedCode()}");
       return this;
    }
 
    public ClassAssertion WithProtectedMethod(string methodName)
    {
       var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
-      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found");
+      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found.{GetGeneratedCode()}");
       methodSymbol.DeclaredAccessibility.Should().Be(Accessibility.Protected);
       return this;
    }

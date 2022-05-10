@@ -19,7 +19,7 @@ internal static class AssertionExtensions
       return new GenerationResultAssertion(target);
    }
 
-   public static SetupClassModelAssertion Should(this SetupClassModel target)
+   public static SetupClassModelAssertion Should(this FClass target)
    {
       return new SetupClassModelAssertion(target);
    }

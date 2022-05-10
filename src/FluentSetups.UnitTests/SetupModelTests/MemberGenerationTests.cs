@@ -39,14 +39,14 @@ namespace FluentSetups.UnitTests.SetupModelTests
       public void EnsureContainingNamespaceIsCorrect()
       {
          string code = @"namespace RonnyThePony
-                      {
-                         [FluentSetups.FluentSetup]
-                         public partial class PersonSetup
                          {
-                            [FluentSetups.FluentProperty]
-                            public string Name { get; set; }
-                         }
-                      }";
+                            [FluentSetups.FluentSetup]
+                            public partial class PersonSetup
+                            {
+                               [FluentSetups.FluentProperty]
+                               public string Name { get; set; }
+                            }
+                         }";
 
          var result = Setup.SetupClassModel()
             .FromSource(code)
@@ -207,6 +207,57 @@ namespace FluentSetups.UnitTests.SetupModelTests
             .Done();
 
          result.Should().HaveTargetTypeNamespace("RonnyTheRobber");
+      }
+
+      [TestMethod]
+      public void EnsureBackingFieldIsAddedFromTargetType()
+      {
+         string code = @"namespace RonnyTheRobber
+                         {
+                            [FluentSetups.FluentSetup(typeof(Person))]
+                            public partial class PersonSetup
+                            {
+                            }
+
+                            public class Person
+                            {
+                               public string Name { get; set; }
+                            }
+                         }";
+
+         var result = Setup.SetupClassModel()
+            .FromSource(code)
+            .Done();
+
+         result.Should()
+            .HaveField("name")
+            .WithTypeName("string");
+      }
+      
+      [TestMethod]
+      public void EnsureSetupMethodIsAddedFromTargetType()
+      {
+         string code = @"namespace RonnyTheRobber
+                      {
+                         [FluentSetups.FluentSetup(typeof(Person))]
+                         public partial class PersonSetup
+                         {
+                         }
+
+                         public class Person
+                         {
+                            public string Name { get; set; }
+                         }
+                      }";
+
+         var result = Setup.SetupClassModel()
+            .FromSource(code)
+            .Done();
+
+         result.Should()
+            .HaveMethod("WithName")
+            .WithTypeName("string").And
+            .WithReturnTypeName("PersonSetup");
       }
 
       #endregion

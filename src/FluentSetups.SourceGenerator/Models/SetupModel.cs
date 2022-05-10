@@ -19,7 +19,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public IList<SetupEntryClassModel> EntryClasses { get; private set; }
 
-      public IList<SetupClassModel> SetupClasses { get; private set; }
+      public IList<FClass> SetupClasses { get; private set; }
 
       #endregion
 
@@ -27,10 +27,10 @@ namespace FluentSetups.SourceGenerator.Models
 
       public static SetupModel Create(FluentGeneratorContext context, SetupClassInfo[] fluentSetupClasses)
       {
-         var classModels = new List<SetupClassModel>(fluentSetupClasses.Length);
+         var classModels = new List<FClass>(fluentSetupClasses.Length);
          foreach (var setupClassInfo in fluentSetupClasses)
          {
-            var classModel = SetupClassModel.Create(context, setupClassInfo);
+            var classModel = FClass.Create(context, setupClassInfo);
             classModels.Add(classModel);
          }
 
@@ -77,7 +77,7 @@ namespace FluentSetups.SourceGenerator.Models
          return ComputeModifier(existingType);
       }
 
-      private static IEnumerable<SetupEntryClassModel> CreateEntryClasses(IEnumerable<SetupClassModel> setupClasses, FluentGeneratorContext context)
+      private static IEnumerable<SetupEntryClassModel> CreateEntryClasses(IEnumerable<FClass> setupClasses, FluentGeneratorContext context)
       {
          foreach (var namespaceGroup in setupClasses.GroupBy(x => x.EntryClassNamespace))
          {

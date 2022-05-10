@@ -15,7 +15,7 @@ internal class SetupClassModelSetup : SetupBase
 {
    #region Public Methods and Operators
 
-   public SetupClassModel Done()
+   public FClass Done()
    {
       var compilation = CreateCompilation();
       var context = FluentGeneratorContext.FromCompilation(compilation);
@@ -24,7 +24,7 @@ internal class SetupClassModelSetup : SetupBase
          throw new InvalidOperationException("The parsed syntax was not a class");
       
       var classInfo = context.CreateFluentSetupInfo(setupClass);
-      return SetupClassModel.Create(context, classInfo);
+      return FClass.Create(context, classInfo);
    }
 
    public SetupClassModelSetup FromSource(string code)

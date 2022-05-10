@@ -44,8 +44,8 @@ namespace FluentSetups.UnitTests
       {
          var classType = Subject.Compilation.GetTypeByMetadataName(className);
          
-         Assert.IsNotNull(classType, $"The class {className} could not be found");
-         return new ClassAssertion(classType);
+         Assert.IsNotNull(classType, $"The class {className} could not be found. {Environment.NewLine}{Subject.SyntaxTrees.Last().ToString()}");
+         return new ClassAssertion(Subject, classType);
       }
 
       public ClassAssertion HavePartialClass(string className)

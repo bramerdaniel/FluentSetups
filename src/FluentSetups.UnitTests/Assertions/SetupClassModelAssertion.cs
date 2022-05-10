@@ -15,11 +15,11 @@ using FluentSetups.SourceGenerator.Models;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-internal class SetupClassModelAssertion : ReferenceTypeAssertions<SetupClassModel, SetupClassModelAssertion>
+internal class SetupClassModelAssertion : ReferenceTypeAssertions<FClass, SetupClassModelAssertion>
 {
    #region Constructors and Destructors
 
-   public SetupClassModelAssertion(SetupClassModel target)
+   public SetupClassModelAssertion(FClass target)
       : base(target)
    {
    }
@@ -64,64 +64,31 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<SetupClassMode
       return new AndConstraint<SetupClassModelAssertion>(this);
    }
 
-   public SetupMemberModelAssertion HaveProperty(string expectedPropertyName)
+   public FPropertyAssertion HaveProperty(string expectedPropertyName)
    {
       var property = Subject.Properties.FirstOrDefault(p => p.MemberName == expectedPropertyName);
       Assert.IsNotNull(property);
 
-      return new SetupMemberModelAssertion(property);
+      return new FPropertyAssertion(property);
    }
 
-   public SetupMemberModelAssertion HaveField(string expectedFieldName)
+   public FMethodAssertion HaveMethod(string expectedFieldName)
    {
-      var property = Subject.Fields.FirstOrDefault(p => p.MemberName == expectedFieldName);
-      Assert.IsNotNull(property);
+      var method = Subject.Methods.FirstOrDefault(p => p.MemberName == expectedFieldName);
+      Assert.IsNotNull(method, $"The class {Subject.ClassName} did not have the expected method '{expectedFieldName}'.");
 
-      return new SetupMemberModelAssertion(property);
+      return new FMethodAssertion(method);
+   }
+   public FFieldAssertion HaveField(string expectedFieldName)
+   {
+      var field = Subject.Fields.FirstOrDefault(p => p.Name == expectedFieldName);
+      Assert.IsNotNull(field, $"The class {Subject.ClassName} did not have the expected field {expectedFieldName}.");
+
+      return new FFieldAssertion(field);
    }
 
    #endregion
 
-   internal class SetupMemberModelAssertion : ReferenceTypeAssertions<FMember, SetupMemberModelAssertion>
-   {
-      #region Constructors and Destructors
-
-      public SetupMemberModelAssertion(FMember subject)
-         : base(subject)
-      {
-      }
-
-      #endregion
-
-      #region Properties
-
-      protected override string Identifier => nameof(SetupMemberModelAssertion);
-
-      #endregion
-
-      #region Public Methods and Operators
-
-      public AndConstraint<SetupMemberModelAssertion> WithSetupMethodName(string expectedName)
-      {
-         Assert.AreEqual(expectedName, Subject.SetupMethodName);
-         return new AndConstraint<SetupMemberModelAssertion>(this);
-      }
-
-      #endregion
-
-      public AndConstraint<SetupMemberModelAssertion> WithTypeName(string expectedTypeName)
-      {
-         Assert.AreEqual(expectedTypeName, Subject.TypeName);
-         return new AndConstraint<SetupMemberModelAssertion>(this);
-      }
-
-      public AndConstraint<SetupMemberModelAssertion> WithRequiredNamespace(string expectedNamespace)
-      {
-         Assert.AreEqual(expectedNamespace, Subject.RequiredNamespace);
-         return new AndConstraint<SetupMemberModelAssertion>(this);
-      }
-
-   }
 
 
 }
