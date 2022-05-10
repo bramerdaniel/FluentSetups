@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SyntaxHelper.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SyntaxHelper.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,12 +16,22 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public class SyntaxHelper : CSharpSyntaxWalker
 {
+   #region Constants and Fields
+
    private readonly FluentSetupSyntaxReceiver receiver;
+
+   #endregion
+
+   #region Constructors and Destructors
 
    public SyntaxHelper()
    {
       receiver = new FluentSetupSyntaxReceiver();
    }
+
+   #endregion
+
+   #region Public Methods and Operators
 
    public override void VisitClassDeclaration(ClassDeclarationSyntax node)
    {
@@ -29,10 +39,9 @@ public class SyntaxHelper : CSharpSyntaxWalker
       base.VisitClassDeclaration(node);
    }
 
-   internal IList<ClassDeclarationSyntax> GetSetupClasses()
-   {
-      return receiver.SetupCandidates;
-   }
+   #endregion
+
+   #region Methods
 
    internal static IEnumerable<ClassDeclarationSyntax> FindSetupClasses(SyntaxTree syntaxTree)
    {
@@ -40,4 +49,11 @@ public class SyntaxHelper : CSharpSyntaxWalker
       syntaxWalker.Visit(syntaxTree.GetRoot());
       return syntaxWalker.GetSetupClasses();
    }
+
+   internal IList<ClassDeclarationSyntax> GetSetupClasses()
+   {
+      return receiver.SetupCandidates;
+   }
+
+   #endregion
 }

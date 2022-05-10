@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupTargetModel.cs" company="consolovers">
+// <copyright file="FTarget.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -7,30 +7,29 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System.Collections.Generic;
-   using System.Globalization;
    using System.Linq;
 
    using Microsoft.CodeAnalysis;
 
-   internal class SetupTargetModel
+   internal class FTarget
    {
       #region Constructors and Destructors
 
-      public IReadOnlyList<TargetMemberModel> Members { get; }
+      public IReadOnlyList<FTargetProperty> Properties { get; }
 
-      private SetupTargetModel(SetupClassModel setupClass, INamedTypeSymbol typeSymbol)
+      internal FTarget(FClass setupClass, INamedTypeSymbol typeSymbol)
       {
          SetupClass = setupClass;
          TypeSymbol = typeSymbol;
-         Members = ComputeMembers(typeSymbol).ToArray();
+         Properties = ComputeMembers().ToArray();
       }
 
-      private static IEnumerable<TargetMemberModel> ComputeMembers(INamedTypeSymbol typeSymbol)
+      private IEnumerable<FTargetProperty> ComputeMembers()
       {
-         foreach (var targetMember in typeSymbol.GetMembers().OfType<IPropertySymbol>())
+         foreach (var targetMember in TypeSymbol.GetMembers().OfType<IPropertySymbol>())
          {
             if (CanBeSet(targetMember))
-               yield return TargetMemberModel.Create(targetMember);
+               yield return new FTargetProperty(targetMember);
          }
       }
 
@@ -59,7 +58,7 @@ namespace FluentSetups.SourceGenerator.Models
       public string Namespace => TypeSymbol.ContainingNamespace.IsGlobalNamespace
             ? null : TypeSymbol.ContainingNamespace.ToString();
 
-      public SetupClassModel SetupClass { get; }
+      public FClass SetupClass { get; }
 
       public string TypeName => TypeSymbol.Name;
 
@@ -69,9 +68,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
-      public static SetupTargetModel Create(SetupClassModel owningSetup, INamedTypeSymbol targetType)
+      public static FTarget Create(FClass owningSetup, INamedTypeSymbol targetType)
       {
-         return new SetupTargetModel(owningSetup, targetType);
+         return new FTarget(owningSetup, targetType);
       }
 
       #endregion

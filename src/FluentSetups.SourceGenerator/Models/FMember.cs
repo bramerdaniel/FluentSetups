@@ -14,12 +14,12 @@ namespace FluentSetups.SourceGenerator.Models
    {
       #region Public Properties
 
-      public string LowerMemberName => $"{char.ToLowerInvariant(MemberName[0])}{MemberName.Substring(1)}";
+      //public string LowerMemberName => $"{char.ToLowerInvariant(Name[0])}{Name.Substring(1)}";
 
       /// <summary>Gets or sets the name of the member.</summary>
-      public string MemberName { get; set; }
+      //public string Name { get; set; }
 
-      public string MemberSetFieldName => $"{LowerMemberName}WasSet";
+      //public string MemberSetFieldName => $"{LowerMemberName}WasSet";
 
       public string RequiredNamespace { get; protected set; }
 
@@ -28,7 +28,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string TypeName { get; protected set; }
 
-      public string UpperMemberName => $"{char.ToUpperInvariant(MemberName[0])}{MemberName.Substring(1)}";
+      // public string UpperMemberName => $"{char.ToUpperInvariant(Name[0])}{Name.Substring(1)}";
 
       #endregion
 
@@ -36,6 +36,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       protected static string ComputeSetupNameFromAttribute(AttributeData attributeData)
       {
+         if (attributeData == null)
+            return null;
+
          return attributeData.ConstructorArguments.FirstOrDefault().Value?.ToString();
       }
 

@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EntryPointGenerationTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="EntryPointGenerationTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,6 +14,55 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 public class EntryPointGenerationTests
 {
    #region Public Methods and Operators
+
+   [TestMethod]
+   public void EnsureExistingEntryClassWithDifferentModifierAdjustGeneratedModifier()
+   {
+      string code = @"namespace MyUnitTests
+                      {  
+                         using FluentSetups;
+
+                         public partial class Setup { }
+
+                         [FluentSetup]
+                         public partial class PersonSetup { }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("MyUnitTests")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyUnitTests.Setup")
+         .WithPublicModifier()
+         .WithStaticMethod("Person");
+   }
+
+   [TestMethod]
+   public void EnsureMultipleSetupMethodsGetSameEntryClass()
+   {
+      string code = @"namespace RonnyTheRobber
+                      {
+                         [FluentSetups.FluentSetup(""FSetup"")]
+                         public partial class PersonSetup
+                         { }
+
+                         [FluentSetups.FluentSetup(""FSetup"")]
+                         public partial class BallSetup
+                         { }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("RonnyTheRobber")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.FSetup")
+         .WithStaticMethod("Person")
+         .WithStaticMethod("Ball");
+   }
 
    [TestMethod]
    public void EnsureSetupEntryMethodIsGeneratedCorrectly()
@@ -38,6 +87,27 @@ public class EntryPointGenerationTests
    }
 
    [TestMethod]
+   public void EnsureSetupInRootNamespaceIsGeneratedCorrectly()
+   {
+      string code = @"
+                      public class Person{ }
+                      
+                      [FluentSetups.FluentSetup(typeof(Person))]
+                      internal partial class PersonSetup { }
+                      ";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("MyRoot")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyRoot.Setup")
+         .WithInternalModifier()
+         .WithStaticMethod("Person");
+   }
+
+   [TestMethod]
    public void EnsureSetupMethodIsGeneratedCorrectly()
    {
       string code = @"namespace RonnyTheRobber
@@ -56,30 +126,36 @@ public class EntryPointGenerationTests
          .WithInternalModifier()
          .WithStaticMethod("Person");
    }
-   
-   [TestMethod]
-   public void EnsureMultipleSetupMethodsGetSameEntryClass()
-   {
-      string code = @"namespace RonnyTheRobber
-                      {
-                         [FluentSetups.FluentSetup(""FSetup"")]
-                         public partial class PersonSetup
-                         { }
 
-                         [FluentSetups.FluentSetup(""FSetup"")]
-                         public partial class BallSetup
-                         { }
+   [TestMethod]
+   public void EnsureSetupTypesFromDifferentNamespacesWorkCorrectly()
+   {
+      string target = @"namespace FirstNamespace
+                      {
+                         [FluentSetups.FluentSetup]
+                         public partial class FirstSetup
+                         {
+                         }
+                      }";
+
+      string code = @"namespace SecondNamespace
+                      {
+                         [FluentSetups.FluentSetup]
+                         public partial class SecondSetup
+                         {
+                         }
                       }";
 
       var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("RonnyTheRobber")
+         .WithRootNamespace("RootNamespace")
+         .WithSource(target)
          .WithSource(code)
          .Done();
 
       result.Should().NotHaveErrors().And
-         .HaveClass("RonnyTheRobber.FSetup")
-         .WithStaticMethod("Person")
-         .WithStaticMethod("Ball");
+         .HaveClass("RootNamespace.Setup")
+         .WithStaticMethod("First")
+         .WithStaticMethod("Second");
    }
 
    [TestMethod]
@@ -115,82 +191,5 @@ public class EntryPointGenerationTests
          .WithStaticMethod("Person");
    }
 
-   [TestMethod]
-   public void EnsureSetupTypesFromDifferentNamespacesWorkCorrectly()
-   {
-      string target = @"namespace FirstNamespace
-                      {
-                         [FluentSetups.FluentSetup]
-                         public partial class FirstSetup
-                         {
-                         }
-                      }";
-
-      string code = @"namespace SecondNamespace
-                      {
-                         [FluentSetups.FluentSetup]
-                         public partial class SecondSetup
-                         {
-                         }
-                      }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("RootNamespace")
-         .WithSource(target)
-         .WithSource(code)
-         .Done();
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("RootNamespace.Setup")
-         .WithStaticMethod("First")
-         .WithStaticMethod("Second");
-   }
-
-
-   [TestMethod]
-   public void EnsureExistingEntryClassWithDifferentModifierAdjustGeneratedModifier()
-   {
-      string code = @"namespace MyUnitTests
-                      {  
-                         using FluentSetups;
-
-                         public partial class Setup { }
-
-                         [FluentSetup]
-                         public partial class PersonSetup { }
-                      }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("MyUnitTests")
-         .WithSource(code)
-         .Done();
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("MyUnitTests.Setup")
-         .WithPublicModifier()
-         .WithStaticMethod("Person");
-   }
-
-
-   [TestMethod]
-   public void EnsureSetupInRootNamespaceIsGeneratedCorrectly()
-   {
-      string code = @"
-                      public class Person{ }
-                      
-                      [FluentSetups.FluentSetup(typeof(Person))]
-                      internal partial class PersonSetup { }
-                      ";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithRootNamespace("MyRoot")
-         .WithSource(code)
-         .Done();
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("MyRoot.Setup")
-         .WithInternalModifier()
-         .WithStaticMethod("Person");
-   }
    #endregion
 }

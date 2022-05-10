@@ -1,13 +1,16 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="consolovers">
+// <copyright file="IFluentTypedMember.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace MySetups
+namespace FluentSetups.SourceGenerator.Models
 {
-   internal class Setup
+   using Microsoft.CodeAnalysis;
+
+   interface IFluentTypedMember : IFluentMember
    {
-   
+      /// <summary>Gets the type of the member.</summary>
+      ITypeSymbol Type { get;  }
    }
 }

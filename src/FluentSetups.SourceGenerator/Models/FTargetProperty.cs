@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TargetMemberModel.cs" company="consolovers">
+// <copyright file="FTargetProperty.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -10,23 +10,32 @@ namespace FluentSetups.SourceGenerator.Models
 
    using Microsoft.CodeAnalysis;
 
-   internal class TargetMemberModel : FMember
+   internal class FTargetProperty
    {
       public IPropertySymbol PropertySymbol { get; }
 
-      private TargetMemberModel(IPropertySymbol propertySymbol)
+      internal FTargetProperty(IPropertySymbol propertySymbol)
       {
          PropertySymbol = propertySymbol ?? throw new ArgumentNullException(nameof(propertySymbol));
-         MemberName = PropertySymbol.Name;
+         Name = PropertySymbol.Name;
          SetupMethodName = $"With{propertySymbol.Name}";
-         TypeName = propertySymbol.Type.ToString();
          RequiredNamespace = propertySymbol.Type.ContainingNamespace.ToString(); // TODO for global namespace
-         
+
       }
 
-      public static TargetMemberModel Create(IPropertySymbol propertySymbol)
+      public string RequiredNamespace { get; }
+
+      public string SetupMethodName { get; }
+
+      public string TypeName => PropertySymbol.Type.ToString();
+
+      public string Name { get; set; }
+
+      public ITypeSymbol Type => PropertySymbol.Type;
+
+      public static FTargetProperty Create(IPropertySymbol propertySymbol)
       {
-         return new TargetMemberModel(propertySymbol);
+         return new FTargetProperty(propertySymbol);
       }
    }
 }

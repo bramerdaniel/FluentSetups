@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GetSetupEntryClassNameTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="GetSetupEntryClassNameTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,39 +17,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 [TestClass]
 public class GetSetupEntryClassNameTests
 {
-   [TestMethod]
-   public void EnsureSetupEntryClassNameIsNullWhenFluentSetupsNamespaceIsMissing()
-   {
-      string code = @"[FluentSetup]
-                      public partial class PersonSetup
-                      {
-                         [FluentProperty]
-                         public string Name { get; set; }
-
-                      }";
-
-      Setup.SetupClassInfo()
-         .WithSource(code)
-         .Invoking(x => x.Done())
-         .Should().Throw<ArgumentException>();
-   }
-
-   [TestMethod]
-   public void EnsureSetupEntryClassNameIsNullWhenWrongNamespaceIsUsed()
-   {
-      string code = @"[AnyOtherName.FluentSetup]
-                      public partial class PersonSetup : ISetup<Person>
-                      {
-                         [FluentProperty]
-                         public string Name { get; set; }
-
-                      }";
-
-      Setup.SetupClassInfo()
-         .WithSource(code)
-         .Invoking(x => x.Done())
-         .Should().Throw<ArgumentException>();
-   }
+   #region Public Methods and Operators
 
    [TestMethod]
    public void EnsureEntryClassNameIsComputedCorrectlyWithCorrectNamespace()
@@ -111,4 +79,39 @@ public class GetSetupEntryClassNameTests
       setupClassInfo.GetSetupEntryClassName().Should().Be("MyCustomSetup");
    }
 
+   [TestMethod]
+   public void EnsureSetupEntryClassNameIsNullWhenFluentSetupsNamespaceIsMissing()
+   {
+      string code = @"[FluentSetup]
+                      public partial class PersonSetup
+                      {
+                         [FluentProperty]
+                         public string Name { get; set; }
+
+                      }";
+
+      Setup.SetupClassInfo()
+         .WithSource(code)
+         .Invoking(x => x.Done())
+         .Should().Throw<ArgumentException>();
+   }
+
+   [TestMethod]
+   public void EnsureSetupEntryClassNameIsNullWhenWrongNamespaceIsUsed()
+   {
+      string code = @"[AnyOtherName.FluentSetup]
+                      public partial class PersonSetup : ISetup<Person>
+                      {
+                         [FluentProperty]
+                         public string Name { get; set; }
+
+                      }";
+
+      Setup.SetupClassInfo()
+         .WithSource(code)
+         .Invoking(x => x.Done())
+         .Should().Throw<ArgumentException>();
+   }
+
+   #endregion
 }

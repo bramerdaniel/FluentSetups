@@ -1,13 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupClassInfo.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SetupClassInfo.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.SourceGenerator
 {
    using System;
-   using System.Collections.Generic;
    using System.Linq;
 
    using Microsoft.CodeAnalysis;
@@ -16,30 +15,21 @@ namespace FluentSetups.SourceGenerator
    /// <summary>Data class containing all the required information along the generation process</summary>
    internal class SetupClassInfo
    {
-      #region Constants and Fields
-
-      private FluentGeneratorContext Context { get; }
-
-      #endregion
-
       #region Constructors and Destructors
 
-      public SetupClassInfo(FluentGeneratorContext context, ClassDeclarationSyntax candidate, SemanticModel semanticModel, ITypeSymbol classSymbol, AttributeData fluentSetupAttribute)
+      public SetupClassInfo(FluentGeneratorContext context, ClassDeclarationSyntax candidate, SemanticModel semanticModel, ITypeSymbol classSymbol,
+         AttributeData fluentSetupAttribute)
       {
          Context = context;
          ClassSyntax = candidate ?? throw new ArgumentNullException(nameof(candidate));
          SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
          ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
          FluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
-         TargetType = GetTargetType();
-         TargetMode= GetTargetMode();
       }
 
       #endregion
 
       #region Public Properties
-
-      public string ClassName => ClassSyntax.Identifier.Text;
 
       /// <summary>Gets or sets the class symbol.</summary>
       public ITypeSymbol ClassSymbol { get; }
@@ -49,11 +39,17 @@ namespace FluentSetups.SourceGenerator
       public AttributeData FluentSetupAttribute { get; }
 
       public SemanticModel SemanticModel { get; }
-      
-      public TypedConstant TargetType { get; }
 
-      public TypedConstant TargetMode{ get; }
-      
+      public TypedConstant TargetMode => FluentSetupAttribute.GetTargetMode();
+
+      public TypedConstant TargetType => FluentSetupAttribute.GetTargetType();
+
+      #endregion
+
+      #region Properties
+
+      private FluentGeneratorContext Context { get; }
+
       #endregion
 
       #region Public Methods and Operators
@@ -94,6 +90,13 @@ namespace FluentSetups.SourceGenerator
          return ClassSymbol.ContainingAssembly.MetadataName;
       }
 
+      private TypedConstant GetTargetMode()
+      {
+         if (TryGetNamedArgument("TargetMode", out var targetType) && targetType.Kind == TypedConstantKind.Enum)
+            return targetType;
+         return default;
+      }
+
       private TypedConstant GetTargetType()
       {
          if (TryGetConstructorArgument(TypedConstantKind.Type, out var targetType))
@@ -102,11 +105,15 @@ namespace FluentSetups.SourceGenerator
             return targetType;
          return default;
       }
-      private TypedConstant GetTargetMode()
+
+      private bool IsFluentSetupAttribute(AttributeData attributeData)
       {
-         if (TryGetNamedArgument("TargetMode", out var targetType) && targetType.Kind == TypedConstantKind.Enum)
-            return targetType;
-         return default;
+         return IsFluentSetupAttribute(attributeData.AttributeClass);
+      }
+
+      private bool IsFluentSetupAttribute(INamedTypeSymbol attributeSymbol)
+      {
+         return Context.FluentSetupAttribute.Equals(attributeSymbol, SymbolEqualityComparer.Default);
       }
 
       private bool TryGetConstructorArgument(TypedConstantKind type, out TypedConstant targetType)
@@ -137,16 +144,6 @@ namespace FluentSetups.SourceGenerator
 
          typedConstant = default;
          return false;
-      }
-
-      private bool IsFluentSetupAttribute(AttributeData attributeData)
-      {
-         return IsFluentSetupAttribute(attributeData.AttributeClass);
-      }
-
-      private bool IsFluentSetupAttribute(INamedTypeSymbol attributeSymbol)
-      {
-         return Context.FluentSetupAttribute.Equals(attributeSymbol, SymbolEqualityComparer.Default);
       }
 
       #endregion
