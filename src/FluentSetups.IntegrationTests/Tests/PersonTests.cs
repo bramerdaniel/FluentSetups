@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 public class PersonTests
 {
    [TestMethod]
+   [Ignore]
    public void SetupThatIsHidingAPublicProperty()
    {
       var person = Setup.Person()

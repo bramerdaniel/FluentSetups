@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Setup.cs" company="KUKA Deutschland GmbH">
+// <copyright file="SinglePropTargetSetup.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,8 +8,12 @@ namespace FluentSetups.IntegrationTests.Setups;
 
 using FluentSetups.IntegrationTests.Targets;
 
-[FluentSetup(typeof(Car))]
-internal partial class CarSetup
+[FluentSetup(typeof(SinglePropTarget))]
+internal partial class SinglePropTargetSetup
 {
+}
 
+[FluentSetup(typeof(MultiPropTarget))]
+internal partial class MultiPropTargetSetup
+{
 }

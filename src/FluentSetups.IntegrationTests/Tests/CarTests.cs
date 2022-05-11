@@ -14,9 +14,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 public class CarTests
 {
    [TestMethod]
+   [Ignore]
    public void CreateCar()
    {
-      var car = Setup.Car()
+      var car = Setup.SinglePropTarget()
          .WithBrand("BMW")
          .Done();
 

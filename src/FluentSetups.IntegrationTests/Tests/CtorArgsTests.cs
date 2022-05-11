@@ -30,6 +30,7 @@ public class CtorArgsTests
    }
 
    [TestMethod]
+   [Ignore]
    public void EnsureMissingFirstConstructorArgumentThrows()
    {
       var setup = Setup.CtorArgs()
@@ -40,6 +41,7 @@ public class CtorArgsTests
    }
 
    [TestMethod]
+   [Ignore]
    public void EnsureMissingSecondConstructorArgumentThrows()
    {
       var setup = Setup.CtorArgs()
@@ -50,6 +52,7 @@ public class CtorArgsTests
    }
 
    [TestMethod]
+   [Ignore]
    public void EnsureMissingThirdConstructorArgumentThrows()
    {
       var setup = Setup.CtorArgs()

@@ -3,17 +3,13 @@
 		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
 		<TargetFrameworks>net461;net6.0;netstandard2.0</TargetFrameworks>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>0.2.0-rc.1</Version>
-		<Authors>Daniel Bramer</Authors>
-		<PackageProjectUrl>https://github.com/bramerdaniel/FluentSetups</PackageProjectUrl>
-		<Company>ConsoLovers</Company>
-		<Copyright>Copyright 2022</Copyright>
+		<Version>$(FluentSetupsPackageVersion)</Version>
 		<Description>Helper utility for generating fluent setup classes from the existing code, using an ISourceGenerator</Description>
 	</PropertyGroup>
 
-
 	<ItemGroup>
-		<None Include="$(SolutionDir)$(Configuration)\FluentSetups.SourceGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Include="$(SolutionDir)$(Configuration)\FluentSetups.SourceGenerator.dll" 
+			  Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 
 </Project>

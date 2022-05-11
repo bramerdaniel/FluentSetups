@@ -20,7 +20,6 @@ namespace FluentSetups.SourceGenerator.Models
          Name = PropertySymbol.Name;
          SetupMethodName = $"With{propertySymbol.Name}";
          RequiredNamespace = propertySymbol.Type.ContainingNamespace.ToString(); // TODO for global namespace
-
       }
 
       public string RequiredNamespace { get; }

@@ -404,17 +404,6 @@ namespace FluentSetups.SourceGenerator.Models
             {
                AddMethodFromField(backingField);
             }
-
-            //var method = new FMethod($"With{constructorParameter.Name.ToFirstUpper()}", constructorParameter.Type, classSymbol);
-            //if (AddMethod(method))
-            //{
-            //   var backingField = new FField(constructorParameter.Type, constructorParameter.Name);
-            //   method.Source = backingField;
-            //   AddField(backingField);
-
-            //   method.SetupIndicatorField = new FField(Context.BooleanType, $"{constructorParameter.Name.ToFirstLower()}WasSet");
-            //   AddField(method.SetupIndicatorField);
-            //}
          }
       }
 
