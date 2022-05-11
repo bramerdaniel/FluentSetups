@@ -47,14 +47,9 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         name: binaries
-        path: ${{ env.SOLUTION_DIRECTORY }}\net6.0\*.dll
+        path: ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\*.dll
         retention-days: 1      
 
-
-      
-      #TODO create matrix for all platforms
-    - name: run unit tests
-      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
 
   unit-tests:
     needs: build
