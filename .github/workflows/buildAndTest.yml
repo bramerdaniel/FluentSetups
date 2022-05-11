@@ -33,24 +33,49 @@ jobs:
     - name: build solution
       run: msbuild ${{ env.SOLUTION_PATH }} -property:Configuration=Release
 
-    - name: show results
+    - name: show build results
       run: dir ${{ env.SOLUTION_DIRECTORY }}\Release
-      
-    - name: setup VSTest.console.exe
-      uses: darenm/Setup-VSTest@v1
-      
-      #TODO create matrix for all platforms
-    - name: run unit tests
-      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
-    
-    - name: upload artifacts
-      # if: ${{ github.ref == 'refs/heads/master' }}
+
+    - name: upload nuget package
       uses: actions/upload-artifact@v3.0.0
       with:
         name: nugetPackage
         path: ${{ env.SOLUTION_DIRECTORY }}\Release\*.nupkg
         retention-days: 1
 
+    - name: upload binaries
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: binaries
+        path: ${{ env.SOLUTION_DIRECTORY }}\net6.0\*.dll
+        retention-days: 1      
+
+
+      
+      #TODO create matrix for all platforms
+    - name: run unit tests
+      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
+
+  unit-tests:
+    needs: build
+    runs-on: windows-latest
+    steps:
+
+    - name: download artifacts
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: binaries
+        path: testBinaries
+    
+    - name: show binaries
+      run: dir testBinaries
+ 
+    - name: setup VSTest.console.exe
+      uses: darenm/Setup-VSTest@v1
+
+    - name: run unit tests
+      run: vstest.console.exe testBinaries\FluentSetups.UnitTests.dll
+    
   integration-tests:
     needs: build
     runs-on: windows-latest
@@ -92,7 +117,7 @@ jobs:
       run: dir
 
   publish:
-    needs: integration-tests
+    needs: [unit-tests, integration-tests]
     runs-on: windows-latest
     if: ${{ github.ref == 'refs/heads/master' }}
     steps:
