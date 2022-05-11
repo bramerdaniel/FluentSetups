@@ -38,6 +38,9 @@ jobs:
       #TODO create matrix for all platforms
     - name: run unit tests
       run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
+    
+    - name: show results
+      run: dir ${{ env.SOLUTION_DIRECTORY }}\Release
 
     - name: upload artifacts
       if: ${{ github.ref == 'refs/heads/master' }}
