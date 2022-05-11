@@ -8,6 +8,7 @@ on:
 env:
   SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
+  INTEGRATION_TEST_SOLUTION : src/FluentSetups.IntegrationTests/FluentSetups.IntegrationTests.sln
   
 jobs:
   build:
@@ -31,7 +32,10 @@ jobs:
 
     - name: build solution
       run: msbuild ${{ env.SOLUTION_PATH }} -property:Configuration=Release
-   
+
+    - name: show results
+      run: dir ${{ env.SOLUTION_DIRECTORY }}\Release
+      
     - name: setup VSTest.console.exe
       uses: darenm/Setup-VSTest@v1
       
@@ -39,16 +43,53 @@ jobs:
     - name: run unit tests
       run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
     
-    - name: show results
-      run: dir ${{ env.SOLUTION_DIRECTORY }}\Release
-
     - name: upload artifacts
-      if: ${{ github.ref == 'refs/heads/master' }}
+      # if: ${{ github.ref == 'refs/heads/master' }}
       uses: actions/upload-artifact@v3.0.0
       with:
         name: nugetPackage
-        path: src\Release\*.nupkg
+        path: ${{ env.SOLUTION_DIRECTORY }}\Release\*.nupkg
         retention-days: 1
+
+  integration-tests:
+    needs: build
+    runs-on: windows-latest
+    steps:
+    - name: checkout branch
+      uses: actions/checkout@v3
+
+    - name: download artifacts
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: nugetPackage
+        path: src\FluentSetups.IntegrationTests\packages
+    
+    - name: show working dir
+      run: dir
+
+    - name: setup NuGet.exe
+      uses: NuGet/setup-nuget@v1.0.6
+      with:
+        nuget-version: latest
+        nuget-api-key: ${{secrets.NUGET_API_KEY}}
+    
+    - name: restore NuGet packages
+      run: nuget restore ${{ env.INTEGRATION_TEST_SOLUTION }}
+    
+    - name: setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: build solution
+      run: msbuild ${{ env.INTEGRATION_TEST_SOLUTION }} -property:Configuration=Release
+   
+    - name: setup VSTest.console.exe
+      uses: darenm/Setup-VSTest@v1
+
+    - name: run integration tests
+      run: vstest.console.exe src/FluentSetups.IntegrationTests/Release/net6.0/FluentSetups.IntegrationTests.dll /logger:trx;LogFileName=result.trx
+
+    - name: show working dir
+      run: dir
 
   publish:
     needs: build
