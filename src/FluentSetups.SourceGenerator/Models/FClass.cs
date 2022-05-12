@@ -247,6 +247,7 @@ namespace FluentSetups.SourceGenerator.Models
       {
          sourceBuilder.AppendLine("using System;");
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
+         sourceBuilder.AppendLine("using FluentSetups;");
          if (TargetCreationPossible() && !string.IsNullOrWhiteSpace(TargetTypeNamespace))
             sourceBuilder.AppendLine($"using {TargetTypeNamespace};");
       }

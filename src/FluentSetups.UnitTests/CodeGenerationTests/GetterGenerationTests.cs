@@ -202,4 +202,34 @@ public class GetterGenerationTests
          .WithField("nameWasSet")
          .WhereMethod("GetName").IsProtected();
    }
+
+   [TestMethod]
+   public void EnsureContentOfGetNameIsGeneratedCorrectly()
+   {
+      var code = @"namespace RonnyTheRobber
+                      {
+                         internal class Person 
+                         {  
+                           public Person(string name) 
+                           {
+                           }
+                         }
+
+                         [FluentSetups.FluentSetup(typeof(Person))]
+                         public partial class PersonSetup
+                         {
+                         }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WhereMethod("GetName")
+         .Contains("if (nameWasSet)")
+         .Contains("return name;")
+         .Contains("return defaultValue != null ? defaultValue() : throw new SetupMemberNotInitializedException(nameof(name));");
+   }
 }

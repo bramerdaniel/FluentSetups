@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CarTests.cs" company="KUKA Deutschland GmbH">
+// <copyright file="SinglePropTests.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
-public class CarTests
+public class SinglePropTests
 {
    [TestMethod]
    [Ignore]
