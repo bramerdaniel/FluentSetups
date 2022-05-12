@@ -30,36 +30,39 @@ public class CtorArgsTests
    }
 
    [TestMethod]
-   [Ignore]
    public void EnsureMissingFirstConstructorArgumentThrows()
    {
       var setup = Setup.CtorArgs()
          .WithSecond(5)
          .WithThird(true);
 
-      setup.Invoking(s => s.Done()).Should().Throw<SetupMemberNotInitializedException>();
+      setup.Invoking(s => s.Done()).Should()
+         .Throw<SetupMemberNotInitializedException>()
+         .Where(e => e.MemberName == "first");
    }
 
    [TestMethod]
-   [Ignore]
    public void EnsureMissingSecondConstructorArgumentThrows()
    {
       var setup = Setup.CtorArgs()
          .WithFirst("Hans")
          .WithThird(true);
 
-      setup.Invoking(s => s.Done()).Should().Throw<SetupMemberNotInitializedException>();
+      setup.Invoking(s => s.Done()).Should()
+         .Throw<SetupMemberNotInitializedException>()
+         .Where(e => e.MemberName == "second");
    }
 
    [TestMethod]
-   [Ignore]
    public void EnsureMissingThirdConstructorArgumentThrows()
    {
       var setup = Setup.CtorArgs()
          .WithFirst("Hans")
          .WithSecond(5);
 
-      setup.Invoking(s => s.Done()).Should().Throw<SetupMemberNotInitializedException>();
+      setup.Invoking(s => s.Done()).Should()
+         .Throw<SetupMemberNotInitializedException>()
+         .Where(e => e.MemberName == "third");
    }
 
 

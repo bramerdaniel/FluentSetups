@@ -12,11 +12,15 @@ namespace FluentSetups
    [SuppressMessage("ReSharper", "UnusedMember.Global")]
    public class SetupMemberNotInitializedException : Exception
    {
+      /// <summary>Gets the name of the member.</summary>
+      public string MemberName { get; }
+
       #region Constructors and Destructors
 
       public SetupMemberNotInitializedException(string memberName)
          : base(CreateMessage(memberName))
       {
+         MemberName = memberName;
       }
 
       #endregion
