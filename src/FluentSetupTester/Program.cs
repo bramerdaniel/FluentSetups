@@ -55,7 +55,7 @@ namespace FluentSetupTester
 
       static void Main()
       {
-         var syntaxTrees = ParseInput("FluentSetupTester.ToolSetup.cs", "FluentSetupTester.Setup.cs");
+         var syntaxTrees = ParseInput("FluentSetupTester.Setup.cs", "FluentSetupTester.ToolSetup.cs");
 
          var (diagnostics, output) = RunSourceGenerator(syntaxTrees);
          if (diagnostics.Length > 0)
@@ -114,7 +114,7 @@ namespace FluentSetupTester
          driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var generateDiagnostics);
 
          //// var immutableArray = compilation.GetDiagnostics();
-         return (generateDiagnostics, outputCompilation.SyntaxTrees.Last().ToString());
+         return (generateDiagnostics, outputCompilation.SyntaxTrees.ElementAt(2).ToString());
       }
 
       private static void WriteDiagnostic(Diagnostic diagnostic)

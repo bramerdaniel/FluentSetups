@@ -7,11 +7,13 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System;
+   using System.Diagnostics;
    using System.Linq;
    using System.Text;
 
    using Microsoft.CodeAnalysis;
 
+   [DebuggerDisplay("{Name}")]
    internal class FMethod : IFluentMethod
    {
       #region Constants and Fields
@@ -29,28 +31,29 @@ namespace FluentSetups.SourceGenerator.Models
          ParameterType = methodSymbol.Parameters.FirstOrDefault()?.Type;
          ParameterTypeName = ParameterType?.ToString();
          ParameterCount = methodSymbol.Parameters.Length;
+         Category = ComputeCategory(Name);
       }
 
       public FMethod(string methodName, ITypeSymbol parameterType, ITypeSymbol returnType)
       {
          Name = methodName ?? throw new ArgumentNullException(nameof(methodName));
-         ParameterType = parameterType ?? throw new ArgumentNullException(nameof(parameterType));
-         ParameterTypeName = parameterType.ToString();
-         ReturnType = returnType.Name;
-         ParameterCount = 1;
+         ParameterType = parameterType;
+         ParameterTypeName = parameterType?.ToString();
+         ReturnType = returnType?.Name ?? "void";
+         ParameterCount = parameterType == null ? 0 : 1;
+         Category = ComputeCategory(Name);
       }
 
       #endregion
 
-      #region IFluentMember Members
+      #region IFluentMethod Members
 
-      /// <summary>Gets or sets the member that caused the generation of this method.</summary>
-      internal IFluentMember Source { get; set; }
-
-      public string ToCode()
+      public virtual string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         codeBuilder.AppendLine($"internal {ReturnType} {Name}({ParameterTypeName} value)");
+         codeBuilder.Append($"internal {ReturnType} {Name}");
+         codeBuilder.AppendLine(ParameterCount == 0 ? "()" : $"({ParameterTypeName} value)");
+
          codeBuilder.AppendLine("{");
          AppendMethodContent(codeBuilder);
          codeBuilder.AppendLine("}");
@@ -58,35 +61,34 @@ namespace FluentSetups.SourceGenerator.Models
          return codeBuilder.ToString();
       }
 
-      private void AppendMethodContent(StringBuilder codeBuilder)
-      {
-         if (Source != null)
-            codeBuilder.AppendLine($"   {Source.Name} = value;");
-         if (SetupIndicatorField != null)
-            codeBuilder.AppendLine($"   {SetupIndicatorField.Name} = true;");
-         
-         codeBuilder.AppendLine("   return this;");
-      }
-
       public bool IsUserDefined => methodSymbol != null;
-
-      #endregion
-
-      #region Public Properties
 
       /// <summary>Gets the name of the method.</summary>
       public string Name { get; }
 
       public int ParameterCount { get; }
 
+      public string Category { get; internal set; }
+
+      #endregion
+
+      #region Public Properties
+
       /// <summary>Gets the type of the first parameter parameter.</summary>
       public ITypeSymbol ParameterType { get; }
 
-      public string ReturnType { get; }
-
       public string ParameterTypeName { get; }
 
+      public string ReturnType { get; }
+
       public FField SetupIndicatorField { get; set; }
+
+      #endregion
+
+      #region Properties
+
+      /// <summary>Gets or sets the member that caused the generation of this method.</summary>
+      internal IFluentMember Source { get; set; }
 
       #endregion
 
@@ -118,9 +120,27 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Methods
 
+      protected virtual void AppendMethodContent(StringBuilder codeBuilder)
+      {
+         if (Source != null)
+            codeBuilder.AppendLine($"   {Source.Name} = value;");
+         if (SetupIndicatorField != null)
+            codeBuilder.AppendLine($"   {SetupIndicatorField.Name} = true;");
+
+         codeBuilder.AppendLine("   return this;");
+      }
+
       protected bool Equals(FMethod other)
       {
          return Name == other.Name && ParameterCount == other.ParameterCount && ParameterTypeEquals(other);
+      }
+
+      private string ComputeCategory(string methodName)
+      {
+         if (methodName == "Done" || methodName == "CreateTarget" || methodName == "SetupTarget")
+            return "TargetBuilder";
+
+         return methodName;
       }
 
       private bool ParameterTypeEquals(FMethod other)

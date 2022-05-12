@@ -12,7 +12,7 @@ namespace FluentSetups.SourceGenerator.Models
 
    using Microsoft.CodeAnalysis;
 
-   [DebuggerDisplay("private {TypeName} {Name}")]
+   [DebuggerDisplay("{ToCode()}")]
    internal class FField : IFluentTypedMember
    {
       #region Constants and Fields
@@ -60,7 +60,7 @@ namespace FluentSetups.SourceGenerator.Models
          return $"private {TypeName} {Name};";
       }
 
-      public string Name { get; set; }
+      public string Name { get; }
 
       public ITypeSymbol Type { get; }
 
@@ -98,7 +98,23 @@ namespace FluentSetups.SourceGenerator.Models
 
       public static FField ForProperty(FTargetProperty property)
       {
-         return new FField(property.Type, property.Name.ToFirstLower());
+         return new FField(property.Type, property.Name.ToFirstLower()) { generateFluentSetup = true };
+      }
+
+      public override bool Equals(object obj)
+      {
+         if (ReferenceEquals(null, obj))
+            return false;
+         if (ReferenceEquals(this, obj))
+            return true;
+         if (obj.GetType() != GetType())
+            return false;
+         return Equals((FField)obj);
+      }
+
+      public override int GetHashCode()
+      {
+         return (Name != null ? Name.GetHashCode() : 0);
       }
 
       #endregion
@@ -111,6 +127,11 @@ namespace FluentSetups.SourceGenerator.Models
             return null;
 
          return attributeData.ConstructorArguments.FirstOrDefault().Value?.ToString();
+      }
+
+      protected bool Equals(FField other)
+      {
+         return Name == other.Name;
       }
 
       private static string ComputeRequiredNamespace(IFieldSymbol fieldSymbol)

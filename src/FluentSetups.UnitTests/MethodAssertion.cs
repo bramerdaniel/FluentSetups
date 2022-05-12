@@ -17,6 +17,7 @@ using FluentAssertions.Primitives;
 using FluentSetups.UnitTests.Setups;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 internal class MethodAssertion : ReferenceTypeAssertions<IMethodSymbol, MethodAssertion>
@@ -45,6 +46,35 @@ internal class MethodAssertion : ReferenceTypeAssertions<IMethodSymbol, MethodAs
 
    #region Public Methods and Operators
 
+   public MethodAssertion HasParameter(string expectedParameter)
+   {
+      var syntaxReference = Subject.DeclaringSyntaxReferences.FirstOrDefault();
+      var syntax = syntaxReference?.GetSyntax() as MethodDeclarationSyntax;
+
+      if (syntax == null)
+         throw new AssertFailedException("Method syntax could not be found");
+
+      foreach (var parameter in syntax.ParameterList.Parameters)
+      {
+         if (parameter.ToString().Contains(expectedParameter))
+            return this;
+      }
+
+      Assert.Fail(CreateMessage());
+
+      return this;
+      string CreateMessage()
+      {
+         var builder = new StringBuilder();
+         builder.AppendLine($"The expected parameter '{expectedParameter}' could not be found.");
+         builder.AppendLine();
+         builder.AppendLine("METHOD CODE");
+         builder.AppendLine();
+         builder.AppendLine(syntax.ToString());
+
+         return builder.ToString();
+      }
+   }
    public MethodAssertion Contains(string expectedSubstring)
    {
       var syntaxReference = Subject.DeclaringSyntaxReferences.FirstOrDefault();
@@ -54,7 +84,7 @@ internal class MethodAssertion : ReferenceTypeAssertions<IMethodSymbol, MethodAs
       var code = syntaxReference.GetSyntax().ToString();
       Assert.IsTrue(code.Contains(expectedSubstring), CreateMessage());
       code.Should().Contain(expectedSubstring);
-      
+
       return this;
       string CreateMessage()
       {
@@ -78,6 +108,12 @@ internal class MethodAssertion : ReferenceTypeAssertions<IMethodSymbol, MethodAs
    public MethodAssertion IsPublic()
    {
       Subject.DeclaredAccessibility.Should().Be(Accessibility.Public);
+      return this;
+   }
+
+   public MethodAssertion IsProtected()
+   {
+      Subject.DeclaredAccessibility.Should().Be(Accessibility.Protected);
       return this;
    }
 

@@ -170,11 +170,21 @@ namespace FluentSetups.SourceGenerator.Models
                }
             case IMethodSymbol methodSymbol:
                {
-                  var method = new FMethod(methodSymbol);
-                  methods.Add(method);
+                  methods.Add(CreateMethod(methodSymbol));
                   break;
                }
          }
+      }
+
+      private FMethod CreateMethod(IMethodSymbol methodSymbol)
+      {
+         if (methodSymbol.Name == "Done" && methodSymbol.Parameters.Length == 0)
+            return new FDone(methodSymbol);
+
+         if (methodSymbol.Name == "CreateTarget" && methodSymbol.Parameters.Length == 0)
+            return new FCreateTarget(methodSymbol, Target);
+
+         return new FMethod(methodSymbol);
       }
 
       private bool AddMethod(IFluentMethod method)
@@ -200,16 +210,16 @@ namespace FluentSetups.SourceGenerator.Models
          if (string.IsNullOrWhiteSpace(field.TypeName))
             return;
 
-         var method = new FMethod(field.SetupMethodName, field.Type, classSymbol) { Source = field };
+         var method = new FMethod(field.SetupMethodName, field.Type, classSymbol) { Source = field, Category = field.SetupMethodName };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetOrThrow(field, method.SetupIndicatorField);
+            var fGetOrThrow = new FGetOrThrow(field, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueMethod(field, method.SetupIndicatorField);
+            var getMember = new FGetValueMethod(field, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(getMember);
          }
       }
@@ -263,6 +273,17 @@ namespace FluentSetups.SourceGenerator.Models
          InitializeTarget();
          InitializeWithExistingMembers();
          UpdateMembersToGenerate();
+         UpdateTargetBuilders();
+      }
+
+      private void UpdateTargetBuilders()
+      {
+         if (!TargetCreationPossible(this))
+            return;
+
+         AddMethod(new FDone(Target.TypeSymbol));
+         AddMethod(new FCreateTarget(Target.TypeSymbol, Target));
+         AddMethod(new FSetupTargetMethod(this));
       }
 
       private void InitializeWithExistingMembers()
@@ -317,10 +338,19 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void GenerateSetupMethods(StringBuilder sourceBuilder)
       {
-         var methodsToGenerate = Methods.Where(x => !x.IsUserDefined).ToArray();
+         var methodGroups = Methods.Where(x => !x.IsUserDefined)
+            .GroupBy(x => x.Category)
+            .ToArray();
 
-         foreach (var method in methodsToGenerate)
-            sourceBuilder.AppendLine(method.ToCode());
+         foreach (var methodGroup in methodGroups)
+         {
+            sourceBuilder.AppendLine($"#region {methodGroup.Key}");
+
+            foreach (var method in methodGroup)
+               sourceBuilder.AppendLine(method.ToCode());
+
+            sourceBuilder.AppendLine("#endregion");
+         }
       }
 
       private void GenerateTargetCreation(StringBuilder sourceBuilder)
@@ -379,16 +409,9 @@ namespace FluentSetups.SourceGenerator.Models
 
          foreach (var property in Target.Properties)
          {
-            var method = new FMethod(property.SetupMethodName, property.Type, classSymbol);
-            if (AddMethod(method))
-            {
-               var backingField = FField.ForProperty(property);
-               method.Source = backingField;
-               AddField(backingField);
-
-               method.SetupIndicatorField = new FField(Context.BooleanType, $"{property.Name.ToFirstLower()}WasSet");
-               AddField(method.SetupIndicatorField);
-            }
+            var backingField = FField.ForProperty(property);
+            if (AddField(backingField))
+               AddMethodFromField(backingField);
          }
       }
 
@@ -401,9 +424,7 @@ namespace FluentSetups.SourceGenerator.Models
          {
             var backingField = FField.ForConstructorParameter(constructorParameter);
             if (AddField(backingField))
-            {
                AddMethodFromField(backingField);
-            }
          }
       }
 

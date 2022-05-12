@@ -148,4 +148,58 @@ public class GetterGenerationTests
          .HaveClass("RonnyTheRobber.PersonSetup")
          .WithField("nameWasSet");
    }
+
+   [TestMethod]
+   public void EnsureGetNameIsGeneratedFromTargetProperty()
+   {
+      var code = @"namespace RonnyTheRobber
+                      {
+                         internal class Person 
+                         {  
+                            public string Name{ get; set; }
+                         }
+
+                         [FluentSetups.FluentSetup(typeof(Person))]
+                         public partial class PersonSetup
+                         {
+                         }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WithField("nameWasSet")
+         .WhereMethod("GetName").IsProtected();
+   }
+
+   [TestMethod]
+   public void EnsureGetNameIsGeneratedFromTargetConstructorParameter()
+   {
+      var code = @"namespace RonnyTheRobber
+                      {
+                         internal class Person 
+                         {  
+                           public Person(string name) 
+                           {
+                           }
+                         }
+
+                         [FluentSetups.FluentSetup(typeof(Person))]
+                         public partial class PersonSetup
+                         {
+                         }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WithField("nameWasSet")
+         .WhereMethod("GetName").IsProtected();
+   }
 }

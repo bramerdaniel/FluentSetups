@@ -19,6 +19,8 @@ namespace FluentSetups.SourceGenerator
 
       public ITypeSymbol BooleanType { get; set; }
 
+      public INamedTypeSymbol VoidType { get; set; }
+
       public Compilation Compilation { get; set; }
 
       #endregion
@@ -49,9 +51,12 @@ namespace FluentSetups.SourceGenerator
             FluentEntryNamespaceAttribute = compilation.GetTypeByMetadataName(FluentEntryNamespaceAttributeName),
             FluentSetupAttribute = compilation.GetTypeByMetadataName(FluentSetupAttributeName),
             FluentMemberAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName),
-            BooleanType = compilation.GetTypeByMetadataName("System.Boolean")
-         };
+            BooleanType = compilation.GetTypeByMetadataName("System.Boolean"),
+            VoidType = compilation.GetTypeByMetadataName("System.Void")
+      };
       }
+
+      
 
       public SetupClassInfo CreateFluentSetupInfo(ClassDeclarationSyntax setupCandidate)
       {

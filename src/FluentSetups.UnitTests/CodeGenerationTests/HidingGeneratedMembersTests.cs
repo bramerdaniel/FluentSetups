@@ -182,4 +182,33 @@ public class HidingGeneratedMembersTests
          .WithMethod("Done")
          .WithMethod("Done", "bool");
    }
+
+   [TestMethod]
+   public void EnsureCreateTargetCanBeHiddenByUserCode()
+   {
+      var code = @"using FluentSetups;
+
+                   public class Person
+                   {
+                   }
+
+                   [FluentSetup(typeof(Person))]
+                   internal partial class PersonSetup
+                   {
+                       internal Person CreateTarget()
+                       {
+                           return new Person();
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithRootNamespace("Root")
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("PersonSetup")
+         .WithMethod("CreateTarget")
+         .WithMethod("Done");
+   }
 }

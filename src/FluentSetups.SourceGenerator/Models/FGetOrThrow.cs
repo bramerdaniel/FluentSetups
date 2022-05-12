@@ -38,5 +38,7 @@ namespace FluentSetups.SourceGenerator.Models
       public bool IsUserDefined => false;
 
       public int ParameterCount => 0;
+
+      public string Category { get; set; }
    }
 }

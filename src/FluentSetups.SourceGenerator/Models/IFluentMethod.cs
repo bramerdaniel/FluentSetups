@@ -10,5 +10,7 @@ namespace FluentSetups.SourceGenerator.Models
    {
       /// <summary>Gets the methods parameter count.</summary>
       int ParameterCount { get; }
+
+      string Category { get; }
    }
 }

@@ -49,6 +49,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       public int ParameterCount => 1;
 
+      public string Category { get; set; }
+
       #endregion
    }
 }

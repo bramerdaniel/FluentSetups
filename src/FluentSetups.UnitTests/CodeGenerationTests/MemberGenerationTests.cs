@@ -230,6 +230,34 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .WithMethod("SetName");
       }
 
+      [TestMethod]
+      public void EnsureSetupMemberMethodIsGeneratedCorrectly()
+      {
+         var code = @"namespace DonnyTheDagger
+                      {
+                         using FluentSetups;
+
+                         public class Person
+                         {
+                            public int Age { get ;set; }
+                         }
+
+                         [FluentSetup(typeof(Person))]
+                         public partial class PersonSetup
+                         {
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors().And
+            .HaveClass("DonnyTheDagger.PersonSetup")
+            .WhereMethod("SetupTarget")
+            .HasParameter("Person target");
+      }
+
       #endregion
    }
 }
