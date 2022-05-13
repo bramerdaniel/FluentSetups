@@ -7,10 +7,12 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System;
+   using System.Diagnostics;
    using System.Linq;
 
    using Microsoft.CodeAnalysis;
 
+   [DebuggerDisplay("{TypeName} {Name}")]
    internal class FProperty : IFluentTypedMember
    {
       #region Constants and Fields

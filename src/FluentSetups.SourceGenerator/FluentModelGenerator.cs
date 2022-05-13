@@ -33,8 +33,6 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
-   
-
       private static void ReportError(GeneratedSource source, Exception e)
       {
          var missingReference = new DiagnosticDescriptor(id: "FS0002", title: "fluent source generator failed",

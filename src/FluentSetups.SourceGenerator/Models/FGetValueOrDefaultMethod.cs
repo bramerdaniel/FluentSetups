@@ -40,12 +40,18 @@ namespace FluentSetups.SourceGenerator.Models
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}(Func<{backingFieldSymbol.Type}> defaultValue)");
          codeBuilder.AppendLine("{");
+         AppendContent(codeBuilder);
+         codeBuilder.AppendLine("}");
+         return codeBuilder.ToString();
+      }
+
+      private void AppendContent(StringBuilder codeBuilder)
+      {
          codeBuilder.AppendLine($"if ({setupIndicatorField.Name})");
          codeBuilder.AppendLine($"   return {backingFieldSymbol.Name};");
          codeBuilder.AppendLine();
-         codeBuilder.AppendLine($"return defaultValue != null ? defaultValue() : throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name}));");
-         codeBuilder.AppendLine("}");
-         return codeBuilder.ToString();
+         codeBuilder.AppendLine(
+            $"return defaultValue != null ? defaultValue() : throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name}));");
       }
 
       public bool IsUserDefined => false;

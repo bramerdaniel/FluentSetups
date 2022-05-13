@@ -26,7 +26,16 @@ namespace FluentSetups.SourceGenerator.Models
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}()");
          codeBuilder.AppendLine("{");
-         codeBuilder.AppendLine($"  return {Name}(() => throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name})));");
+         if (backingFieldSymbol is FField field && field.DefaultValue != null)
+         {
+
+            codeBuilder.AppendLine($"  return {Name}(() => {field.DefaultValue});");
+         }
+         else
+         {
+            codeBuilder.AppendLine($"  return {Name}(() => throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name})));");
+         }
+
          codeBuilder.AppendLine("}");
          return codeBuilder.ToString();
       }
