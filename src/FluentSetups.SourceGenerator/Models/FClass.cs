@@ -63,6 +63,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       public IReadOnlyList<FField> Fields => fields;
 
+      public bool IsPublic => classSymbol.DeclaredAccessibility == Accessibility.Public;
+
       public IReadOnlyList<IFluentMethod> Methods => methods;
 
       public string Modifier { get; }
@@ -77,11 +79,14 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string TargetTypeNamespace { get; set; }
 
-      public bool IsPublic => classSymbol.DeclaredAccessibility == Accessibility.Public;
-
       #endregion
 
       #region Public Methods and Operators
+
+      public static bool IsDoneMethod(IMethodSymbol candidate)
+      {
+         return candidate.Parameters.Length == 0 && string.Equals(candidate.Name, "Done", StringComparison.InvariantCulture);
+      }
 
       public string ToCode()
       {
@@ -133,6 +138,16 @@ namespace FluentSetups.SourceGenerator.Models
          return "internal";
       }
 
+      private static bool IsCreateTargetMethod(IMethodSymbol methodSymbol)
+      {
+         return methodSymbol.Parameters.Length == 0 && string.Equals(methodSymbol.Name, "CreateTarget", StringComparison.InvariantCulture);
+      }
+
+      private static bool IsSetupTargetMethod(IMethodSymbol methodSymbol)
+      {
+         return methodSymbol.Name == "SetupTarget" && methodSymbol.Parameters.Length == 1;
+      }
+
       private static bool TargetCreationPossible(FClass classModel)
       {
          if (classModel.TargetMode == TargetGenerationMode.Disabled)
@@ -158,42 +173,23 @@ namespace FluentSetups.SourceGenerator.Models
          switch (member)
          {
             case IFieldSymbol fieldSymbol:
-               {
-                  var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
-                  fields.Add(field);
-                  break;
-               }
+            {
+               var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
+               fields.Add(field);
+               break;
+            }
             case IPropertySymbol propertySymbol:
-               {
-                  var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
-                  properties.Add(property);
-                  break;
-               }
+            {
+               var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
+               properties.Add(property);
+               break;
+            }
             case IMethodSymbol methodSymbol:
-               {
-                  methods.Add(CreateMethod(methodSymbol));
-                  break;
-               }
+            {
+               methods.Add(CreateMethod(methodSymbol));
+               break;
+            }
          }
-      }
-
-      private FMethod CreateMethod(IMethodSymbol methodSymbol)
-      {
-         if (TargetAvailable())
-         {
-            if (methodSymbol.Name == "Done" && methodSymbol.Parameters.Length == 0)
-               return new FDone(methodSymbol);
-
-            /// TODO refactor this
-            if (methodSymbol.Name == "CreateTarget" && methodSymbol.Parameters.Length == 0)
-               return new FCreateTargetMethod(methodSymbol, Target);
-
-            /// TODO refactor this
-            if (methodSymbol.Name == "SetupTarget" && methodSymbol.Parameters.Length == 1)
-               return new FSetupTargetMethod(methodSymbol, this);
-         }
-
-         return new FMethod(methodSymbol);
       }
 
       private bool AddMethod(IFluentMethod method)
@@ -239,15 +235,6 @@ namespace FluentSetups.SourceGenerator.Models
          }
       }
 
-      private bool CanAddSet(IFluentMember field)
-      {
-         if (!TargetAvailable())
-            return false;
-
-         return Target.HasAccessibleProperty(field.Name.ToFirstUpper());
-
-      }
-
       private void AddSetupMethodFromProperty(FProperty property)
       {
          if (!property.RequiredSetupGeneration())
@@ -282,6 +269,14 @@ namespace FluentSetups.SourceGenerator.Models
             sourceBuilder.AppendLine($"using {TargetTypeNamespace};");
       }
 
+      private bool CanAddSet(IFluentMember field)
+      {
+         if (!TargetAvailable())
+            return false;
+
+         return Target.HasAccessibleProperty(field.Name.ToFirstUpper());
+      }
+
       private void CloseNamespace(StringBuilder sourceBuilder)
       {
          if (!string.IsNullOrWhiteSpace(ContainingNamespace))
@@ -299,45 +294,36 @@ namespace FluentSetups.SourceGenerator.Models
          return Methods.Any(m => m.Name == "Done" && m.ParameterCount == 0);
       }
 
+      private string CreateConstructorCall()
+      {
+         var arguments = string.Join(", ", Target.ConstructorParameters.Select(p => $"Get{p.Name.ToFirstUpper()}(null)"));
+         var builder = new StringBuilder($"new {Target.TypeName}({arguments})");
+         return builder.ToString();
+      }
+
+      private FMethod CreateMethod(IMethodSymbol methodSymbol)
+      {
+         if (TargetAvailable())
+         {
+            if (IsDoneMethod(methodSymbol))
+               return new FDoneMethod(methodSymbol);
+
+            if (IsCreateTargetMethod(methodSymbol))
+               return new FCreateTargetMethod(methodSymbol, Target);
+
+            if (IsSetupTargetMethod(methodSymbol))
+               return new FSetupTargetMethod(methodSymbol, this);
+         }
+
+         return new FMethod(methodSymbol);
+      }
+
       private void FillMembers()
       {
          InitializeTarget();
          InitializeWithExistingMembers();
          UpdateMembersToGenerate();
          UpdateTargetBuilders();
-      }
-
-      private void UpdateTargetBuilders()
-      {
-         if (!TargetCreationPossible(this))
-            return;
-
-         AddMethod(new FDone(Target.TypeSymbol));
-         AddMethod(new FCreateTargetMethod(Target));
-         AddMethod(new FSetupTargetMethod(this));
-      }
-
-      private void InitializeWithExistingMembers()
-      {
-         foreach (var member in classSymbol.GetMembers())
-            AddMember(member);
-      }
-
-      private void InitializeTarget()
-      {
-         var targetType = fluentSetupAttribute.GetTargetType();
-         if (targetType.IsNull)
-            return;
-
-         var targetMode = fluentSetupAttribute.GetTargetMode();
-         if (targetMode.Value is int enumValue)
-            TargetMode = (TargetGenerationMode)enumValue;
-
-         if (targetType.Value is INamedTypeSymbol typeSymbol)
-         {
-            TargetTypeNamespace = typeSymbol.ContainingNamespace.IsGlobalNamespace ? null : typeSymbol.ContainingNamespace.ToString();
-            Target = new FTarget(this, typeSymbol);
-         }
       }
 
       private AttributeData FindMemberAttribute(ISymbol symbol)
@@ -399,11 +385,27 @@ namespace FluentSetups.SourceGenerator.Models
          sourceBuilder.AppendLine("}");
       }
 
-      private string CreateConstructorCall()
+      private void InitializeTarget()
       {
-         var arguments = string.Join(", ", Target.ConstructorParameters.Select(p => $"Get{p.Name.ToFirstUpper()}(null)"));
-         var builder = new StringBuilder($"new {Target.TypeName}({arguments})");
-         return builder.ToString();
+         var targetType = fluentSetupAttribute.GetTargetType();
+         if (targetType.IsNull)
+            return;
+
+         var targetMode = fluentSetupAttribute.GetTargetMode();
+         if (targetMode.Value is int enumValue)
+            TargetMode = (TargetGenerationMode)enumValue;
+
+         if (targetType.Value is INamedTypeSymbol typeSymbol)
+         {
+            TargetTypeNamespace = typeSymbol.ContainingNamespace.IsGlobalNamespace ? null : typeSymbol.ContainingNamespace.ToString();
+            Target = new FTarget(this, typeSymbol);
+         }
+      }
+
+      private void InitializeWithExistingMembers()
+      {
+         foreach (var member in classSymbol.GetMembers())
+            AddMember(member);
       }
 
       private void OpenClass(StringBuilder sourceBuilder)
@@ -432,6 +434,19 @@ namespace FluentSetups.SourceGenerator.Models
          return !string.IsNullOrWhiteSpace(TargetTypeName);
       }
 
+      private void UpdateFromConstructor()
+      {
+         if (Target?.Constructor == null)
+            return;
+
+         foreach (var constructorParameter in Target.Constructor.Parameters)
+         {
+            var backingField = FField.ForConstructorParameter(constructorParameter);
+            if (AddField(backingField))
+               AddMethodFromField(backingField);
+         }
+      }
+
       private void UpdateFromTarget()
       {
          if (Target == null)
@@ -447,19 +462,6 @@ namespace FluentSetups.SourceGenerator.Models
          }
       }
 
-      private void UpdateFromConstructor()
-      {
-         if (Target?.Constructor == null)
-            return;
-
-         foreach (var constructorParameter in Target.Constructor.Parameters)
-         {
-            var backingField = FField.ForConstructorParameter(constructorParameter);
-            if (AddField(backingField))
-               AddMethodFromField(backingField);
-         }
-      }
-
       private void UpdateMembersToGenerate()
       {
          foreach (var field in Fields.ToArray())
@@ -469,6 +471,16 @@ namespace FluentSetups.SourceGenerator.Models
             AddSetupMethodFromProperty(property);
 
          UpdateFromTarget();
+      }
+
+      private void UpdateTargetBuilders()
+      {
+         if (!TargetCreationPossible(this))
+            return;
+
+         AddMethod(new FDoneMethod(Target.TypeSymbol));
+         AddMethod(new FCreateTargetMethod(Target));
+         AddMethod(new FSetupTargetMethod(this));
       }
 
       #endregion
