@@ -18,8 +18,6 @@ namespace FluentSetups.SourceGenerator.Models
    {
       #region Constants and Fields
 
-      private readonly ITypeSymbol classSymbol;
-
       private readonly List<FField> fields = new List<FField>(5);
 
       private readonly AttributeData fluentSetupAttribute;
@@ -35,7 +33,7 @@ namespace FluentSetups.SourceGenerator.Models
       internal FClass(FluentGeneratorContext context, ITypeSymbol classSymbol, AttributeData fluentSetupAttribute)
       {
          Context = context;
-         this.classSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
+         this.ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
          this.fluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
 
          ClassName = classSymbol.Name;
@@ -63,7 +61,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public IReadOnlyList<FField> Fields => fields;
 
-      public bool IsPublic => classSymbol.DeclaredAccessibility == Accessibility.Public;
+      public bool IsPublic => ClassSymbol.DeclaredAccessibility == Accessibility.Public;
 
       public IReadOnlyList<IFluentMethod> Methods => methods;
 
@@ -78,6 +76,8 @@ namespace FluentSetups.SourceGenerator.Models
       public string TargetTypeName => Target?.TypeName;
 
       public string TargetTypeNamespace { get; set; }
+
+      public ITypeSymbol ClassSymbol { get; }
 
       #endregion
 
@@ -215,7 +215,7 @@ namespace FluentSetups.SourceGenerator.Models
          if (string.IsNullOrWhiteSpace(field.TypeName))
             return;
 
-         var method = new FMethod(field.SetupMethodName, field.Type, classSymbol) { Source = field, Category = field.SetupMethodName };
+         var method = new FMethod(field.SetupMethodName, field.Type, ClassSymbol) { Source = field, Category = field.SetupMethodName };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
@@ -240,7 +240,7 @@ namespace FluentSetups.SourceGenerator.Models
          if (!property.RequiredSetupGeneration())
             return;
 
-         var method = new FMethod(property.GetSetupMethodName(), property.Type, classSymbol) { Source = property };
+         var method = new FMethod(property.GetSetupMethodName(), property.Type, ClassSymbol) { Source = property };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{property.Name.ToFirstLower()}WasSet");
@@ -285,7 +285,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private string ComputeNamespace()
       {
-         var namespaceSymbol = classSymbol.ContainingNamespace;
+         var namespaceSymbol = ClassSymbol.ContainingNamespace;
          return namespaceSymbol.IsGlobalNamespace ? null : namespaceSymbol.ToString();
       }
 
@@ -404,7 +404,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void InitializeWithExistingMembers()
       {
-         foreach (var member in classSymbol.GetMembers())
+         foreach (var member in ClassSymbol.GetMembers())
             AddMember(member);
       }
 

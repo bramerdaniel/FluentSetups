@@ -52,6 +52,13 @@ namespace FluentSetups.SourceGenerator
          source.Error = Diagnostic.Create(missingReference, Location.None, source.Name, e.Message);
       }
 
+      private string ComputeEntryMethodName(FClass setupClass)
+      {
+         if (setupClass.Target != null)
+            return setupClass.TargetTypeName;
+         return ComputeEntryMethodName(setupClass.ClassName);
+      }
+
       private GeneratedSource GenerateEntryClass(SetupEntryClassModel classModel)
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
@@ -86,7 +93,7 @@ namespace FluentSetups.SourceGenerator
          foreach (var setupClass in classModel.SetupClasses)
          {
             sourceBuilder.AppendLine($"/// <summary>Creates a new setup for the {setupClass.ClassName} class</summary>");
-            sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {ComputeEntryMethodName(setupClass.ClassName)}()");
+            sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {ComputeEntryMethodName(setupClass)}()");
             sourceBuilder.AppendLine($" => new {setupClass.ClassName}();");
             sourceBuilder.AppendLine();
          }

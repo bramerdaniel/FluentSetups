@@ -191,5 +191,31 @@ public class EntryPointGenerationTests
          .WithStaticMethod("Person");
    }
 
+   [TestMethod]
+   public void EnsureDefaultNamingOfTargetIsUsed()
+   {
+      var code = @"namespace SetupNameSpace
+                   {
+                      using FluentSetups;
+
+                      [FluentSetup(typeof(Person))]
+                      public partial class SomeCustomName
+                      {
+                      }
+
+                      public class Person
+                      { 
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RootNamespace.Setup")
+         .WithStaticMethod("Person");
+   }
+
    #endregion
 }

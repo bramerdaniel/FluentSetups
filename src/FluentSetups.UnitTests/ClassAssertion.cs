@@ -117,8 +117,8 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
    public ClassAssertion WithStaticMethod(string methodName)
    {
       var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
-      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found");
-      Assert.IsTrue(methodSymbol.IsStatic, $"The found method {methodName} is not static");
+      Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found. {GetGeneratedCode()}");
+      Assert.IsTrue(methodSymbol.IsStatic, $"The found method {methodName} is not static. {GetGeneratedCode()}");
       return this;
    }
 
