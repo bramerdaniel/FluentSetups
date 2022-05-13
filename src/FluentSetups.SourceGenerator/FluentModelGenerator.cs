@@ -1,11 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentModelGenerator.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FluentModelGenerator.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.SourceGenerator
 {
+   using System;
    using System.Collections.Generic;
    using System.Linq;
    using System.Text;
@@ -17,6 +18,8 @@ namespace FluentSetups.SourceGenerator
 
    internal class FluentModelGenerator
    {
+      #region Public Methods and Operators
+
       public IEnumerable<GeneratedSource> Execute(SetupModel setupModel)
       {
          foreach (var setupClass in setupModel.SetupClasses)
@@ -26,35 +29,56 @@ namespace FluentSetups.SourceGenerator
             yield return GenerateEntryClass(entryClass);
       }
 
+      #endregion
+
+      #region Methods
+
+      private static string ComputeEntryMethodName(string className)
+      {
+         if (className.EndsWith("Setup"))
+            return className.Substring(0, className.Length - 5);
+
+         return className;
+      }
+
+      private static void ReportError(GeneratedSource source, Exception e)
+      {
+         var missingReference = new DiagnosticDescriptor(id: "FS0002", title: "fluent source generator failed",
+            messageFormat: "Error while generating source '{0}'. Message: {1}",
+            category: nameof(FluentSetupSourceGenerator),
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+         source.Error = Diagnostic.Create(missingReference, Location.None, source.Name, e.Message);
+      }
+
       private GeneratedSource GenerateEntryClass(SetupEntryClassModel classModel)
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
-         var sourceBuilder = new StringBuilder();
-         sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
-         sourceBuilder.AppendLine("{");
-         GenerateRequiredNamespaces(classModel, sourceBuilder);
+         try
+         {
+            var sourceBuilder = new StringBuilder();
+            sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
+            sourceBuilder.AppendLine("{");
+            GenerateRequiredNamespaces(classModel, sourceBuilder);
 
-         sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
-         sourceBuilder.AppendLine("[CompilerGenerated]");
-         sourceBuilder.AppendLine($"{classModel.Modifier} partial class {classModel.ClassName}");
-         sourceBuilder.AppendLine("{");
-         GenerateEntryPoints(classModel, sourceBuilder);
-         sourceBuilder.AppendLine("}");
+            sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
+            sourceBuilder.AppendLine("[CompilerGenerated]");
+            sourceBuilder.AppendLine($"{classModel.Modifier} partial class {classModel.ClassName}");
+            sourceBuilder.AppendLine("{");
+            GenerateEntryPoints(classModel, sourceBuilder);
+            sourceBuilder.AppendLine("}");
 
-         sourceBuilder.AppendLine("}");
-         var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
-         source.Code = syntaxTree.ToString();
+            sourceBuilder.AppendLine("}");
+            var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
+            source.Code = syntaxTree.ToString();
+         }
+         catch (Exception e)
+         {
+            ReportError(source, e);
+         }
 
          return source;
-      }
-
-      private void GenerateRequiredNamespaces(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
-      {
-         sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
-
-         var enumerable = classModel.SetupClasses.Select(x => x.ContainingNamespace);
-         foreach (var requiredNamespace in enumerable)
-            sourceBuilder.AppendLine($"using {requiredNamespace};");
       }
 
       private void GenerateEntryPoints(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
@@ -68,68 +92,32 @@ namespace FluentSetups.SourceGenerator
          }
       }
 
-      private static string ComputeEntryMethodName(string className)
+      private void GenerateRequiredNamespaces(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
       {
-         if (className.EndsWith("Setup"))
-            return className.Substring(0, className.Length - 5);
-
-         return className;
-      }
-
-      private GeneratedSource GenerateSetupClass(SetupClassModel classModel)
-      {
-         var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
-         var sourceBuilder = new StringBuilder();
-         sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
-         sourceBuilder.AppendLine("{");
-         sourceBuilder.AppendLine("using System;");
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
 
-         sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
-         sourceBuilder.AppendLine("[CompilerGenerated]");
-         sourceBuilder.AppendLine($"{classModel.Modifier} partial class {classModel.ClassName}");
-         sourceBuilder.AppendLine("{");
-         GenerateSetupMembers(classModel, sourceBuilder);
-         sourceBuilder.AppendLine("}");
+         var enumerable = classModel.SetupClasses.Where(x => !string.IsNullOrWhiteSpace(x.ContainingNamespace)).Select(x => x.ContainingNamespace);
+         foreach (var requiredNamespace in enumerable)
+            sourceBuilder.AppendLine($"using {requiredNamespace};");
+      }
 
-         sourceBuilder.AppendLine("}");
-         var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
-         source.Code = syntaxTree.ToString();
+      private GeneratedSource GenerateSetupClass(FClass classModel)
+      {
+         var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
+         try
+         {
+            var text = classModel.ToCode();
+            var syntaxTree = CSharpSyntaxTree.ParseText(text).GetRoot().NormalizeWhitespace();
+            source.Code = syntaxTree.ToString();
+         }
+         catch (Exception e)
+         {
+            ReportError(source, e);
+         }
+
          return source;
       }
 
-      private void GenerateSetupMembers(SetupClassModel classModel, StringBuilder sourceBuilder)
-      {
-         foreach (var member in classModel.Fields)
-            GenerateMemberSetup(classModel, sourceBuilder, member);
-
-         foreach (var member in classModel.Properties)
-            GenerateMemberSetup(classModel, sourceBuilder, member);
-
-      }
-
-      private static void GenerateMemberSetup(SetupClassModel classModel, StringBuilder sourceBuilder, SetupMemberModel memberModel)
-      {
-         sourceBuilder.AppendLine($"{classModel.Modifier} {classModel.ClassName} {memberModel.SetupMethodName}({memberModel.TypeName} value)");
-         sourceBuilder.AppendLine("{");
-
-         ////var validation = CreateParameterValidation(propertySymbol, "value");
-         ////if (!string.IsNullOrWhiteSpace(validation))
-         ////   sourceBuilder.AppendLine(validation);
-
-         sourceBuilder.AppendLine($"{memberModel.MemberName} = value;");
-         sourceBuilder.AppendLine($"{memberModel.MemberSetFieldName} = true;");
-         sourceBuilder.AppendLine("return this;");
-         sourceBuilder.AppendLine("}");
-         sourceBuilder.AppendLine();
-
-         sourceBuilder.AppendLine($"private bool {memberModel.MemberSetFieldName};");
-         sourceBuilder.AppendLine($"protected {memberModel.TypeName} Get{memberModel.UpperMemberName}OrThrow()");
-         sourceBuilder.AppendLine($"=> {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : throw new InvalidOperationException(\"The member {memberModel.MemberName} was not set.\");");
-
-         sourceBuilder.AppendLine();
-         sourceBuilder.AppendLine($"protected {memberModel.TypeName} Get{memberModel.UpperMemberName}OrDefault(Func<{memberModel.TypeName}> defaultValue)");
-         sourceBuilder.AppendLine($" => {memberModel.MemberSetFieldName} ? {memberModel.MemberName} : defaultValue();");
-      }
+      #endregion
    }
 }

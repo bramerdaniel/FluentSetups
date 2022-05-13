@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AssertionExtensions.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="AssertionExtensions.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ internal static class AssertionExtensions
       return new GenerationResultAssertion(target);
    }
 
-   public static SetupClassModelAssertion Should(this SetupClassModel target)
+   public static SetupClassModelAssertion Should(this FClass target)
    {
       return new SetupClassModelAssertion(target);
    }

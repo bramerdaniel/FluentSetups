@@ -1,26 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-	  <OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net461;net6.0</TargetFrameworks>
+		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
+		<IsPackable>false</IsPackable>
+		<LangVersion>10</LangVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.6.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
-    <PackageReference Include="coverlet.collector" Version="3.1.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="FluentAssertions" Version="6.6.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
+		<PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+		<!--<PackageReference Include="coverlet.collector" Version="3.1.0" />-->
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FluentSetups.SourceGenerator\FluentSetups.SourceGenerator.csproj" />
-    <ProjectReference Include="..\FluentSetups\FluentSetups.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FluentSetups.SourceGenerator\FluentSetups.SourceGenerator.csproj" />
+		<ProjectReference Include="..\FluentSetups\FluentSetups.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Setups\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Setups\" />
+	</ItemGroup>
 
 </Project>

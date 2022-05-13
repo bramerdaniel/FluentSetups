@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupBase.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SetupBase.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ internal class SetupBase
 
    #endregion
 
-   #region Public Properties
+   #region Properties
 
    protected string RootNamespace { get; set; } = "RootNamespace";
 
@@ -52,19 +52,6 @@ internal class SetupBase
       return (CSharpSyntaxTree)syntaxTree;
    }
 
-   private void ThrowOnErrors(IEnumerable<Diagnostic> diagnostics)
-   {
-      var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity == DiagnosticSeverity.Error);
-      if (errorDiagnostic != null)
-         throw new InvalidOperationException(errorDiagnostic.GetMessage());
-   }
-
-   protected virtual CSharpCompilation CreateCompilation()
-   {
-      return CSharpCompilation.Create(RootNamespace, SyntaxTrees, ComputeReferences(),
-         new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-   }
-
    protected virtual List<MetadataReference> ComputeReferences()
    {
       AppDomain.CurrentDomain.Load(typeof(FluentSetupAttribute).Assembly.GetName());
@@ -78,18 +65,10 @@ internal class SetupBase
       return references;
    }
 
-   protected ClassDeclarationSyntax? FirstClassDeclarationSyntax()
+   protected virtual CSharpCompilation CreateCompilation()
    {
-      return GetAllClasses().FirstOrDefault();
-   }
-
-   protected IEnumerable<ClassDeclarationSyntax> GetAllClasses()
-   {
-      foreach (var syntaxTree in SyntaxTrees)
-      {
-         foreach (var setupClass in SyntaxHelper.FindSetupClasses(syntaxTree))
-            yield return setupClass;
-      }
+      return CSharpCompilation.Create(RootNamespace, SyntaxTrees, ComputeReferences(),
+         new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
    }
 
    protected ClassDeclarationSyntax? FindClassDeclarationSyntax(string name)
@@ -106,6 +85,26 @@ internal class SetupBase
       return null;
    }
 
+   protected ClassDeclarationSyntax? FirstClassDeclarationSyntax()
+   {
+      return GetAllClasses().FirstOrDefault();
+   }
+
+   protected IEnumerable<ClassDeclarationSyntax> GetAllClasses()
+   {
+      foreach (var syntaxTree in SyntaxTrees)
+      {
+         foreach (var setupClass in SyntaxHelper.FindSetupClasses(syntaxTree))
+            yield return setupClass;
+      }
+   }
+
+   private void ThrowOnErrors(IEnumerable<Diagnostic> diagnostics)
+   {
+      var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity == DiagnosticSeverity.Error);
+      if (errorDiagnostic != null)
+         throw new InvalidOperationException(errorDiagnostic.GetMessage());
+   }
 
    #endregion
 }

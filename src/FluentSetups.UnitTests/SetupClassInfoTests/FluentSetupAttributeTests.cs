@@ -24,7 +24,6 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
                         }";
 
          var setupClassInfo = Setup.SetupClassInfo()
-            .WithName("PersonSetup")
             .WithSource(code)
             .Done();
 
@@ -45,7 +44,6 @@ namespace FluentSetups.UnitTests.SetupClassInfoTests
                         }";
 
          var setupClassInfo = Setup.SetupClassInfo()
-            .WithName("PersonSetup")
             .WithSource(code)
             .Done();
 

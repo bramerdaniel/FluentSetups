@@ -1,0 +1,15 @@
+<!-- the .props are all imported at the start of each project file-->
+<Project>
+	<!-- Properties are a Dictionary<string, string> they work like AddOrUpdate -->
+	<PropertyGroup>
+		<FluentSetupsPackageVersion>0.2.0-rc.4</FluentSetupsPackageVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Authors>Daniel Bramer</Authors>
+		<PackageProjectUrl>https://github.com/bramerdaniel/FluentSetups</PackageProjectUrl>
+		<Company>ConsoLovers</Company>
+		<Copyright>Copyright 2022</Copyright>
+		<Description>Helper utility for generating fluent setup classes from the existing code, using an ISourceGenerator</Description>
+	</PropertyGroup>
+</Project>

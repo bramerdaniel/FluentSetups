@@ -1,17 +1,14 @@
-name: Build and Test
+name: build workflow
 
 on:
   push:
-    branches-ignore: [ master ]
-    paths-ignore:
-      - '**.yml'
   pull_request:
-    branches-ignore: [ master ]
   workflow_dispatch:
 
 env:
   SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
+  INTEGRATION_TEST_SOLUTION : src/FluentSetups.IntegrationTests/FluentSetups.IntegrationTests.sln
   
 jobs:
   build:
@@ -26,35 +23,114 @@ jobs:
       with:
         nuget-version: latest
         nuget-api-key: ${{secrets.NUGET_API_KEY}}
-
+    
+    - name: restore NuGet packages
+      run: nuget restore ${{ env.SOLUTION_PATH }}
+    
     - name: setup MSBuild
       uses: microsoft/setup-msbuild@v1.1
 
-    - name: restore NuGet packages
-      run: nuget restore ${{ env.SOLUTION_PATH }}
-
     - name: build solution
       run: msbuild ${{ env.SOLUTION_PATH }} -property:Configuration=Release
-   
-    - name: setup VSTest.console.exe
-      uses: darenm/Setup-VSTest@v1
-      
-    - name: run unit tests
-      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
 
-    - name: dir src\Release
-      run: dir src\Release
+    - name: show build results
+      run: dir ${{ env.SOLUTION_DIRECTORY }}\Release
 
-    - name: cache packages
-      uses: actions/cache@v2
+    - name: upload nuget package
+      uses: actions/upload-artifact@v3.0.0
       with:
-        path: src\Release\*.nupkg
-        key: ${{ runner.os }}-fluentSetupPackage
-  
-  publish:
+        name: nugetPackage
+        path: ${{ env.SOLUTION_DIRECTORY }}\Release\*.nupkg
+        retention-days: 1
+
+    - name: upload binaries
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: binaries
+        path: ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\*
+        retention-days: 1      
+
+
+  unit-tests:
     needs: build
     runs-on: windows-latest
     steps:
-    - name: dir src\Release
-      run: dir src\Releasee
+
+    - name: download artifacts
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: binaries
+        path: testBinaries
+    
+    - name: show binaries
+      run: dir testBinaries
+ 
+    - name: setup VSTest.console.exe
+      uses: darenm/Setup-VSTest@v1
+
+    - name: run unit tests
+      run: vstest.console.exe testBinaries\FluentSetups.UnitTests.dll
+    
+  integration-tests:
+    needs: build
+    runs-on: windows-latest
+    steps:
+    - name: checkout branch
+      uses: actions/checkout@v3
+
+    - name: download artifacts
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: nugetPackage
+        path: src\FluentSetups.IntegrationTests\packages
+    
+    - name: show working dir
+      run: dir
+
+    - name: setup NuGet.exe
+      uses: NuGet/setup-nuget@v1.0.6
+      with:
+        nuget-version: latest
+        nuget-api-key: ${{secrets.NUGET_API_KEY}}
+    
+    - name: restore NuGet packages
+      run: nuget restore ${{ env.INTEGRATION_TEST_SOLUTION }}
+    
+    - name: setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: build solution
+      run: msbuild ${{ env.INTEGRATION_TEST_SOLUTION }} -property:Configuration=Release
+   
+    - name: setup VSTest.console.exe
+      uses: darenm/Setup-VSTest@v1
+
+    - name: run integration tests
+      run: vstest.console.exe src/FluentSetups.IntegrationTests/Release/net6.0/FluentSetups.IntegrationTests.dll
+
+    - name: show working dir
+      run: dir
+
+  publish:
+    needs: [unit-tests, integration-tests]
+    runs-on: windows-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+    steps:
+    - name: download artifacts
+      uses: actions/download-artifact@v3.0.0
+      with:
+        name: nugetPackage
+        path: packages
+        
+    - name: show packages
+      run: dir packages
+      
+    - name: setup NuGet.exe
+      uses: NuGet/setup-nuget@v1.0.6
+      with:
+        nuget-version: latest
+        #nuget-api-key: ${{secrets.NUGET_API_KEY}} 
+      
+    - name: push to nuget.org
+      run: nuget push packages\*.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}} -SkipDuplicate
   

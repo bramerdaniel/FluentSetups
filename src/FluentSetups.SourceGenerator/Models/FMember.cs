@@ -1,31 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupMemberModel.cs" company="consolovers">
+// <copyright file="FMember.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.SourceGenerator.Models
 {
-   using System;
    using System.Linq;
 
    using Microsoft.CodeAnalysis;
 
-   internal class SetupMemberModel
+   internal class FMember
    {
-      #region Constructors and Destructors
-
-      public SetupMemberModel(SetupClassModel owningClass)
-      {
-         OwningClass = owningClass ?? throw new ArgumentNullException(nameof(owningClass));
-      }
-
-      #endregion
-
       #region Public Properties
 
-      /// <summary>Gets the owning class.</summary>
-      public SetupClassModel OwningClass { get; }
+      //public string LowerMemberName => $"{char.ToLowerInvariant(Name[0])}{Name.Substring(1)}";
+
+      /// <summary>Gets or sets the name of the member.</summary>
+      //public string Name { get; set; }
+
+      //public string MemberSetFieldName => $"{LowerMemberName}WasSet";
 
       public string RequiredNamespace { get; protected set; }
 
@@ -34,14 +28,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string TypeName { get; protected set; }
 
-      /// <summary>Gets or sets the name of the member.</summary>
-      public string MemberName { get; set; }
-
-      public string UpperMemberName => $"{char.ToUpperInvariant(MemberName[0])}{MemberName.Substring(1)}";
-      
-      public string LowerMemberName => $"{char.ToLowerInvariant(MemberName[0])}{MemberName.Substring(1)}";
-
-      public string MemberSetFieldName => $"{LowerMemberName}WasSet";
+      // public string UpperMemberName => $"{char.ToUpperInvariant(Name[0])}{Name.Substring(1)}";
 
       #endregion
 
@@ -49,6 +36,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       protected static string ComputeSetupNameFromAttribute(AttributeData attributeData)
       {
+         if (attributeData == null)
+            return null;
+
          return attributeData.ConstructorArguments.FirstOrDefault().Value?.ToString();
       }
 

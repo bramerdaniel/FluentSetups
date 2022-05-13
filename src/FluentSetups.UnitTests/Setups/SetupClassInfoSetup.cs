@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupClassInfoSetup.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SetupClassInfoSetup.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,15 +10,18 @@ using FluentSetups.SourceGenerator;
 
 internal class SetupClassInfoSetup : SetupBase
 {
-
-
-   #region Public Properties
-
-   public string ClassName { get; private set; }
-
-   #endregion
-
    #region Public Methods and Operators
+
+   public SetupClassInfo Done()
+   {
+      var compilation = CreateCompilation();
+
+      var syntaxWalker = new SyntaxHelper();
+      syntaxWalker.Visit(SyntaxTrees[0].GetRoot());
+
+      var context = FluentGeneratorContext.FromCompilation(compilation);
+      return context.CreateFluentSetupInfo(FirstClassDeclarationSyntax());
+   }
 
    public SetupClassInfoSetup WithRootNamespace(string value)
    {
@@ -32,24 +35,5 @@ internal class SetupClassInfoSetup : SetupBase
       return this;
    }
 
-   public SetupClassInfo Done()
-   {
-      var compilation = CreateCompilation();
-      
-      var syntaxWalker = new SyntaxHelper();
-      syntaxWalker.Visit(SyntaxTrees[0].GetRoot());
-      
-      var api = FluentGeneratorContext.FromCompilation(compilation);
-      var semanticModel = compilation.GetSemanticModel(SyntaxTrees[0]);
-      return new SetupClassInfo(api, FirstClassDeclarationSyntax(), semanticModel);
-   }
-
-   public SetupClassInfoSetup WithName(string className)
-   {
-      ClassName = className;
-      return this;
-   }
-
    #endregion
-   
 }

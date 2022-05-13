@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupClassInfo.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SetupClassInfo.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,29 +15,21 @@ namespace FluentSetups.SourceGenerator
    /// <summary>Data class containing all the required information along the generation process</summary>
    internal class SetupClassInfo
    {
-      #region Constants and Fields
-
-      private readonly FluentGeneratorContext fluentApi;
-
-      #endregion
-
       #region Constructors and Destructors
 
-      public SetupClassInfo(FluentGeneratorContext fluentApi, ClassDeclarationSyntax candidate, SemanticModel semanticModel)
+      public SetupClassInfo(FluentGeneratorContext context, ClassDeclarationSyntax candidate, SemanticModel semanticModel, ITypeSymbol classSymbol,
+         AttributeData fluentSetupAttribute)
       {
-         this.fluentApi = fluentApi;
-
+         Context = context;
          ClassSyntax = candidate ?? throw new ArgumentNullException(nameof(candidate));
          SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
-         ClassSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
-         FluentSetupAttribute = ClassSymbol?.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
+         ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
+         FluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
       }
 
       #endregion
 
       #region Public Properties
-
-      public string ClassName => ClassSyntax.Identifier.Text;
 
       /// <summary>Gets or sets the class symbol.</summary>
       public ITypeSymbol ClassSymbol { get; }
@@ -47,6 +39,16 @@ namespace FluentSetups.SourceGenerator
       public AttributeData FluentSetupAttribute { get; }
 
       public SemanticModel SemanticModel { get; }
+
+      public TypedConstant TargetMode => FluentSetupAttribute.GetTargetMode();
+
+      public TypedConstant TargetType => FluentSetupAttribute.GetTargetType();
+
+      #endregion
+
+      #region Properties
+
+      private FluentGeneratorContext Context { get; }
 
       #endregion
 
@@ -67,33 +69,41 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
-      internal static void InitializeFromCompilation(Compilation compilation)
-      {
-      }
-
       internal string GetSetupEntryClassName()
       {
-         if (FluentSetupAttribute == null)
-            return null;
+         if (TryGetConstructorArgument(TypedConstantKind.Primitive, out var targetType))
+            return targetType.Value.ToString();
 
-         var firstArgument = FluentSetupAttribute.ConstructorArguments.FirstOrDefault();
-         if (firstArgument.IsNull)
-            return "Setup";
+         if (TryGetNamedArgument("EntryClassName", out targetType) && targetType.Kind == TypedConstantKind.Primitive)
+            return targetType.Value.ToString();
 
-         return firstArgument.Value?.ToString() ?? "Setup";
+         // TODO return default atttibute value
+         return "Setup";
       }
 
       internal string GetSetupEntryNameSpace()
       {
-         if (FluentSetupAttribute == null)
-            return null;
-
-         var firstArgument = FluentSetupAttribute.NamedArguments.FirstOrDefault(x => x.Key == "EntryNamespace");
-         if (firstArgument.Value.Value is string value)
-            return value;
+         if (TryGetNamedArgument("EntryNamespace", out var targetType) && targetType.Kind == TypedConstantKind.Primitive)
+            return targetType.Value?.ToString();
 
          // This should be the default namespace of the containing assembly
          return ClassSymbol.ContainingAssembly.MetadataName;
+      }
+
+      private TypedConstant GetTargetMode()
+      {
+         if (TryGetNamedArgument("TargetMode", out var targetType) && targetType.Kind == TypedConstantKind.Enum)
+            return targetType;
+         return default;
+      }
+
+      private TypedConstant GetTargetType()
+      {
+         if (TryGetConstructorArgument(TypedConstantKind.Type, out var targetType))
+            return targetType;
+         if (TryGetNamedArgument("TargetType", out targetType) && targetType.Kind == TypedConstantKind.Type)
+            return targetType;
+         return default;
       }
 
       private bool IsFluentSetupAttribute(AttributeData attributeData)
@@ -103,7 +113,37 @@ namespace FluentSetups.SourceGenerator
 
       private bool IsFluentSetupAttribute(INamedTypeSymbol attributeSymbol)
       {
-         return fluentApi.FluentSetupAttribute.Equals(attributeSymbol, SymbolEqualityComparer.Default);
+         return Context.FluentSetupAttribute.Equals(attributeSymbol, SymbolEqualityComparer.Default);
+      }
+
+      private bool TryGetConstructorArgument(TypedConstantKind type, out TypedConstant targetType)
+      {
+         var attribute = FluentSetupAttribute;
+         if (attribute != null && attribute.ConstructorArguments.Length > 0)
+         {
+            targetType = attribute.ConstructorArguments.FirstOrDefault(x => x.Kind == type);
+            return !targetType.IsNull;
+         }
+
+         targetType = default;
+         return false;
+      }
+
+      private bool TryGetNamedArgument(string argumentName, out TypedConstant typedConstant)
+      {
+         var attribute = FluentSetupAttribute;
+         if (attribute != null && attribute.NamedArguments.Length > 0)
+         {
+            var match = attribute.NamedArguments.FirstOrDefault(x => x.Key == argumentName);
+            if (match.Key != null)
+            {
+               typedConstant = match.Value;
+               return true;
+            }
+         }
+
+         typedConstant = default;
+         return false;
       }
 
       #endregion

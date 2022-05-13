@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetupClassModelSetup.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SetupClassModelSetup.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ internal class SetupClassModelSetup : SetupBase
 {
    #region Public Methods and Operators
 
-   public SetupClassModel Done()
+   public FClass Done()
    {
       var compilation = CreateCompilation();
       var context = FluentGeneratorContext.FromCompilation(compilation);
@@ -23,8 +23,8 @@ internal class SetupClassModelSetup : SetupBase
       if (setupClass == null)
          throw new InvalidOperationException("The parsed syntax was not a class");
 
-      var classInfo = new SetupClassInfo(context, setupClass, compilation.GetSemanticModel(setupClass.SyntaxTree));
-      return SetupClassModel.Create(context, classInfo);
+      var classInfo = context.CreateFluentSetupInfo(setupClass);
+      return new FClass(context, classInfo.ClassSymbol, classInfo.FluentSetupAttribute);
    }
 
    public SetupClassModelSetup FromSource(string code)

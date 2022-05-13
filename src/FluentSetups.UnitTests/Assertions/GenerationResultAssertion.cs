@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GenerationResultAssertion.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="GenerationResultAssertion.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace FluentSetups.UnitTests
+namespace FluentSetups.UnitTests.Assertions
 {
    using System;
    using System.Collections.Generic;
@@ -21,7 +21,11 @@ namespace FluentSetups.UnitTests
 
    internal class GenerationResultAssertion : ReferenceTypeAssertions<GenerationResult, GenerationResultAssertion>
    {
+      #region Constants and Fields
+
       private string expectedError;
+
+      #endregion
 
       #region Constructors and Destructors
 
@@ -43,9 +47,9 @@ namespace FluentSetups.UnitTests
       public ClassAssertion HaveClass(string className)
       {
          var classType = Subject.Compilation.GetTypeByMetadataName(className);
-         
-         Assert.IsNotNull(classType, $"The class {className} could not be found");
-         return new ClassAssertion(classType);
+
+         Assert.IsNotNull(classType, $"The class {className} could not be found. {Environment.NewLine}{Subject.SyntaxTrees.Last().ToString()}");
+         return new ClassAssertion(Subject, classType);
       }
 
       public ClassAssertion HavePartialClass(string className)
@@ -55,8 +59,6 @@ namespace FluentSetups.UnitTests
          return classAssertion;
       }
 
-      #endregion
-
       public AndConstraint<GenerationResultAssertion> NotHaveErrors()
       {
          ThrowOnErrors(Subject.GeneratedDiagnostics);
@@ -65,12 +67,9 @@ namespace FluentSetups.UnitTests
          return new AndConstraint<GenerationResultAssertion>(this);
       }
 
-      private void ThrowOnErrors(IEnumerable<Diagnostic> diagnostics)
-      {
-         var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity == DiagnosticSeverity.Error);
-         if (errorDiagnostic != null)
-            throw new AssertFailedException(CreateMessage(errorDiagnostic));
-      }
+      #endregion
+
+      #region Methods
 
       private static string CreateMessage(Diagnostic errorDiagnostic)
       {
@@ -81,5 +80,14 @@ namespace FluentSetups.UnitTests
          builder.AppendLine(errorDiagnostic.Location?.SourceTree?.ToString());
          return builder.ToString();
       }
+
+      private void ThrowOnErrors(IEnumerable<Diagnostic> diagnostics)
+      {
+         var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity == DiagnosticSeverity.Error);
+         if (errorDiagnostic != null)
+            throw new AssertFailedException(CreateMessage(errorDiagnostic));
+      }
+
+      #endregion
    }
 }
