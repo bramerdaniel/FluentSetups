@@ -2,7 +2,7 @@
 <Project>
 	<!-- Properties are a Dictionary<string, string> they work like AddOrUpdate -->
 	<PropertyGroup>
-		<FluentSetupsPackageVersion>0.2.0-rc.7</FluentSetupsPackageVersion>
+		<FluentSetupsPackageVersion>0.2.0-rc.8</FluentSetupsPackageVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
