@@ -33,13 +33,7 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
-      private static string ComputeEntryMethodName(string className)
-      {
-         if (className.EndsWith("Setup"))
-            return className.Substring(0, className.Length - 5);
-
-         return className;
-      }
+   
 
       private static void ReportError(GeneratedSource source, Exception e)
       {
@@ -50,13 +44,6 @@ namespace FluentSetups.SourceGenerator
             isEnabledByDefault: true);
 
          source.Error = Diagnostic.Create(missingReference, Location.None, source.Name, e.Message);
-      }
-
-      private string ComputeEntryMethodName(FClass setupClass)
-      {
-         if (setupClass.Target != null)
-            return setupClass.TargetTypeName;
-         return ComputeEntryMethodName(setupClass.ClassName);
       }
 
       private GeneratedSource GenerateEntryClass(SetupEntryClassModel classModel)
@@ -90,13 +77,28 @@ namespace FluentSetups.SourceGenerator
 
       private void GenerateEntryPoints(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
       {
+         var addedMethods = new HashSet<string>();
          foreach (var setupClass in classModel.SetupClasses)
          {
+            var requestedName = setupClass.SetupMethod;
+            var generatedName = GetName(addedMethods, requestedName);
+
             sourceBuilder.AppendLine($"/// <summary>Creates a new setup for the {setupClass.ClassName} class</summary>");
-            sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {ComputeEntryMethodName(setupClass)}()");
+            sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {generatedName}()");
             sourceBuilder.AppendLine($" => new {setupClass.ClassName}();");
             sourceBuilder.AppendLine();
          }
+      }
+
+      private string GetName(HashSet<string> existingMethods, string requestedName)
+      {
+         var name = requestedName;
+         var counter = 1;
+         while (existingMethods.Contains(name))
+            name = $"{requestedName}{counter++}";
+
+         existingMethods.Add(name);
+         return name;
       }
 
       private void GenerateRequiredNamespaces(SetupEntryClassModel classModel, StringBuilder sourceBuilder)

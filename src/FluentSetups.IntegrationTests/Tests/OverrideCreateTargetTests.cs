@@ -16,7 +16,7 @@ public class OverrideCreateTargetTests
    [TestMethod]
    public void EnsureOverwrittenDoneCompiles()
    {
-      var setup = Setup.CreateTargetOverwrite()
+      var setup = Setup.CustomPerson()
          .WithFirstName("Robert")
          .WithLastName("Ramirez");
 

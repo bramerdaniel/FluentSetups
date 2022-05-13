@@ -78,5 +78,13 @@ namespace FluentSetups.SourceGenerator
          return "Setup";
       }
 
+      internal static string GetSetupMethod(this AttributeData attribute)
+      {
+         if (TryGetNamedArgument(attribute, "SetupMethod", out var targetType) && targetType.Kind == TypedConstantKind.Primitive)
+            return targetType.Value?.ToString();
+         
+         return null;
+      }
+
    }
 }

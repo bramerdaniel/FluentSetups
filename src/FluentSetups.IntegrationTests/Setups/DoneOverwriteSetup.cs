@@ -8,7 +8,7 @@ namespace FluentSetups.IntegrationTests.Setups;
 
 using FluentSetups.IntegrationTests.Targets;
 
-[FluentSetup(typeof(Person))]
+[FluentSetup(typeof(Person), EntryClassName = "CustomSetup")]
 internal partial class DoneOverwriteSetup 
 {
    internal Person Done()

@@ -16,7 +16,7 @@ public class OverrideDoneTests
    [TestMethod]
    public void EnsureOverwrittenDoneCompiles()
    {
-      var person = Setup.DoneOverwrite()
+      var person = CustomSetup.Person()
          .WithFirstName("Robert")
          .WithLastName("Ramirez")
          .Done();

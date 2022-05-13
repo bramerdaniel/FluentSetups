@@ -77,6 +77,23 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string TargetTypeNamespace { get; set; }
 
+      public string SetupMethod => ComputeSetupMethod();
+
+      private string ComputeSetupMethod()
+      {
+         return fluentSetupAttribute.GetSetupMethod() 
+                ?? TargetTypeName
+                ?? ComputeEntryMethodName();
+      }
+
+      private string ComputeEntryMethodName()
+      {
+         if (ClassName.EndsWith("Setup"))
+            return ClassName.Substring(0, ClassName.Length - 5);
+
+         return ClassName;
+      }
+
       public ITypeSymbol ClassSymbol { get; }
 
       #endregion

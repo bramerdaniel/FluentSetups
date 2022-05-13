@@ -8,7 +8,7 @@ namespace FluentSetups.IntegrationTests.Setups;
 
 using FluentSetups.IntegrationTests.Targets;
 
-[FluentSetup(typeof(Person))]
+[FluentSetup(typeof(Person), SetupMethod = "CustomPerson")]
 internal partial class CreateTargetOverwriteSetup 
 {
    public bool CreateTargetCalled { get; set; }
