@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FGetValueMethod.cs" company="consolovers">
+// <copyright file="FGetValueOrDefaultMethod.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -9,7 +9,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System;
    using System.Text;
 
-   internal class FGetValueMethod : IFluentMethod
+   internal class FGetValueOrDefaultMethod : IFluentMethod
    {
       #region Constants and Fields
 
@@ -21,7 +21,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Constructors and Destructors
 
-      public FGetValueMethod(IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
+      public FGetValueOrDefaultMethod(IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
          this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));

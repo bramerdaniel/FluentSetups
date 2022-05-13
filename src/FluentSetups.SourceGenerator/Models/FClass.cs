@@ -228,7 +228,7 @@ namespace FluentSetups.SourceGenerator.Models
             var fGetOrThrow = new FGetOrThrow(field, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueMethod(field, method.SetupIndicatorField) { Category = method.Category };
+            var getMember = new FGetValueOrDefaultMethod(field, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(getMember);
 
             if (CanAddSet(field))
@@ -262,7 +262,7 @@ namespace FluentSetups.SourceGenerator.Models
             var fGetOrThrow = new FGetOrThrow(property, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueMethod(property, method.SetupIndicatorField) { Category = method.Category };
+            var getMember = new FGetValueOrDefaultMethod(property, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(getMember);
 
             if (CanAddSet(property))

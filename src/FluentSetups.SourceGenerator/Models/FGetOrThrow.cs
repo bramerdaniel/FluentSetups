@@ -20,7 +20,7 @@ namespace FluentSetups.SourceGenerator.Models
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
          this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));
          
-         Name = $"Get{backingFieldSymbol.Name.ToFirstUpper()}OrThrow";
+         Name = $"Get{backingFieldSymbol.Name.ToFirstUpper()}";
       }
 
       public string Name { get; }
@@ -30,7 +30,7 @@ namespace FluentSetups.SourceGenerator.Models
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}()");
          codeBuilder.AppendLine("{");
-         codeBuilder.AppendLine($"  return {setupIndicatorField.Name} ? {backingFieldSymbol.Name} : throw new InvalidOperationException(\"The member {backingFieldSymbol.Name} was not initialized.\");");
+         codeBuilder.AppendLine($"  return {Name}(() => throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name})));");
          codeBuilder.AppendLine("}");
          return codeBuilder.ToString();
       }
