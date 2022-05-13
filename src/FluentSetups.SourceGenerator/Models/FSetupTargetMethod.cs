@@ -31,7 +31,7 @@ namespace FluentSetups.SourceGenerator.Models
       public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         codeBuilder.Append($"internal {ReturnType} {Name}({ParameterTypeName} target)");
+         codeBuilder.Append($"{ComputeModifier()} {ReturnType} {Name}({ParameterTypeName} target)");
          codeBuilder.AppendLine("{");
 
          foreach (var setMethod in SetupClass.Methods.OfType<FSetupMemberMethod>())
@@ -40,6 +40,13 @@ namespace FluentSetups.SourceGenerator.Models
          codeBuilder.AppendLine("}");
 
          return codeBuilder.ToString();
+      }
+
+      private string ComputeModifier()
+      {
+         if (SetupClass.Target.IsInternal && SetupClass.IsPublic)
+            return "private";
+         return "protected";
       }
    }
 }

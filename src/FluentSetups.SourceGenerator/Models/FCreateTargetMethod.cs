@@ -22,7 +22,7 @@ namespace FluentSetups.SourceGenerator.Models
          Target = target ?? throw new ArgumentNullException(nameof(target));
       }
 
-      public FCreateTargetMethod(ITypeSymbol returnType, FTarget target)
+      public FCreateTargetMethod(FTarget target)
          : base("CreateTarget", null, target?.TypeSymbol)
       {
          Target = target ?? throw new ArgumentNullException(nameof(target));

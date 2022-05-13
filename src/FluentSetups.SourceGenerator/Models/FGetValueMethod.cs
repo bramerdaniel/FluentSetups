@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FGetOrThrow.cs" company="consolovers">
+// <copyright file="FGetValueMethod.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -9,17 +9,13 @@ namespace FluentSetups.SourceGenerator.Models
    using System;
    using System.Text;
 
-   internal class FGetOrThrow : IFluentMethod
+   internal class FGetValueMethod : IFluentMethod
    {
       private readonly IFluentTypedMember backingFieldSymbol;
 
-      private readonly FField setupIndicatorField;
-
-      public FGetOrThrow(IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
+      public FGetValueMethod(IFluentTypedMember backingFieldSymbol)
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
-         this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));
-         
          Name = $"Get{backingFieldSymbol.Name.ToFirstUpper()}";
       }
 

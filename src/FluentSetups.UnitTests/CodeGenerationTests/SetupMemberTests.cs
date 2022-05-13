@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SetMemberTests.cs" company="consolovers">
+// <copyright file="SetupMemberTests.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ using FluentSetups.UnitTests.Setups;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
-public class SetMemberTests
+public class SetupMemberTests
 {
    #region Public Methods and Operators
    
@@ -260,13 +260,14 @@ public class SetMemberTests
          .WithSource(code)
          .Done();
 
+      result.Print();
+
       result.Should().NotHaveErrors().And
          .HaveClass("RonnyTheRobber.PersonSetup")
          .WithField("nameWasSet")
          .WhereMethod("SetupName")
          .IsPrivate();
 
-      result.Print();
    }
 
    [TestMethod]

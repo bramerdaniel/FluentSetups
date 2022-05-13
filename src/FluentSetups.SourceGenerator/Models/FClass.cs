@@ -225,7 +225,7 @@ namespace FluentSetups.SourceGenerator.Models
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetOrThrow(field, method.SetupIndicatorField) { Category = method.Category };
+            var fGetOrThrow = new FGetValueMethod(field) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
             var getMember = new FGetValueOrDefaultMethod(field, method.SetupIndicatorField) { Category = method.Category };
@@ -259,7 +259,7 @@ namespace FluentSetups.SourceGenerator.Models
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{property.Name.ToFirstLower()}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetOrThrow(property, method.SetupIndicatorField) { Category = method.Category };
+            var fGetOrThrow = new FGetValueMethod(property) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
             var getMember = new FGetValueOrDefaultMethod(property, method.SetupIndicatorField) { Category = method.Category };
@@ -313,7 +313,7 @@ namespace FluentSetups.SourceGenerator.Models
             return;
 
          AddMethod(new FDone(Target.TypeSymbol));
-         AddMethod(new FCreateTargetMethod(Target.TypeSymbol, Target));
+         AddMethod(new FCreateTargetMethod(Target));
          AddMethod(new FSetupTargetMethod(this));
       }
 
@@ -416,6 +416,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void OpenNamespace(StringBuilder sourceBuilder)
       {
+         sourceBuilder.AppendLine("/// To get help see https://github.com/bramerdaniel/FluentSetups");
          if (!string.IsNullOrWhiteSpace(ContainingNamespace))
          {
             sourceBuilder.AppendLine($"namespace {ContainingNamespace}");
