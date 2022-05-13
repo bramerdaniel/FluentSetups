@@ -479,7 +479,7 @@ namespace FluentSetups.SourceGenerator.Models
             return;
 
          AddMethod(new FDoneMethod(Target.TypeSymbol));
-         AddMethod(new FCreateTargetMethod(Target));
+         AddMethod(new FCreateTargetMethod(this));
          AddMethod(new FSetupTargetMethod(this));
       }
 

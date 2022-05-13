@@ -51,7 +51,7 @@ namespace FluentSetups.SourceGenerator.Models
       public virtual string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         codeBuilder.Append($"internal {ReturnType} {Name}");
+         codeBuilder.Append($"{ComputeModifier()} {ReturnType} {Name}");
          codeBuilder.AppendLine(ParameterCount == 0 ? "()" : $"({ParameterTypeName} value)");
 
          codeBuilder.AppendLine("{");
@@ -59,6 +59,11 @@ namespace FluentSetups.SourceGenerator.Models
          codeBuilder.AppendLine("}");
 
          return codeBuilder.ToString();
+      }
+
+      protected virtual string ComputeModifier()
+      {
+         return "internal";
       }
 
       public bool IsUserDefined => methodSymbol != null;

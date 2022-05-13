@@ -14,6 +14,8 @@ namespace FluentSetups.SourceGenerator.Models
 
    internal class FCreateTargetMethod : FMethod
    {
+      public FClass SetupClass { get; }
+
       public FTarget Target { get; }
 
       public FCreateTargetMethod(IMethodSymbol methodSymbol, FTarget target)
@@ -22,10 +24,18 @@ namespace FluentSetups.SourceGenerator.Models
          Target = target ?? throw new ArgumentNullException(nameof(target));
       }
 
-      public FCreateTargetMethod(FTarget target)
-         : base("CreateTarget", null, target?.TypeSymbol)
+      public FCreateTargetMethod(FClass setupClass)
+         : base("CreateTarget", null, setupClass?.Target?.TypeSymbol)
       {
-         Target = target ?? throw new ArgumentNullException(nameof(target));
+         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
+         Target = setupClass.Target;
+      }
+
+      protected override string ComputeModifier()
+      {
+         if (Target.IsInternal && SetupClass.IsPublic)
+            return "private";
+         return "protected";
       }
 
       protected override void AppendMethodContent(StringBuilder codeBuilder)
