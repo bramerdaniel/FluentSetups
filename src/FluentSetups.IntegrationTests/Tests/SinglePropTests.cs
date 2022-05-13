@@ -14,8 +14,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 public class SinglePropTests
 {
    [TestMethod]
-   [Ignore]
-   public void CreateCar()
+   public void CreateSingleProp()
    {
       var car = Setup.SinglePropTarget()
          .WithBrand("BMW")

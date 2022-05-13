@@ -77,6 +77,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string TargetTypeNamespace { get; set; }
 
+      public bool IsPublic => classSymbol.DeclaredAccessibility == Accessibility.Public;
+
       #endregion
 
       #region Public Methods and Operators
@@ -85,14 +87,13 @@ namespace FluentSetups.SourceGenerator.Models
       {
          var sourceBuilder = new StringBuilder();
          OpenNamespace(sourceBuilder);
-         {
-            AppendRequiredUsingDirectives(sourceBuilder);
-            OpenClass(sourceBuilder);
 
-            GenerateSetupMembers(sourceBuilder);
+         AppendRequiredUsingDirectives(sourceBuilder);
 
-            CloseClass(sourceBuilder);
-         }
+         OpenClass(sourceBuilder);
+         GenerateSetupMembers(sourceBuilder);
+         CloseClass(sourceBuilder);
+
          CloseNamespace(sourceBuilder);
 
          return sourceBuilder.ToString();
@@ -178,11 +179,19 @@ namespace FluentSetups.SourceGenerator.Models
 
       private FMethod CreateMethod(IMethodSymbol methodSymbol)
       {
-         if (methodSymbol.Name == "Done" && methodSymbol.Parameters.Length == 0)
-            return new FDone(methodSymbol);
+         if (TargetAvailable())
+         {
+            if (methodSymbol.Name == "Done" && methodSymbol.Parameters.Length == 0)
+               return new FDone(methodSymbol);
 
-         if (methodSymbol.Name == "CreateTarget" && methodSymbol.Parameters.Length == 0)
-            return new FCreateTarget(methodSymbol, Target);
+            /// TODO refactor this
+            if (methodSymbol.Name == "CreateTarget" && methodSymbol.Parameters.Length == 0)
+               return new FCreateTargetMethod(methodSymbol, Target);
+
+            /// TODO refactor this
+            if (methodSymbol.Name == "SetupTarget" && methodSymbol.Parameters.Length == 1)
+               return new FSetupTargetMethod(methodSymbol, this);
+         }
 
          return new FMethod(methodSymbol);
       }
@@ -221,7 +230,22 @@ namespace FluentSetups.SourceGenerator.Models
 
             var getMember = new FGetValueMethod(field, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(getMember);
+
+            if (CanAddSet(field))
+            {
+               var setMember = new FSetupMemberMethod(field, method.SetupIndicatorField, this) { Category = method.Category };
+               AddMethod(setMember);
+            }
          }
+      }
+
+      private bool CanAddSet(IFluentMember field)
+      {
+         if (!TargetAvailable())
+            return false;
+
+         return Target.HasAccessibleProperty(field.Name.ToFirstUpper());
+
       }
 
       private void AddSetupMethodFromProperty(FProperty property)
@@ -235,11 +259,17 @@ namespace FluentSetups.SourceGenerator.Models
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{property.Name.ToFirstLower()}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetOrThrow(property, method.SetupIndicatorField);
+            var fGetOrThrow = new FGetOrThrow(property, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueMethod(property, method.SetupIndicatorField);
+            var getMember = new FGetValueMethod(property, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(getMember);
+
+            if (CanAddSet(property))
+            {
+               var setMember = new FSetupMemberMethod(property, method.SetupIndicatorField, this) { Category = method.Category };
+               AddMethod(setMember);
+            }
          }
       }
 
@@ -248,7 +278,7 @@ namespace FluentSetups.SourceGenerator.Models
          sourceBuilder.AppendLine("using System;");
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
          sourceBuilder.AppendLine("using FluentSetups;");
-         if (TargetCreationPossible() && !string.IsNullOrWhiteSpace(TargetTypeNamespace))
+         if (TargetAvailable() && !string.IsNullOrWhiteSpace(TargetTypeNamespace))
             sourceBuilder.AppendLine($"using {TargetTypeNamespace};");
       }
 
@@ -283,7 +313,7 @@ namespace FluentSetups.SourceGenerator.Models
             return;
 
          AddMethod(new FDone(Target.TypeSymbol));
-         AddMethod(new FCreateTarget(Target.TypeSymbol, Target));
+         AddMethod(new FCreateTargetMethod(Target.TypeSymbol, Target));
          AddMethod(new FSetupTargetMethod(this));
       }
 
@@ -393,7 +423,7 @@ namespace FluentSetups.SourceGenerator.Models
          }
       }
 
-      private bool TargetCreationPossible()
+      private bool TargetAvailable()
       {
          if (TargetMode == TargetGenerationMode.Disabled)
             return false;

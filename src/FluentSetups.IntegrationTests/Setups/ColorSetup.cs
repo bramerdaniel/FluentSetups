@@ -12,7 +12,7 @@ using FluentSetups.IntegrationTests.Targets;
 public partial class ColorSetup
 {
    [FluentMember]
-   private int name;
+   private string name;
 
    public ColorSetup WithName(string value)
    {

@@ -47,6 +47,4 @@ public class CompileErrorTests
 
       car.Should().NotBeNull();
    }
-
-
 }

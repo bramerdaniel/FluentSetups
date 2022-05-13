@@ -99,6 +99,8 @@ internal class MethodAssertion : ReferenceTypeAssertions<IMethodSymbol, MethodAs
       }
    }
 
+
+
    public MethodAssertion IsInternal()
    {
       Subject.DeclaredAccessibility.Should().Be(Accessibility.Internal);
@@ -114,6 +116,11 @@ internal class MethodAssertion : ReferenceTypeAssertions<IMethodSymbol, MethodAs
    public MethodAssertion IsProtected()
    {
       Subject.DeclaredAccessibility.Should().Be(Accessibility.Protected);
+      return this;
+   }
+   public MethodAssertion IsPrivate()
+   {
+      Subject.DeclaredAccessibility.Should().Be(Accessibility.Private);
       return this;
    }
 

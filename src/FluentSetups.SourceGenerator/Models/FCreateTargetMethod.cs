@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FCreateTarget.cs" company="consolovers">
+// <copyright file="FCreateTargetMethod.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -12,17 +12,17 @@ namespace FluentSetups.SourceGenerator.Models
 
    using Microsoft.CodeAnalysis;
 
-   internal class FCreateTarget : FMethod
+   internal class FCreateTargetMethod : FMethod
    {
       public FTarget Target { get; }
 
-      public FCreateTarget(IMethodSymbol methodSymbol, FTarget target)
+      public FCreateTargetMethod(IMethodSymbol methodSymbol, FTarget target)
          : base(methodSymbol)
       {
          Target = target ?? throw new ArgumentNullException(nameof(target));
       }
 
-      public FCreateTarget(ITypeSymbol returnType, FTarget target)
+      public FCreateTargetMethod(ITypeSymbol returnType, FTarget target)
          : base("CreateTarget", null, target?.TypeSymbol)
       {
          Target = target ?? throw new ArgumentNullException(nameof(target));

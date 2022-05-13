@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PersonTests.cs" company="KUKA Deutschland GmbH">
+// <copyright file="OverrideDoneTests.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -11,21 +11,18 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
-public class PersonTests
+public class OverrideDoneTests
 {
    [TestMethod]
-   public void SetupThatIsHidingAPublicProperty()
+   public void EnsureOverwrittenDoneCompiles()
    {
-      var person = Setup.Person()
+      var person = Setup.DoneOverwrite()
          .WithFirstName("Robert")
          .WithLastName("Ramirez")
-         .WithAge(34) 
          .Done();
 
-      person.FirstName.Should().Be("Robert");
-      person.LastName.Should().Be("Ramirez");
-      person.Age.Should().Be(34);
+      person.FirstName.Should().Be("Ramirez");
+      person.LastName.Should().Be("Robert");
+      person.Age.Should().Be(10);
    }
-
-
 }

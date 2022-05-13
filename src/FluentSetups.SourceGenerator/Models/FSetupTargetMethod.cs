@@ -14,28 +14,29 @@ namespace FluentSetups.SourceGenerator.Models
 
    internal class FSetupTargetMethod : FMethod
    {
-      public FTarget Target { get; }
+      public FClass SetupClass { get; }
 
-      public FSetupTargetMethod(IMethodSymbol methodSymbol, FTarget target)
+      public FSetupTargetMethod(IMethodSymbol methodSymbol, FClass setupClass)
          : base(methodSymbol)
       {
-         Target = target ?? throw new ArgumentNullException(nameof(target));
+         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
       }
 
       public FSetupTargetMethod(FClass setupClass)
-         : base("SetupTarget", setupClass.Target.TypeSymbol, null)
+         : base("SetupTarget", setupClass?.Target?.TypeSymbol, null)
       {
+         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
       }
 
       public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         //codeBuilder.AppendLine($"/// <summary>");
-         //codeBuilder.AppendLine($"// This method initializes the created <see cref=\"{ReturnType}\"/> instance");
-         //codeBuilder.AppendLine($"///</summary>");
          codeBuilder.Append($"internal {ReturnType} {Name}({ParameterTypeName} target)");
          codeBuilder.AppendLine("{");
-         codeBuilder.AppendLine($"   // TODO");
+
+         foreach (var setMethod in SetupClass.Methods.OfType<FSetupMemberMethod>())
+            codeBuilder.AppendLine($"{setMethod.Name}(target);");
+         
          codeBuilder.AppendLine("}");
 
          return codeBuilder.ToString();

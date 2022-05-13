@@ -43,12 +43,6 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
 
    #region Public Methods and Operators
 
-   public ClassAssertion MustBePartial()
-   {
-      var namedTypeSymbol = Subject;
-      return this;
-   }
-
    public MethodAssertion WhereMethod(string methodName)
    {
       var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();

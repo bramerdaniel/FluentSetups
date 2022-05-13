@@ -36,7 +36,7 @@ namespace FluentSetups.SourceGenerator.Models
       {
          if (Constructor == null)
             yield break;
-         
+
          foreach (var parameter in Constructor.Parameters)
             yield return new FConstructorParameter(parameter);
       }
@@ -54,8 +54,6 @@ namespace FluentSetups.SourceGenerator.Models
 
       private IEnumerable<FTargetProperty> ComputeMembers()
       {
-
-
          foreach (var targetMember in TypeSymbol.GetMembers().OfType<IPropertySymbol>())
          {
             if (CanBeSet(targetMember))
@@ -94,6 +92,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       public INamedTypeSymbol TypeSymbol { get; }
 
+      public bool IsInternal => TypeSymbol.DeclaredAccessibility == Accessibility.Internal;
+
       #endregion
 
       #region Public Methods and Operators
@@ -104,5 +104,10 @@ namespace FluentSetups.SourceGenerator.Models
       }
 
       #endregion
+
+      public bool HasAccessibleProperty(string name)
+      {
+         return Properties.Any(p => p.Name == name);
+      }
    }
 }

@@ -21,12 +21,6 @@ namespace FluentSetups.UnitTests.Assertions
 
    internal class GenerationResultAssertion : ReferenceTypeAssertions<GenerationResult, GenerationResultAssertion>
    {
-      #region Constants and Fields
-
-      private string expectedError;
-
-      #endregion
-
       #region Constructors and Destructors
 
       public GenerationResultAssertion(GenerationResult subject)
@@ -52,13 +46,6 @@ namespace FluentSetups.UnitTests.Assertions
          return new ClassAssertion(Subject, classType);
       }
 
-      public ClassAssertion HavePartialClass(string className)
-      {
-         var classAssertion = HaveClass(className);
-         classAssertion.MustBePartial();
-         return classAssertion;
-      }
-
       public AndConstraint<GenerationResultAssertion> NotHaveErrors()
       {
          ThrowOnErrors(Subject.GeneratedDiagnostics);
@@ -77,7 +64,7 @@ namespace FluentSetups.UnitTests.Assertions
          builder.AppendLine("MESSAGE");
          builder.AppendLine(errorDiagnostic.GetMessage());
          builder.AppendLine("SOURCE");
-         builder.AppendLine(errorDiagnostic.Location?.SourceTree?.ToString());
+         builder.AppendLine(errorDiagnostic.Location.SourceTree?.ToString());
          return builder.ToString();
       }
 
