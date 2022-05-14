@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace FluentSetups.UnitTests.CodeGenerationTests;
+namespace FluentSetups.UnitTests.CodeGenerationTests.HidingMembers;
 
 using FluentSetups.UnitTests.Setups;
 
@@ -211,4 +211,5 @@ public class HidingGeneratedMembersTests
          .WithMethod("CreateTarget")
          .WithMethod("Done");
    }
+   
 }

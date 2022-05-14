@@ -8,8 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)$(Configuration)\FluentSetups.SourceGenerator.dll" 
-			  Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Include="$(SolutionDir)$(Configuration)\FluentSetups.SourceGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 
 </Project>
