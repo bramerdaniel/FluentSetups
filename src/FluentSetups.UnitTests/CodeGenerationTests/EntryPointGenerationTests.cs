@@ -249,5 +249,41 @@ public class EntryPointGenerationTests
          .WithStaticMethod("Custom");
    }
 
+   [TestMethod]
+   public void EnsureNoWarningsForMultipleEntryMethods()
+   {
+      var code = @"namespace SetupNameSpace
+                   {
+                      using FluentSetups;
+
+                      [FluentSetup(typeof(Person))]
+                      public partial class PersonSetup
+                      {
+                      }
+
+                      [FluentSetup(typeof(Car))]
+                      public partial class CarSetup
+                      {
+                      }
+
+                      public class Person
+                      { 
+                      }
+
+                      public class Car
+                      { 
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveWarnings().And
+         .HaveClass("RootNamespace.Setup")
+         .WithStaticMethod("Person")
+         .WithStaticMethod("Car");
+   }
+
    #endregion
 }

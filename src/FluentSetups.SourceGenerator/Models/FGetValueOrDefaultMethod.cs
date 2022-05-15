@@ -7,9 +7,11 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System;
+   using System.Diagnostics;
    using System.Text;
 
-   internal class FGetValueOrDefaultMethod : IFluentMethod
+   [DebuggerDisplay("{Signature}")]
+   internal class FGetValueOrDefaultMethod : MethodBase
    {
       #region Constants and Fields
 
@@ -21,38 +23,39 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Constructors and Destructors
 
-      public FGetValueOrDefaultMethod(IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
+      public FGetValueOrDefaultMethod(FClass setupClass, IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
+      : base(setupClass, $"Get{backingFieldSymbol?.Name?.ToFirstUpper()}",$"System.Func<{backingFieldSymbol?.Type}>")
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
          this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));
-
-         Name = $"Get{backingFieldSymbol.Name.ToFirstUpper()}";
       }
 
       #endregion
 
       #region IFluentMethod Members
-
-      public string Name { get; }
-
-      public string ToCode()
+      
+      public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}(Func<{backingFieldSymbol.Type}> defaultValue)");
          codeBuilder.AppendLine("{");
-         codeBuilder.AppendLine($"if ({setupIndicatorField.Name})");
-         codeBuilder.AppendLine($"   return {backingFieldSymbol.Name};");
-         codeBuilder.AppendLine();
-         codeBuilder.AppendLine($"return defaultValue != null ? defaultValue() : throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name}));");
+         AppendContent(codeBuilder);
          codeBuilder.AppendLine("}");
          return codeBuilder.ToString();
       }
 
-      public bool IsUserDefined => false;
+      private void AppendContent(StringBuilder codeBuilder)
+      {
+         codeBuilder.AppendLine($"if ({setupIndicatorField.Name})");
+         codeBuilder.AppendLine($"   return {backingFieldSymbol.Name};");
+         codeBuilder.AppendLine();
+         codeBuilder.AppendLine(
+            $"return defaultValue != null ? defaultValue() : throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name}));");
+      }
 
-      public int ParameterCount => 1;
+      public override bool IsUserDefined => false;
 
-      public string Category { get; set; }
+      public override int ParameterCount => 1;
 
       #endregion
    }

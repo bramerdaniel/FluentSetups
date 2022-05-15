@@ -33,8 +33,6 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
-   
-
       private static void ReportError(GeneratedSource source, Exception e)
       {
          var missingReference = new DiagnosticDescriptor(id: "FS0002", title: "fluent source generator failed",
@@ -105,8 +103,10 @@ namespace FluentSetups.SourceGenerator
       {
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
 
-         var enumerable = classModel.SetupClasses.Where(x => !string.IsNullOrWhiteSpace(x.ContainingNamespace)).Select(x => x.ContainingNamespace);
-         foreach (var requiredNamespace in enumerable)
+         var namespaces = classModel.SetupClasses.Where(x => !string.IsNullOrWhiteSpace(x.ContainingNamespace))
+            .Select(x => x.ContainingNamespace).Distinct();
+
+         foreach (var requiredNamespace in namespaces)
             sourceBuilder.AppendLine($"using {requiredNamespace};");
       }
 

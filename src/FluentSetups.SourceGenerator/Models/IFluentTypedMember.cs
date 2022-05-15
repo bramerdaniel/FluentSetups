@@ -12,5 +12,8 @@ namespace FluentSetups.SourceGenerator.Models
    {
       /// <summary>Gets the type of the member.</summary>
       ITypeSymbol Type { get;  }
+
+      /// <summary>Gets a value indicating whether this member has default value.</summary>
+      bool HasDefaultValue { get; }
    }
 }

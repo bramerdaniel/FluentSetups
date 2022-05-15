@@ -6,9 +6,12 @@
 
 namespace FluentSetups.IntegrationTests.Setups;
 
+using System.Diagnostics.CodeAnalysis;
+
 using FluentSetups.IntegrationTests.Targets;
 
 [FluentSetup(typeof(Color))]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public partial class ColorSetup
 {
    [FluentMember]
@@ -17,7 +20,7 @@ public partial class ColorSetup
    public ColorSetup WithName(string value)
    {
       // This method hides the generated one => it is not generated
-      
+      name = value;
       return this;
    }
 

@@ -54,6 +54,14 @@ namespace FluentSetups.UnitTests.Assertions
          return new AndConstraint<GenerationResultAssertion>(this);
       }
 
+      public AndConstraint<GenerationResultAssertion> NotHaveWarnings()
+      {
+         ThrowOnWarnings(Subject.GeneratedDiagnostics);
+         ThrowOnWarnings(Subject.Compilation.GetDiagnostics());
+
+         return new AndConstraint<GenerationResultAssertion>(this);
+      }
+
       #endregion
 
       #region Methods
@@ -71,6 +79,13 @@ namespace FluentSetups.UnitTests.Assertions
       private void ThrowOnErrors(IEnumerable<Diagnostic> diagnostics)
       {
          var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity == DiagnosticSeverity.Error);
+         if (errorDiagnostic != null)
+            throw new AssertFailedException(CreateMessage(errorDiagnostic));
+      }
+
+      private void ThrowOnWarnings(IEnumerable<Diagnostic> diagnostics)
+      {
+         var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity >= DiagnosticSeverity.Warning);
          if (errorDiagnostic != null)
             throw new AssertFailedException(CreateMessage(errorDiagnostic));
       }

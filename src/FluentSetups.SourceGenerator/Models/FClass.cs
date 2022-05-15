@@ -81,7 +81,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private string ComputeSetupMethod()
       {
-         return fluentSetupAttribute.GetSetupMethod() 
+         return fluentSetupAttribute.GetSetupMethod()
                 ?? TargetTypeName
                 ?? ComputeEntryMethodName();
       }
@@ -99,11 +99,6 @@ namespace FluentSetups.SourceGenerator.Models
       #endregion
 
       #region Public Methods and Operators
-
-      public static bool IsDoneMethod(IMethodSymbol candidate)
-      {
-         return candidate.Parameters.Length == 0 && string.Equals(candidate.Name, "Done", StringComparison.InvariantCulture);
-      }
 
       public string ToCode()
       {
@@ -155,16 +150,6 @@ namespace FluentSetups.SourceGenerator.Models
          return "internal";
       }
 
-      private static bool IsCreateTargetMethod(IMethodSymbol methodSymbol)
-      {
-         return methodSymbol.Parameters.Length == 0 && string.Equals(methodSymbol.Name, "CreateTarget", StringComparison.InvariantCulture);
-      }
-
-      private static bool IsSetupTargetMethod(IMethodSymbol methodSymbol)
-      {
-         return methodSymbol.Name == "SetupTarget" && methodSymbol.Parameters.Length == 1;
-      }
-
       private static bool TargetCreationPossible(FClass classModel)
       {
          if (classModel.TargetMode == TargetGenerationMode.Disabled)
@@ -190,22 +175,22 @@ namespace FluentSetups.SourceGenerator.Models
          switch (member)
          {
             case IFieldSymbol fieldSymbol:
-            {
-               var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
-               fields.Add(field);
-               break;
-            }
+               {
+                  var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
+                  fields.Add(field);
+                  break;
+               }
             case IPropertySymbol propertySymbol:
-            {
-               var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
-               properties.Add(property);
-               break;
-            }
+               {
+                  var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
+                  properties.Add(property);
+                  break;
+               }
             case IMethodSymbol methodSymbol:
-            {
-               methods.Add(CreateMethod(methodSymbol));
-               break;
-            }
+               {
+                  methods.Add(CreateMethod(methodSymbol));
+                  break;
+               }
          }
       }
 
@@ -232,21 +217,24 @@ namespace FluentSetups.SourceGenerator.Models
          if (string.IsNullOrWhiteSpace(field.TypeName))
             return;
 
-         var method = new FMethod(field.SetupMethodName, field.Type, ClassSymbol) { Source = field, Category = field.SetupMethodName };
+         var method = new FFluentSetupMethod(this, field.SetupMethodName, field.Type, ClassSymbol) { Source = field, Category = field.SetupMethodName };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetValueMethod(field) { Category = method.Category };
+            var fGetOrThrow = new FGetValueMethod(this, field) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueOrDefaultMethod(field, method.SetupIndicatorField) { Category = method.Category };
-            AddMethod(getMember);
+            if (!field.HasDefaultValue)
+            {
+               var getMember = new FGetValueOrDefaultMethod(this, field, method.SetupIndicatorField) { Category = method.Category };
+               AddMethod(getMember);
+            }
 
             if (CanAddSet(field))
             {
-               var setMember = new FSetupMemberMethod(field, method.SetupIndicatorField, this) { Category = method.Category };
+               var setMember = new FSetupMemberMethod(this, field, method.SetupIndicatorField) { Category = method.Category };
                AddMethod(setMember);
             }
          }
@@ -257,21 +245,24 @@ namespace FluentSetups.SourceGenerator.Models
          if (!property.RequiredSetupGeneration())
             return;
 
-         var method = new FMethod(property.GetSetupMethodName(), property.Type, ClassSymbol) { Source = property };
+         var method = new FFluentSetupMethod(this, property.GetSetupMethodName(), property.Type, ClassSymbol) { Source = property };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{property.Name.ToFirstLower()}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetValueMethod(property) { Category = method.Category };
+            var fGetOrThrow = new FGetValueMethod(this, property) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueOrDefaultMethod(property, method.SetupIndicatorField) { Category = method.Category };
-            AddMethod(getMember);
+            if (!property.HasDefaultValue)
+            {
+               var getMember = new FGetValueOrDefaultMethod(this, property, method.SetupIndicatorField) { Category = method.Category };
+               AddMethod(getMember);
+            }
 
             if (CanAddSet(property))
             {
-               var setMember = new FSetupMemberMethod(property, method.SetupIndicatorField, this) { Category = method.Category };
+               var setMember = new FSetupMemberMethod(this, property, method.SetupIndicatorField) { Category = method.Category };
                AddMethod(setMember);
             }
          }
@@ -318,21 +309,9 @@ namespace FluentSetups.SourceGenerator.Models
          return builder.ToString();
       }
 
-      private FMethod CreateMethod(IMethodSymbol methodSymbol)
+      private FExistingMethod CreateMethod(IMethodSymbol methodSymbol)
       {
-         if (TargetAvailable())
-         {
-            if (IsDoneMethod(methodSymbol))
-               return new FDoneMethod(methodSymbol);
-
-            if (IsCreateTargetMethod(methodSymbol))
-               return new FCreateTargetMethod(methodSymbol, Target);
-
-            if (IsSetupTargetMethod(methodSymbol))
-               return new FSetupTargetMethod(methodSymbol, this);
-         }
-
-         return new FMethod(methodSymbol);
+         return new FExistingMethod(this, methodSymbol);
       }
 
       private void FillMembers()
@@ -398,7 +377,7 @@ namespace FluentSetups.SourceGenerator.Models
          sourceBuilder.AppendLine($"public {TargetTypeName} Done()");
          sourceBuilder.AppendLine("{");
          sourceBuilder.AppendLine($"   var target = {CreateConstructorCall()};");
-         sourceBuilder.AppendLine($"   return target;");
+         sourceBuilder.AppendLine("   return target;");
          sourceBuilder.AppendLine("}");
       }
 
@@ -473,9 +452,17 @@ namespace FluentSetups.SourceGenerator.Models
 
          foreach (var property in Target.Properties)
          {
-            var backingField = FField.ForProperty(property);
-            if (AddField(backingField))
-               AddMethodFromField(backingField);
+            var existingProperty = Properties.FirstOrDefault(p => p.Name == property.Name && p.TypeName == property.Type.ToString());
+            if (existingProperty != null)
+            {
+               AddSetupMethodFromProperty(existingProperty);
+            }
+            else
+            {
+               var backingField = FField.ForProperty(property);
+               if (AddField(backingField))
+                  AddMethodFromField(backingField);
+            }
          }
       }
 
@@ -495,7 +482,7 @@ namespace FluentSetups.SourceGenerator.Models
          if (!TargetCreationPossible(this))
             return;
 
-         AddMethod(new FDoneMethod(Target.TypeSymbol));
+         AddMethod(new FDoneMethod(this));
          AddMethod(new FCreateTargetMethod(this));
          AddMethod(new FSetupTargetMethod(this));
       }

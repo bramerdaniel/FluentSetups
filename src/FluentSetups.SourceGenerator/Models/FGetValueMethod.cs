@@ -7,34 +7,42 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System;
+   using System.Diagnostics;
    using System.Text;
-
-   internal class FGetValueMethod : IFluentMethod
+   
+   [DebuggerDisplay("{Signature}")]
+   internal class FGetValueMethod : MethodBase
    {
       private readonly IFluentTypedMember backingFieldSymbol;
 
-      public FGetValueMethod(IFluentTypedMember backingFieldSymbol)
+      public FGetValueMethod(FClass setupClass, IFluentTypedMember backingFieldSymbol)
+         : base(setupClass, $"Get{backingFieldSymbol?.Name?.ToFirstUpper()}")
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
-         Name = $"Get{backingFieldSymbol.Name.ToFirstUpper()}";
       }
+      
 
-      public string Name { get; }
-
-      public string ToCode()
+      public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}()");
          codeBuilder.AppendLine("{");
-         codeBuilder.AppendLine($"  return {Name}(() => throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name})));");
+
+         if (backingFieldSymbol.HasDefaultValue)
+         {
+            codeBuilder.AppendLine($"  return {backingFieldSymbol.Name};");
+         }
+         else
+         {
+            codeBuilder.AppendLine($"  return {Name}(() => throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name})));");
+         }
+
          codeBuilder.AppendLine("}");
          return codeBuilder.ToString();
       }
 
-      public bool IsUserDefined => false;
+      public override bool IsUserDefined => false;
 
-      public int ParameterCount => 0;
-
-      public string Category { get; set; }
+      public override int ParameterCount => 0;
    }
 }

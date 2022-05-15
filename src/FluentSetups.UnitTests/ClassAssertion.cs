@@ -43,23 +43,33 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
 
    #region Public Methods and Operators
 
-   public MethodAssertion WhereMethod(string methodName)
+   public MethodAssertion WhereMethod(string methodName, string signature = null)
    {
-      var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
+      IMethodSymbol methodSymbol  = null;
+      var methodSymbols = Subject.GetMembers(methodName).OfType<IMethodSymbol>().ToArray();
+      if (methodSymbols.Length == 1)
+      {
+         methodSymbol = methodSymbols[0];
+      }
+      else
+      {
+         methodSymbol = methodSymbols.FirstOrDefault(m => m.Parameters.FirstOrDefault()?.ToString() == signature);
+      }
+
       Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found.{GetGeneratedCode()}");
       return new MethodAssertion(generationResult, methodSymbol);
    }
 
    public ClassAssertion WithField(string expectedFieldName)
    {
-      var fieldSymbol = Subject.GetMembers(expectedFieldName).OfType<IFieldSymbol>().FirstOrDefault();
+      var fieldSymbol = Subject.GetMembers(expectedFieldName).OfType<IFieldSymbol>().Single();
       Assert.IsNotNull(fieldSymbol, $"The field {expectedFieldName} could not be found.{GetGeneratedCode()}");
       return this;
    }
 
    public ClassAssertion WithInternalMethod(string methodName)
    {
-      var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
+      var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().Single();
       Assert.IsNotNull(methodSymbol, $"The method {methodName} could not be found");
 
       methodSymbol.DeclaredAccessibility.Should().Be(Accessibility.Internal);
@@ -97,6 +107,23 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
    {
       var methodSymbol = Subject.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault();
       Assert.IsNull(methodSymbol, $"The method {methodName} was found but it should not.");
+      return this;
+   }
+
+   public ClassAssertion WithoutMethod(string methodName , string signature)
+   {
+      IMethodSymbol methodSymbol;
+      var methodSymbols = Subject.GetMembers(methodName).OfType<IMethodSymbol>().ToArray();
+      if (methodSymbols.Length == 1 && signature == null)
+      {
+         methodSymbol = methodSymbols[0];
+      }
+      else
+      {
+         methodSymbol = methodSymbols.FirstOrDefault(m => m.Parameters.FirstOrDefault()?.ToString() == signature);
+      }
+
+      Assert.IsNull(methodSymbol, $"The method {methodName}({methodSymbol?.Parameters.FirstOrDefault()?.ToString()}) was found but it should not.");
       return this;
    }
 

@@ -234,4 +234,64 @@ public class GetterGenerationTests
          .WhereMethod("GetName")
          .Contains("return GetName(() => throw new SetupMemberNotInitializedException(nameof(name)));");
    }
+
+   [TestMethod]
+   public void EnsureGetAgeWithDefaultIsNotGeneratedWhenAgePropertyHasADefaultValue()
+   {
+      var code = @"namespace RonnyTheRobber
+                   {
+                      internal class Person 
+                      {  
+                         public int Age { get; set; }
+                      }
+
+                      [FluentSetups.FluentSetup(typeof(Person))]
+                      public partial class PersonSetup
+                      {
+                          [FluentSetups.FluentMember]
+                          public int Age { get; set; } = 66;
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WhereMethod("GetAge")
+         .IsProtected()
+         .Contains("return Age;")
+         .NotContains("ageWasSet");
+   }
+
+   [TestMethod]
+   public void EnsureGetAgeWithDefaultIsNotGeneratedWhenAgeFieldHasADefaultValue()
+   {
+      var code = @"namespace RonnyTheRobber
+                   {
+                      internal class Person 
+                      {  
+                         public int Age { get; set; }
+                      }
+
+                      [FluentSetups.FluentSetup(typeof(Person))]
+                      public partial class PersonSetup
+                      {
+                          [FluentSetups.FluentMember]
+                          private int age = 77;
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WhereMethod("GetAge")
+         .IsProtected()
+         .Contains("return age;")
+         .NotContains("ageWasSet");
+   }
 }
