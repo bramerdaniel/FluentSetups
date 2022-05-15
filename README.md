@@ -35,4 +35,15 @@ with FluentSetups all you have to write, is this.
  {
  }
 ```
+Now that you have done this, you are able to write the code below, 
+without having to write any of the called methods or the static Setup class.
+These are all generated for you, but you can customize them if you want, 
+and the fluent setup generator will adjust the generated code to fit your needs.
 
+``` csharp
+      var person = Setup.Person()
+         .WithFirstName("Robert")
+         .WithLastName("Ramirez")
+         .WithAge(34) 
+         .Done();
+```
