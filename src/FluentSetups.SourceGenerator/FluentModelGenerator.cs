@@ -33,14 +33,6 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
-      private static string ComputeEntryMethodName(string className)
-      {
-         if (className.EndsWith("Setup"))
-            return className.Substring(0, className.Length - 5);
-
-         return className;
-      }
-
       private static void ReportError(GeneratedSource source, Exception e)
       {
          var missingReference = new DiagnosticDescriptor(id: "FS0002", title: "fluent source generator failed",
@@ -83,21 +75,38 @@ namespace FluentSetups.SourceGenerator
 
       private void GenerateEntryPoints(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
       {
+         var addedMethods = new HashSet<string>();
          foreach (var setupClass in classModel.SetupClasses)
          {
+            var requestedName = setupClass.SetupMethod;
+            var generatedName = GetName(addedMethods, requestedName);
+
             sourceBuilder.AppendLine($"/// <summary>Creates a new setup for the {setupClass.ClassName} class</summary>");
-            sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {ComputeEntryMethodName(setupClass.ClassName)}()");
+            sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {generatedName}()");
             sourceBuilder.AppendLine($" => new {setupClass.ClassName}();");
             sourceBuilder.AppendLine();
          }
+      }
+
+      private string GetName(HashSet<string> existingMethods, string requestedName)
+      {
+         var name = requestedName;
+         var counter = 1;
+         while (existingMethods.Contains(name))
+            name = $"{requestedName}{counter++}";
+
+         existingMethods.Add(name);
+         return name;
       }
 
       private void GenerateRequiredNamespaces(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
       {
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
 
-         var enumerable = classModel.SetupClasses.Where(x => !string.IsNullOrWhiteSpace(x.ContainingNamespace)).Select(x => x.ContainingNamespace);
-         foreach (var requiredNamespace in enumerable)
+         var namespaces = classModel.SetupClasses.Where(x => !string.IsNullOrWhiteSpace(x.ContainingNamespace))
+            .Select(x => x.ContainingNamespace).Distinct();
+
+         foreach (var requiredNamespace in namespaces)
             sourceBuilder.AppendLine($"using {requiredNamespace};");
       }
 

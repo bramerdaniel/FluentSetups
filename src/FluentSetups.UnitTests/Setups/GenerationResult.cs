@@ -9,7 +9,9 @@ namespace FluentSetups.UnitTests.Setups;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -45,4 +47,26 @@ internal class GenerationResult
    }
 
    #endregion
+
+   public void Print()
+   {
+      Debug.WriteLine(GetGeneratedCode());
+
+      string GetGeneratedCode()
+      {
+         var builder = new StringBuilder();
+         builder.AppendLine();
+         builder.AppendLine("### GENERATED CODE ###");
+         builder.AppendLine();
+
+         foreach (var resultSyntaxTree in SyntaxTrees.Skip(1))
+         {
+            builder.AppendLine(resultSyntaxTree.ToString());
+            builder.AppendLine();
+            builder.AppendLine("".PadRight(50, '-'));
+         }
+
+         return builder.ToString();
+      }
+   }
 }

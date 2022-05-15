@@ -58,7 +58,9 @@ public class GetterGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("DonnyTheDagger.PersonSetup")
-         .WithProtectedMethod("GetAgeOrThrow");
+         .WhereMethod("GetAge")
+         .IsProtected()
+         .Contains("return GetAge(() => throw new SetupMemberNotInitializedException(nameof(age)));");
    }
 
    [TestMethod]
@@ -102,7 +104,9 @@ public class GetterGenerationTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("RonnyTheRobber.PersonSetup")
-         .WithProtectedMethod("GetNameOrThrow");
+         .WhereMethod("GetName")
+         .IsProtected()
+         .Contains("return GetName(() => throw new SetupMemberNotInitializedException(nameof(Name)));");
    }
 
    [TestMethod]
@@ -228,8 +232,66 @@ public class GetterGenerationTests
       result.Should().NotHaveErrors().And
          .HaveClass("RonnyTheRobber.PersonSetup")
          .WhereMethod("GetName")
-         .Contains("if (nameWasSet)")
-         .Contains("return name;")
-         .Contains("return defaultValue != null ? defaultValue() : throw new SetupMemberNotInitializedException(nameof(name));");
+         .Contains("return GetName(() => throw new SetupMemberNotInitializedException(nameof(name)));");
+   }
+
+   [TestMethod]
+   public void EnsureGetAgeWithDefaultIsNotGeneratedWhenAgePropertyHasADefaultValue()
+   {
+      var code = @"namespace RonnyTheRobber
+                   {
+                      internal class Person 
+                      {  
+                         public int Age { get; set; }
+                      }
+
+                      [FluentSetups.FluentSetup(typeof(Person))]
+                      public partial class PersonSetup
+                      {
+                          [FluentSetups.FluentMember]
+                          public int Age { get; set; } = 66;
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WhereMethod("GetAge")
+         .IsProtected()
+         .Contains("return Age;")
+         .NotContains("ageWasSet");
+   }
+
+   [TestMethod]
+   public void EnsureGetAgeWithDefaultIsNotGeneratedWhenAgeFieldHasADefaultValue()
+   {
+      var code = @"namespace RonnyTheRobber
+                   {
+                      internal class Person 
+                      {  
+                         public int Age { get; set; }
+                      }
+
+                      [FluentSetups.FluentSetup(typeof(Person))]
+                      public partial class PersonSetup
+                      {
+                          [FluentSetups.FluentMember]
+                          private int age = 77;
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WhereMethod("GetAge")
+         .IsProtected()
+         .Contains("return age;")
+         .NotContains("ageWasSet");
    }
 }

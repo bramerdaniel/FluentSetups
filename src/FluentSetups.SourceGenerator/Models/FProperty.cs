@@ -7,10 +7,13 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System;
+   using System.Diagnostics;
    using System.Linq;
 
    using Microsoft.CodeAnalysis;
+   using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+   [DebuggerDisplay("{TypeName} {Name}")]
    internal class FProperty : IFluentTypedMember
    {
       #region Constants and Fields
@@ -28,6 +31,18 @@ namespace FluentSetups.SourceGenerator.Models
          this.propertySymbol = propertySymbol ?? throw new ArgumentNullException(nameof(propertySymbol));
          this.memberAttribute = memberAttribute;
          Name = propertySymbol.Name;
+         ComputeDefaultValue();
+      }
+      
+      private void ComputeDefaultValue()
+      {
+         if (propertySymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is PropertyDeclarationSyntax propertySyntax)
+         {
+            if (propertySyntax.Initializer?.Value is LiteralExpressionSyntax literalExpression)
+            {
+               HasDefaultValue = true;
+            }
+         }
       }
 
       #endregion
@@ -35,6 +50,9 @@ namespace FluentSetups.SourceGenerator.Models
       #region IFluentTypedMember Members
 
       public ITypeSymbol Type => propertySymbol.Type;
+
+      // TODO handel this
+      public bool HasDefaultValue { get; private set; } 
 
       public string Name { get; set; }
 

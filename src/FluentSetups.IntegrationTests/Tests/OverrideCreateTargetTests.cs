@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PersonTests.cs" company="KUKA Deutschland GmbH">
+// <copyright file="OverrideCreateTargetTests.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -11,21 +11,22 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
-public class PersonTests
+public class OverrideCreateTargetTests
 {
    [TestMethod]
-   public void SetupThatIsHidingAPublicProperty()
+   public void EnsureOverwrittenDoneCompiles()
    {
-      var person = Setup.Person()
+      var setup = Setup.CustomPerson()
          .WithFirstName("Robert")
-         .WithLastName("Ramirez")
-         .WithAge(34) 
-         .Done();
+         .WithLastName("Ramirez");
 
+      setup.CreateTargetCalled.Should().BeFalse();
+
+      var person = setup.Done();
+
+      setup.CreateTargetCalled.Should().BeTrue();
       person.FirstName.Should().Be("Robert");
       person.LastName.Should().Be("Ramirez");
-      person.Age.Should().Be(34);
+      person.Age.Should().Be(10);
    }
-
-
 }

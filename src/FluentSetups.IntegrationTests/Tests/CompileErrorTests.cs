@@ -30,7 +30,7 @@ public class CompileErrorTests
       var target = Setup.MultiPropTarget()
          .WithName("Brand")
          .WithKind(3)
-         .WithType(typeof(string))
+         .WithPropertyType(typeof(string))
          .Done();
 
       target.Should().NotBeNull();
@@ -47,6 +47,4 @@ public class CompileErrorTests
 
       car.Should().NotBeNull();
    }
-
-
 }

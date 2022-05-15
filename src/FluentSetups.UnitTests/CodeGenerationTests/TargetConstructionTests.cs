@@ -117,38 +117,7 @@ public class TargetConstructionTests
          .WithMethod("Done");
    }
 
-   [TestMethod]
-   public void EnsureCreateTargetMethodIsCreated()
-   {
-      var code = @"namespace MyTests
-                   {
-                       using FluentSetups;
 
-                       public class Person
-                       {
-                           public Person(string name)
-                           {
-                               Name = name;
-                           }
-
-                           public string Name { get; }
-                       }
-   
-                       [FluentSetup(typeof(Person))]
-                       public partial class PersonSetup
-                       {
-                       }
-                   }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithSource(code)
-         .Done();
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("MyTests.PersonSetup")
-         .WithMethod("CreateTarget")
-         .WhereMethod("CreateTarget").Contains("var target = new Person(GetName(null));");
-   }
    
    [TestMethod]
    public void EnsureSetupTargetMethodIsCreated()
@@ -179,7 +148,74 @@ public class TargetConstructionTests
 
       result.Should().NotHaveErrors().And
          .HaveClass("MyTests.PersonSetup")
-         .WithMethod("SetupTarget");
+         .WhereMethod("SetupTarget")
+         .IsProtected();
+   }
+
+   [TestMethod]
+   public void EnsureSetupTargetMethodIsCreatedPrivateWhenTargetIsInternalButSetupPublic()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+
+                       internal class Person
+                       {
+                           public Person(string name)
+                           {
+                               Name = name;
+                           }
+
+                           public string Name { get; }
+                       }
+   
+                       [FluentSetup(typeof(Person))]
+                       public partial class PersonSetup
+                       {
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.PersonSetup")
+         .WhereMethod("SetupTarget")
+         .IsPrivate();
+   }
+   
+   [TestMethod]
+   public void EnsureSetupTargetMethodIsCreatedProtectedWhenTargetAndSetupIsInternal()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+
+                       internal class Person
+                       {
+                           public Person(string name)
+                           {
+                               Name = name;
+                           }
+
+                           public string Name { get; }
+                       }
+   
+                       [FluentSetup(typeof(Person))]
+                       internal partial class PersonSetup
+                       {
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.PersonSetup")
+         .WhereMethod("SetupTarget")
+         .IsProtected();
    }
 
    #endregion

@@ -11,11 +11,10 @@ using FluentSetups.IntegrationTests.Targets;
 [FluentSetup(typeof(Color))]
 public partial class HideMethodColorSetup
 {
-
-
    public HideMethodColorSetup WithName(string value)
    {
       // This method hides the generated one => it is not generated
+      name = value;
       return this;
    }
 

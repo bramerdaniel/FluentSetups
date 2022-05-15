@@ -6,7 +6,7 @@
 
 namespace FluentSetups.UnitTests.Setups;
 
-internal class Setup
+internal static class Setup
 {
    #region Public Methods and Operators
 

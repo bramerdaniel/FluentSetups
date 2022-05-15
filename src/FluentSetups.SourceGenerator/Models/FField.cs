@@ -11,6 +11,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System.Linq;
 
    using Microsoft.CodeAnalysis;
+   using Microsoft.CodeAnalysis.CSharp.Syntax;
 
    [DebuggerDisplay("{ToCode()}")]
    internal class FField : IFluentTypedMember
@@ -37,6 +38,7 @@ namespace FluentSetups.SourceGenerator.Models
          TypeName = fieldSymbol.Type.ToString();
          SetupMethodName = ComputeSetupNameFromAttribute(memberAttribute) ?? $"With{WithUpperCase(fieldSymbol)}";
          RequiredNamespace = ComputeRequiredNamespace(fieldSymbol);
+         ComputeDefaultValue();
       }
 
       public FField(ITypeSymbol type, string name)
@@ -64,9 +66,14 @@ namespace FluentSetups.SourceGenerator.Models
 
       public ITypeSymbol Type { get; }
 
+      /// <summary>Gets a value indicating whether this instance has default value.</summary>
+      public bool HasDefaultValue { get; private set; }
+
       #endregion
 
       #region Public Properties
+
+      public string DefaultValue { get; private set; }
 
       public bool GenerateFluentSetup
       {
@@ -147,6 +154,18 @@ namespace FluentSetups.SourceGenerator.Models
       private static string WithUpperCase(string name)
       {
          return $"{char.ToUpper(name[0])}{name.Substring(1)}";
+      }
+
+      private void ComputeDefaultValue()
+      {
+         if (fieldSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is VariableDeclaratorSyntax fieldSyntax)
+         {
+            if (fieldSyntax.Initializer?.Value is LiteralExpressionSyntax literalExpression)
+            {
+               HasDefaultValue = true;
+               DefaultValue = literalExpression.ToString();
+            }
+         }
       }
 
       #endregion

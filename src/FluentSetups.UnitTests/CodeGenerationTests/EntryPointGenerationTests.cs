@@ -191,5 +191,99 @@ public class EntryPointGenerationTests
          .WithStaticMethod("Person");
    }
 
+   [TestMethod]
+   public void EnsureDefaultNamingOfTargetIsUsed()
+   {
+      var code = @"namespace SetupNameSpace
+                   {
+                      using FluentSetups;
+
+                      [FluentSetup(typeof(Person))]
+                      public partial class SomeCustomName
+                      {
+                      }
+
+                      public class Person
+                      { 
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RootNamespace.Setup")
+         .WithStaticMethod("Person");
+   }
+
+   [TestMethod]
+   public void EnsureDifferentEntryPointMethodsArePossible()
+   {
+      var code = @"namespace SetupNameSpace
+                   {
+                      using FluentSetups;
+
+                      [FluentSetup(typeof(Person))]
+                      public partial class First
+                      {
+                      }
+
+                      [FluentSetup(typeof(Person), SetupMethod = ""Custom"")]
+                      public partial class Second
+                      {
+                      }
+
+                      public class Person
+                      { 
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RootNamespace.Setup")
+         .WithStaticMethod("Person")
+         .WithStaticMethod("Custom");
+   }
+
+   [TestMethod]
+   public void EnsureNoWarningsForMultipleEntryMethods()
+   {
+      var code = @"namespace SetupNameSpace
+                   {
+                      using FluentSetups;
+
+                      [FluentSetup(typeof(Person))]
+                      public partial class PersonSetup
+                      {
+                      }
+
+                      [FluentSetup(typeof(Car))]
+                      public partial class CarSetup
+                      {
+                      }
+
+                      public class Person
+                      { 
+                      }
+
+                      public class Car
+                      { 
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveWarnings().And
+         .HaveClass("RootNamespace.Setup")
+         .WithStaticMethod("Person")
+         .WithStaticMethod("Car");
+   }
+
    #endregion
 }

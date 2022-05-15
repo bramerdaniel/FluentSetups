@@ -53,7 +53,7 @@ internal class SetupClassModelAssertion : ReferenceTypeAssertions<FClass, SetupC
       var method = Subject.Methods.FirstOrDefault(p => p.Name == expectedFieldName);
       Assert.IsNotNull(method, $"The class {Subject.ClassName} did not have the expected method '{expectedFieldName}'.");
 
-      return new FMethodAssertion((FMethod)method);
+      return new FMethodAssertion((MethodBase)method);
    }
 
    public AndConstraint<SetupClassModelAssertion> HaveName(string expectedName)

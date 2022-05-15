@@ -71,21 +71,7 @@ internal class SetupBase
          new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
    }
 
-   protected ClassDeclarationSyntax? FindClassDeclarationSyntax(string name)
-   {
-      foreach (var syntaxTree in SyntaxTrees)
-      {
-         foreach (var setupClass in SyntaxHelper.FindSetupClasses(syntaxTree))
-         {
-            if (setupClass.Identifier.Text == name)
-               return setupClass;
-         }
-      }
-
-      return null;
-   }
-
-   protected ClassDeclarationSyntax? FirstClassDeclarationSyntax()
+   protected ClassDeclarationSyntax FirstClassDeclarationSyntax()
    {
       return GetAllClasses().FirstOrDefault();
    }

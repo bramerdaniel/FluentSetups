@@ -25,9 +25,7 @@ namespace FluentSetups.SourceGenerator.Models
       public string RequiredNamespace { get; }
 
       public string SetupMethodName { get; }
-
-      public string TypeName => PropertySymbol.Type.ToString();
-
+      
       public string Name { get; set; }
 
       public ITypeSymbol Type => PropertySymbol.Type;

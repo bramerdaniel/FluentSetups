@@ -7,53 +7,42 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System;
+   using System.Diagnostics;
    using System.Text;
-
-   internal class FGetValueMethod : IFluentMethod
+   
+   [DebuggerDisplay("{Signature}")]
+   internal class FGetValueMethod : MethodBase
    {
-      #region Constants and Fields
-
       private readonly IFluentTypedMember backingFieldSymbol;
 
-      private readonly FField setupIndicatorField;
-
-      #endregion
-
-      #region Constructors and Destructors
-
-      public FGetValueMethod(IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
+      public FGetValueMethod(FClass setupClass, IFluentTypedMember backingFieldSymbol)
+         : base(setupClass, $"Get{backingFieldSymbol?.Name?.ToFirstUpper()}")
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
-         this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));
-
-         Name = $"Get{backingFieldSymbol.Name.ToFirstUpper()}";
       }
+      
 
-      #endregion
-
-      #region IFluentMethod Members
-
-      public string Name { get; }
-
-      public string ToCode()
+      public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}(Func<{backingFieldSymbol.Type}> defaultValue)");
+         codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}()");
          codeBuilder.AppendLine("{");
-         codeBuilder.AppendLine($"if ({setupIndicatorField.Name})");
-         codeBuilder.AppendLine($"   return {backingFieldSymbol.Name};");
-         codeBuilder.AppendLine();
-         codeBuilder.AppendLine($"return defaultValue != null ? defaultValue() : throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name}));");
+
+         if (backingFieldSymbol.HasDefaultValue)
+         {
+            codeBuilder.AppendLine($"  return {backingFieldSymbol.Name};");
+         }
+         else
+         {
+            codeBuilder.AppendLine($"  return {Name}(() => throw new SetupMemberNotInitializedException(nameof({backingFieldSymbol.Name})));");
+         }
+
          codeBuilder.AppendLine("}");
          return codeBuilder.ToString();
       }
 
-      public bool IsUserDefined => false;
+      public override bool IsUserDefined => false;
 
-      public int ParameterCount => 1;
-
-      public string Category { get; set; }
-
-      #endregion
+      public override int ParameterCount => 0;
    }
 }

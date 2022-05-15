@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PersonTests.cs" company="KUKA Deutschland GmbH">
+// <copyright file="DuplicateSetupMethodNames.cs" company="KUKA Deutschland GmbH">
 //   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -11,21 +11,12 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
-public class PersonTests
+public class DuplicateSetupMethodNames
 {
    [TestMethod]
-   public void SetupThatIsHidingAPublicProperty()
+   public void EnsureOverwrittenDoneCompiles()
    {
-      var person = Setup.Person()
-         .WithFirstName("Robert")
-         .WithLastName("Ramirez")
-         .WithAge(34) 
-         .Done();
-
-      person.FirstName.Should().Be("Robert");
-      person.LastName.Should().Be("Ramirez");
-      person.Age.Should().Be(34);
+      Setup.Olga().Done().LastName.Should().Be("OlgaSetup");
+      Setup.Olga1().Done().LastName.Should().Be("AnotherOlgaSetup");
    }
-
-
 }
