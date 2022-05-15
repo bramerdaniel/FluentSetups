@@ -44,7 +44,6 @@ public class DefaultValueTests
          .Contains("target.Name = name;")
          .NotContains("nameWasSet");
 
-
       result.Print();
    }
 
@@ -72,13 +71,12 @@ public class DefaultValueTests
          .WithSource(code)
          .Done();
 
-      result.Should().NotHaveWarnings().And
+      result.Should().NotHaveErrors().And
          .HaveClass("RonnyTheRobber.PersonSetup")
          .WhereMethod("SetupName")
          .IsProtected()
          .Contains("target.Name = Name;")
          .NotContains("nameWasSet");
-
 
       result.Print();
    }
@@ -107,5 +105,65 @@ public class DefaultValueTests
          .WhereMethod("GetNumber")
          .IsProtected()
          .Contains("return number;");
+   }
+
+   [TestMethod]
+   public void EnsureGetNumberMethodIsCreatedCorrectlyForTargetProperties()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+   
+                       [FluentSetup]
+                       public partial class PersonSetup
+                       {
+                           [FluentMember]
+                           public int Number { get; set; } = 123;
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.PersonSetup")
+         .WhereMethod("GetNumber")
+         .IsProtected()
+         .Contains("return Number;");
+
+
+      result.Should().HaveClass("MyTests.PersonSetup")
+         .WithoutMethod("GetNumber" ,"System.Func<int>");
+   }
+   
+   [TestMethod]
+   public void EnsureGetNumberMethodIsCreatedCorrectlyForTargetFields()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+   
+                       [FluentSetup]
+                       public partial class PersonSetup
+                       {
+                           [FluentMember]
+                           private int number = 123;
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.PersonSetup")
+         .WhereMethod("GetNumber")
+         .IsProtected()
+         .Contains("return number;");
+
+
+      result.Should().HaveClass("MyTests.PersonSetup")
+         .WithoutMethod("GetNumber" ,"System.Func<int>");
    }
 }

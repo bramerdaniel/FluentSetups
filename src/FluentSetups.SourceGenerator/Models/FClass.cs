@@ -81,7 +81,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private string ComputeSetupMethod()
       {
-         return fluentSetupAttribute.GetSetupMethod() 
+         return fluentSetupAttribute.GetSetupMethod()
                 ?? TargetTypeName
                 ?? ComputeEntryMethodName();
       }
@@ -175,22 +175,22 @@ namespace FluentSetups.SourceGenerator.Models
          switch (member)
          {
             case IFieldSymbol fieldSymbol:
-            {
-               var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
-               fields.Add(field);
-               break;
-            }
+               {
+                  var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
+                  fields.Add(field);
+                  break;
+               }
             case IPropertySymbol propertySymbol:
-            {
-               var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
-               properties.Add(property);
-               break;
-            }
+               {
+                  var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
+                  properties.Add(property);
+                  break;
+               }
             case IMethodSymbol methodSymbol:
-            {
-               methods.Add(CreateMethod(methodSymbol));
-               break;
-            }
+               {
+                  methods.Add(CreateMethod(methodSymbol));
+                  break;
+               }
          }
       }
 
@@ -198,14 +198,14 @@ namespace FluentSetups.SourceGenerator.Models
       {
          if (method == null)
             throw new ArgumentNullException(nameof(method));
-         
+
          if (methods.Contains(method))
             return false;
 
          methods.Add(method);
          return true;
       }
-      
+
       private void AddMethodFromField(FField field)
       {
          if (!field.GenerateFluentSetup)
@@ -254,8 +254,11 @@ namespace FluentSetups.SourceGenerator.Models
             var fGetOrThrow = new FGetValueMethod(this, property) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueOrDefaultMethod(this, property, method.SetupIndicatorField) { Category = method.Category };
-            AddMethod(getMember);
+            if (!property.HasDefaultValue)
+            {
+               var getMember = new FGetValueOrDefaultMethod(this, property, method.SetupIndicatorField) { Category = method.Category };
+               AddMethod(getMember);
+            }
 
             if (CanAddSet(property))
             {
