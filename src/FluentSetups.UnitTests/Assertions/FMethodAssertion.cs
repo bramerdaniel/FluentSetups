@@ -13,11 +13,11 @@ using FluentSetups.SourceGenerator.Models;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-internal class FMethodAssertion : ReferenceTypeAssertions<FMethod, FMethodAssertion>
+internal class FMethodAssertion : ReferenceTypeAssertions<MethodBase, FMethodAssertion>
 {
    #region Constructors and Destructors
 
-   public FMethodAssertion(FMethod subject)
+   public FMethodAssertion(MethodBase subject)
       : base(subject)
    {
    }

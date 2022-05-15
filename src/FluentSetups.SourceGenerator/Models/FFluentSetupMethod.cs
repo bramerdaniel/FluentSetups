@@ -1,39 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FMethod.cs" company="consolovers">
+// <copyright file="FFluentSetupMethod.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.SourceGenerator.Models
 {
-   using System;
    using System.Diagnostics;
-   using System.Linq;
    using System.Text;
 
    using Microsoft.CodeAnalysis;
 
    [DebuggerDisplay("{Signature}")]
-   internal class FMethod : MethodBase
+   internal class FFluentSetupMethod : MethodBase
    {
-      #region Constants and Fields
-
-      private readonly IMethodSymbol methodSymbol;
-
-      #endregion
-
       #region Constructors and Destructors
 
-      public FMethod(IMethodSymbol methodSymbol)
-      : base(methodSymbol.Name , methodSymbol.Parameters.FirstOrDefault()?.Type)
-      {
-         this.methodSymbol = methodSymbol ?? throw new ArgumentNullException(nameof(methodSymbol));
-         ParameterCount = methodSymbol.Parameters.Length;
-         Category = ComputeCategory(Name);
-      }
-
-      public FMethod(string methodName, ITypeSymbol parameterType, ITypeSymbol returnType)
-      : base(methodName, parameterType)
+      public FFluentSetupMethod(string methodName, ITypeSymbol parameterType, ITypeSymbol returnType)
+         : base(methodName, parameterType)
       {
          ReturnType = returnType?.Name ?? "void";
          ParameterCount = parameterType == null ? 0 : 1;
@@ -42,35 +26,11 @@ namespace FluentSetups.SourceGenerator.Models
 
       #endregion
 
-      #region IFluentMethod Members
-
-      public override string ToCode()
-      {
-         var codeBuilder = new StringBuilder();
-         codeBuilder.Append($"{ComputeModifier()} {ReturnType} {Name}");
-         codeBuilder.AppendLine(ParameterCount == 0 ? "()" : $"({ParameterTypeName} value)");
-
-         codeBuilder.AppendLine("{");
-         AppendMethodContent(codeBuilder);
-         codeBuilder.AppendLine("}");
-
-         return codeBuilder.ToString();
-      }
-
-      protected virtual string ComputeModifier()
-      {
-         return "internal";
-      }
-
-      public override bool IsUserDefined => methodSymbol != null;
-
-      public override int ParameterCount { get; }
-      
-
-      #endregion
-
       #region Public Properties
 
+      public override bool IsUserDefined => false;
+
+      public override int ParameterCount { get; }
 
       public FField SetupIndicatorField { get; set; }
 
@@ -85,7 +45,18 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
+      public override string ToCode()
+      {
+         var codeBuilder = new StringBuilder();
+         codeBuilder.Append($"{ComputeModifier()} {ReturnType} {Name}");
+         codeBuilder.AppendLine(ParameterCount == 0 ? "()" : $"({ParameterTypeName} value)");
 
+         codeBuilder.AppendLine("{");
+         AppendMethodContent(codeBuilder);
+         codeBuilder.AppendLine("}");
+
+         return codeBuilder.ToString();
+      }
 
       #endregion
 
@@ -101,7 +72,10 @@ namespace FluentSetups.SourceGenerator.Models
          codeBuilder.AppendLine("   return this;");
       }
 
-
+      protected virtual string ComputeModifier()
+      {
+         return "internal";
+      }
 
       private string ComputeCategory(string methodName)
       {

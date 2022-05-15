@@ -69,6 +69,8 @@ namespace FluentSetups.SourceGenerator.Models
       /// <summary>Gets the signature of the method.</summary>
       public string Signature => signature ?? (signature = ComputeSignature());
 
+      public string ReturnType { get; set; }
+
       #endregion
 
       #region Public Methods and Operators

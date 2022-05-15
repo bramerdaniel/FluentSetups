@@ -41,17 +41,6 @@ namespace FluentSetups.SourceGenerator.Models
          ComputeDefaultValue();
       }
 
-      private void ComputeDefaultValue()
-      {
-         if (fieldSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is VariableDeclaratorSyntax fieldSyntax)
-         {
-            if (fieldSyntax.Initializer?.Value is LiteralExpressionSyntax literalExpression)
-            {
-               DefaultValue = literalExpression.ToString();
-            }
-         }
-      }
-
       public FField(ITypeSymbol type, string name)
       {
          Type = type ?? throw new ArgumentNullException(nameof(type));
@@ -75,13 +64,13 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string Name { get; }
 
-      public string DefaultValue { get; private set; }
-
       public ITypeSymbol Type { get; }
 
       #endregion
 
       #region Public Properties
+
+      public string DefaultValue { get; private set; }
 
       public bool GenerateFluentSetup
       {
@@ -162,6 +151,17 @@ namespace FluentSetups.SourceGenerator.Models
       private static string WithUpperCase(string name)
       {
          return $"{char.ToUpper(name[0])}{name.Substring(1)}";
+      }
+
+      private void ComputeDefaultValue()
+      {
+         if (fieldSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is VariableDeclaratorSyntax fieldSyntax)
+         {
+            if (fieldSyntax.Initializer?.Value is LiteralExpressionSyntax literalExpression)
+            {
+               DefaultValue = literalExpression.ToString();
+            }
+         }
       }
 
       #endregion

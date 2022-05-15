@@ -221,32 +221,7 @@ namespace FluentSetups.SourceGenerator.Models
          methods.Add(method);
          return true;
       }
-
-      private bool MethodsEqual(IFluentMethod existingMethod, IFluentMethod fluentMethod)
-      {
-         if (existingMethod.Name != fluentMethod.Name)
-            return false;
-
-         if (existingMethod.ParameterCount != fluentMethod.ParameterCount)
-            return false;
-
-         if (existingMethod.ParameterType == null)
-            return fluentMethod.ParameterType == null;
-
-         if (existingMethod.ParameterType is INamedTypeSymbol namedType)
-         {
-            if (namedType.IsGenericType && namedType.TypeArguments.Length == 1)
-            {
-               var genericArgument = namedType.TypeArguments[0];
-            }
-
-
-         }
-         //   return fluentMethod.ParameterType == null;
-
-         return existingMethod == fluentMethod;
-      }
-
+      
       private void AddMethodFromField(FField field)
       {
          if (!field.GenerateFluentSetup)
@@ -258,7 +233,7 @@ namespace FluentSetups.SourceGenerator.Models
          if (string.IsNullOrWhiteSpace(field.TypeName))
             return;
 
-         var method = new FMethod(field.SetupMethodName, field.Type, ClassSymbol) { Source = field, Category = field.SetupMethodName };
+         var method = new FFluentSetupMethod(field.SetupMethodName, field.Type, ClassSymbol) { Source = field, Category = field.SetupMethodName };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
@@ -283,7 +258,7 @@ namespace FluentSetups.SourceGenerator.Models
          if (!property.RequiredSetupGeneration())
             return;
 
-         var method = new FMethod(property.GetSetupMethodName(), property.Type, ClassSymbol) { Source = property };
+         var method = new FFluentSetupMethod(property.GetSetupMethodName(), property.Type, ClassSymbol) { Source = property };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{property.Name.ToFirstLower()}WasSet");
