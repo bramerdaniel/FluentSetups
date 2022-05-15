@@ -6,6 +6,7 @@
 
 namespace FluentSetups.IntegrationTests.Tests
 {
+   using System;
    using System.Reflection;
 
    using FluentAssertions;
@@ -57,6 +58,13 @@ namespace FluentSetups.IntegrationTests.Tests
    {
       [FluentMember]
       private int age = 10;
+
+      protected void SetAgeWasSet()
+      {
+         if (ageWasSet)
+            throw new InvalidOperationException();
+         ageWasSet = true;
+      }
    }
 
    [FluentSetup(typeof(DefaultTarget), SetupMethod = "DefaultProperty")]
@@ -64,6 +72,13 @@ namespace FluentSetups.IntegrationTests.Tests
    {
       [FluentMember]
       private int Age { get; set; } = 20;
+
+      protected void SetAgeWasSet()
+      {
+         if (ageWasSet)
+            throw new InvalidOperationException();
+         ageWasSet = true;
+      }
    }
 
    internal class DefaultTarget
