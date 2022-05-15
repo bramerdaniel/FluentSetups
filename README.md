@@ -2,8 +2,8 @@
 
 ## What is FluentSetups
 
-FluentSetups is a library that that generates the boilerplate code for a builder pattern with a fluent api.
-As I developed it especially for my unit tests...
+FluentSetups is a library that generates the boilerplate code for a fluent builder pattern ( I call it a fluent setup ).
+It uses the roslyn source generators, to analyse your code and add the required setup classes, if you use the FluentSetups attributes in your code.
 
 ## Usage 
 
