@@ -226,8 +226,11 @@ namespace FluentSetups.SourceGenerator.Models
             var fGetOrThrow = new FGetValueMethod(this, field) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueOrDefaultMethod(this, field, method.SetupIndicatorField) { Category = method.Category };
-            AddMethod(getMember);
+            if (!field.HasDefaultValue)
+            {
+               var getMember = new FGetValueOrDefaultMethod(this, field, method.SetupIndicatorField) { Category = method.Category };
+               AddMethod(getMember);
+            }
 
             if (CanAddSet(field))
             {

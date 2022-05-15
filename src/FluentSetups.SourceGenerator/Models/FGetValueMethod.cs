@@ -27,10 +27,10 @@ namespace FluentSetups.SourceGenerator.Models
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}()");
          codeBuilder.AppendLine("{");
-         if (backingFieldSymbol is FField field && field.DefaultValue != null)
-         {
 
-            codeBuilder.AppendLine($"  return {Name}(() => {field.DefaultValue});");
+         if (backingFieldSymbol.HasDefaultValue)
+         {
+            codeBuilder.AppendLine($"  return {backingFieldSymbol.Name};");
          }
          else
          {

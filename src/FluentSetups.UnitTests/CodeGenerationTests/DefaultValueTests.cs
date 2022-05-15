@@ -14,6 +14,76 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 public class DefaultValueTests
 {
    [TestMethod]
+   public void EnsureSetupNameIsGeneratedCorrectlyForFieldsWithDefaultValues()
+   {
+      var code = @"namespace RonnyTheRobber
+                   {   
+                      using FluentSetups;
+
+                      internal class Person 
+                      {  
+                         public string Name{ get; set; }
+                      }
+
+                      [FluentSetup(typeof(Person))]
+                      internal partial class PersonSetup
+                      {
+                          [FluentMember]
+                          private string name = ""Robert"";
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WhereMethod("SetupName")
+         .IsProtected()
+         .Contains("target.Name = name;")
+         .NotContains("nameWasSet");
+
+
+      result.Print();
+   }
+
+   [TestMethod]
+   public void EnsureSetupNameIsGeneratedCorrectlyForPropertiesWithDefaultValues()
+   {
+      var code = @"namespace RonnyTheRobber
+                   {   
+                      using FluentSetups;
+
+                      internal class Person 
+                      {  
+                         public string Name { get; set; }
+                      }
+
+                      [FluentSetup(typeof(Person))]
+                      internal partial class PersonSetup
+                      {
+                          [FluentMember]
+                          private string Name { get; set; } = ""Robert"";
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveWarnings().And
+         .HaveClass("RonnyTheRobber.PersonSetup")
+         .WhereMethod("SetupName")
+         .IsProtected()
+         .Contains("target.Name = Name;")
+         .NotContains("nameWasSet");
+
+
+      result.Print();
+   }
+
+   [TestMethod]
    public void EnsureCreateTargetMethodIsCreatedCorrectlyForTarget()
    {
       var code = @"namespace MyTests
@@ -36,6 +106,6 @@ public class DefaultValueTests
          .HaveClass("MyTests.PersonSetup")
          .WhereMethod("GetNumber")
          .IsProtected()
-         .Contains("return GetNumber(() => 123);");
+         .Contains("return number;");
    }
 }
