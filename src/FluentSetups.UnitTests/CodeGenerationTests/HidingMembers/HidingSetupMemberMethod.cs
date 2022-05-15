@@ -62,7 +62,7 @@ public class HidingSetupMemberMethod
 
                        protected void SetupName(Person target)
                        {
-                           target.Name = name;
+                           target.Name = Name;
                        }
                    }";
 

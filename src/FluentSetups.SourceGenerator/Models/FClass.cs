@@ -446,9 +446,17 @@ namespace FluentSetups.SourceGenerator.Models
 
          foreach (var property in Target.Properties)
          {
-            var backingField = FField.ForProperty(property);
-            if (AddField(backingField))
-               AddMethodFromField(backingField);
+            var existingProperty = Properties.FirstOrDefault(p => p.Name == property.Name && p.TypeName == property.Type.ToString());
+            if (existingProperty != null)
+            {
+               AddSetupMethodFromProperty(existingProperty);
+            }
+            else
+            {
+               var backingField = FField.ForProperty(property);
+               if (AddField(backingField))
+                  AddMethodFromField(backingField);
+            }
          }
       }
 

@@ -35,6 +35,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       public ITypeSymbol Type => parameterSymbol.Type;
 
+      // TODO handel this
+      public bool HasDefaultValue { get; } = false;
+
       public string ToCode()
       {
          return "NOT SUPPORTED";

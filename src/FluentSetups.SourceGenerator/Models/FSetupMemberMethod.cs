@@ -37,12 +37,21 @@ namespace FluentSetups.SourceGenerator.Models
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"{ComputeModifier()} void {Name}({SetupClass.TargetTypeName} target)");
          codeBuilder.AppendLine("{");
-         codeBuilder.AppendLine($"if (!{setupIndicatorField.Name})");
-         codeBuilder.AppendLine("   return;");
-         codeBuilder.AppendLine();
-         codeBuilder.AppendLine($"target.{backingFieldSymbol.Name.ToFirstUpper()} = {backingFieldSymbol.Name};");
+         GenerateContent(codeBuilder);
          codeBuilder.AppendLine("}");
          return codeBuilder.ToString();
+      }
+
+      private void GenerateContent(StringBuilder codeBuilder)
+      {
+         if (!backingFieldSymbol.HasDefaultValue)
+         {
+            codeBuilder.AppendLine($"if (!{setupIndicatorField.Name})");
+            codeBuilder.AppendLine("   return;");
+            codeBuilder.AppendLine();
+         }
+
+         codeBuilder.AppendLine($"target.{backingFieldSymbol.Name.ToFirstUpper()} = {backingFieldSymbol.Name};");
       }
 
       public override bool IsUserDefined => false;

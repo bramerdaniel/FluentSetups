@@ -66,6 +66,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       public ITypeSymbol Type { get; }
 
+      /// <summary>Gets a value indicating whether this instance has default value.</summary>
+      public bool HasDefaultValue { get; private set; }
+
       #endregion
 
       #region Public Properties
@@ -159,6 +162,7 @@ namespace FluentSetups.SourceGenerator.Models
          {
             if (fieldSyntax.Initializer?.Value is LiteralExpressionSyntax literalExpression)
             {
+               HasDefaultValue = true;
                DefaultValue = literalExpression.ToString();
             }
          }
