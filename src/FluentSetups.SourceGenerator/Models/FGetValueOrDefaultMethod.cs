@@ -24,7 +24,7 @@ namespace FluentSetups.SourceGenerator.Models
       #region Constructors and Destructors
 
       public FGetValueOrDefaultMethod(FClass setupClass, IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
-      : base(setupClass, $"Get{backingFieldSymbol.Name.ToFirstUpper()}",$"System.Func<{backingFieldSymbol.Type}>")
+      : base(setupClass, $"Get{backingFieldSymbol?.Name?.ToFirstUpper()}",$"System.Func<{backingFieldSymbol?.Type}>")
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
          this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));

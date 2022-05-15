@@ -6,12 +6,9 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
-   using System;
    using System.Diagnostics;
    using System.Linq;
    using System.Text;
-
-   using Microsoft.CodeAnalysis;
 
    [DebuggerDisplay("{Signature}")]
    internal class FCreateTargetMethod : MethodBase
@@ -58,7 +55,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private string CreateConstructorCall()
       {
-         var arguments = string.Join(", ", Target.ConstructorParameters.Select(p => $"Get{p.Name.ToFirstUpper()}(null)"));
+         var arguments = string.Join(", ", Target.ConstructorParameters.Select(p => $"Get{p.Name.ToFirstUpper()}()"));
          var builder = new StringBuilder($"new {Target.TypeName}({arguments})");
          return builder.ToString();
       }

@@ -9,7 +9,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System;
    using System.Text;
 
-   internal class FSetupMemberMethod : FMethod
+   internal class FSetupMemberMethod : MethodBase
    {
       #region Constants and Fields
 
@@ -22,7 +22,7 @@ namespace FluentSetups.SourceGenerator.Models
       #region Constructors and Destructors
 
       public FSetupMemberMethod(FClass setupClass, IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
-         : base(setupClass, $"Setup{backingFieldSymbol?.Name?.ToFirstUpper()}", setupClass.Target.TypeSymbol ,null)
+         : base(setupClass, $"Setup{backingFieldSymbol?.Name?.ToFirstUpper()}", setupClass.Target.TypeSymbol)
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
          this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));
@@ -54,7 +54,7 @@ namespace FluentSetups.SourceGenerator.Models
       
       #region Methods
 
-      protected override string ComputeModifier()
+      protected string ComputeModifier()
       {
          if (SetupClass.Target.IsInternal && SetupClass.IsPublic)
             return "private";

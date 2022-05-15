@@ -12,7 +12,6 @@ namespace FluentSetups.SourceGenerator.Models
    using System.Text;
 
    using Microsoft.CodeAnalysis;
-   using Microsoft.CodeAnalysis.CSharp;
 
    /// <summary>Model describing a setup class</summary>
    internal class FClass
@@ -101,11 +100,6 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
-      public static bool IsDoneMethod(IMethodSymbol candidate)
-      {
-         return candidate.Parameters.Length == 0 && string.Equals(candidate.Name, "Done", StringComparison.InvariantCulture);
-      }
-
       public string ToCode()
       {
          var sourceBuilder = new StringBuilder();
@@ -154,16 +148,6 @@ namespace FluentSetups.SourceGenerator.Models
          }
 
          return "internal";
-      }
-
-      private static bool IsCreateTargetMethod(IMethodSymbol methodSymbol)
-      {
-         return methodSymbol.Parameters.Length == 0 && string.Equals(methodSymbol.Name, "CreateTarget", StringComparison.InvariantCulture);
-      }
-
-      private static bool IsSetupTargetMethod(IMethodSymbol methodSymbol)
-      {
-         return methodSymbol.Name == "SetupTarget" && methodSymbol.Parameters.Length == 1;
       }
 
       private static bool TargetCreationPossible(FClass classModel)
@@ -319,9 +303,9 @@ namespace FluentSetups.SourceGenerator.Models
          return builder.ToString();
       }
 
-      private FMethod CreateMethod(IMethodSymbol methodSymbol)
+      private FExistingMethod CreateMethod(IMethodSymbol methodSymbol)
       {
-         return new FMethod(this, methodSymbol);
+         return new FExistingMethod(this, methodSymbol);
       }
 
       private void FillMembers()
@@ -387,7 +371,7 @@ namespace FluentSetups.SourceGenerator.Models
          sourceBuilder.AppendLine($"public {TargetTypeName} Done()");
          sourceBuilder.AppendLine("{");
          sourceBuilder.AppendLine($"   var target = {CreateConstructorCall()};");
-         sourceBuilder.AppendLine($"   return target;");
+         sourceBuilder.AppendLine("   return target;");
          sourceBuilder.AppendLine("}");
       }
 

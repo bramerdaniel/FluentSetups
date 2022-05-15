@@ -6,21 +6,30 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
-   using System;
    using System.Linq;
    using System.Text;
 
-   using Microsoft.CodeAnalysis;
-
    internal class FSetupTargetMethod : MethodBase
    {
-
+      #region Constructors and Destructors
 
       public FSetupTargetMethod(FClass setupClass)
          : base(setupClass, "SetupTarget", setupClass?.Target?.TypeSymbol)
       {
          ReturnTypeName = "void";
       }
+
+      #endregion
+
+      #region Public Properties
+
+      public override bool IsUserDefined => false;
+
+      public override int ParameterCount => 1;
+
+      #endregion
+
+      #region Public Methods and Operators
 
       public override string ToCode()
       {
@@ -30,15 +39,15 @@ namespace FluentSetups.SourceGenerator.Models
 
          foreach (var setMethod in SetupClass.Methods.OfType<FSetupMemberMethod>())
             codeBuilder.AppendLine($"{setMethod.Name}(target);");
-         
+
          codeBuilder.AppendLine("}");
 
          return codeBuilder.ToString();
       }
 
-      public override bool IsUserDefined => false;
+      #endregion
 
-      public override int ParameterCount => 1;
+      #region Methods
 
       private string ComputeModifier()
       {
@@ -46,5 +55,7 @@ namespace FluentSetups.SourceGenerator.Models
             return "private";
          return "protected";
       }
+
+      #endregion
    }
 }

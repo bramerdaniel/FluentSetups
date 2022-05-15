@@ -44,7 +44,7 @@ public class CreateTargetTests
          .HaveClass("MyTests.PersonSetup")
          .WhereMethod("CreateTarget")
          .IsProtected()
-         .Contains("var target = new Person(GetName(null));");
+         .Contains("var target = new Person(GetName());");
 
       result.Print();
    }

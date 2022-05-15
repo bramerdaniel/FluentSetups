@@ -41,11 +41,5 @@ namespace FluentSetups.SourceGenerator.Models
       }
 
       #endregion
-
-      #region Public Properties
-
-      public string TypeName { get; set; }
-
-      #endregion
    }
 }
