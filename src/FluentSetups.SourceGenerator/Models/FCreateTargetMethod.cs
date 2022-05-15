@@ -7,11 +7,13 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System;
+   using System.Diagnostics;
    using System.Linq;
    using System.Text;
 
    using Microsoft.CodeAnalysis;
 
+   [DebuggerDisplay("{Signature}")]
    internal class FCreateTargetMethod : FMethod
    {
       public FClass SetupClass { get; }

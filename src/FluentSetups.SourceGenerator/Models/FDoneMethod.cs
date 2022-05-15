@@ -6,11 +6,12 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
-   using System;
+   using System.Diagnostics;
    using System.Text;
 
    using Microsoft.CodeAnalysis;
 
+   [DebuggerDisplay("{Signature}")]
    internal class FDoneMethod : FMethod
    {
       public FDoneMethod(IMethodSymbol methodSymbol)

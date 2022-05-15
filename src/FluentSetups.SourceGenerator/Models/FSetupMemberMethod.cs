@@ -9,7 +9,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System;
    using System.Text;
 
-   internal class FSetupMemberMethod : IFluentMethod
+   internal class FSetupMemberMethod : FMethod
    {
       #region Constants and Fields
 
@@ -22,21 +22,19 @@ namespace FluentSetups.SourceGenerator.Models
       #region Constructors and Destructors
 
       public FSetupMemberMethod(IFluentTypedMember backingFieldSymbol, FField setupIndicatorField, FClass setupClass)
+         : base($"Setup{backingFieldSymbol?.Name?.ToFirstUpper()}", setupClass.Target.TypeSymbol ,null)
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
          this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));
          SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
-
-         Name = $"Setup{backingFieldSymbol.Name.ToFirstUpper()}";
+         
       }
 
       #endregion
 
       #region IFluentMethod Members
-
-      public string Name { get; }
-
-      public string ToCode()
+      
+      public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"{ComputeModifier()} void {Name}({SetupClass.TargetTypeName} target)");
@@ -49,11 +47,10 @@ namespace FluentSetups.SourceGenerator.Models
          return codeBuilder.ToString();
       }
 
-      public bool IsUserDefined => false;
+      public override bool IsUserDefined => false;
 
-      public int ParameterCount => 1;
-
-      public string Category { get; set; }
+      public override int ParameterCount => 1;
+      
 
       #endregion
 
@@ -65,7 +62,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Methods
 
-      private string ComputeModifier()
+      protected override string ComputeModifier()
       {
          if (SetupClass.Target.IsInternal && SetupClass.IsPublic)
             return "private";

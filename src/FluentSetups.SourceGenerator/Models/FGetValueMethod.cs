@@ -7,21 +7,22 @@
 namespace FluentSetups.SourceGenerator.Models
 {
    using System;
+   using System.Diagnostics;
    using System.Text;
-
-   internal class FGetValueMethod : IFluentMethod
+   
+   [DebuggerDisplay("{Signature}")]
+   internal class FGetValueMethod : MethodBase
    {
       private readonly IFluentTypedMember backingFieldSymbol;
 
       public FGetValueMethod(IFluentTypedMember backingFieldSymbol)
+         : base($"Get{backingFieldSymbol?.Name?.ToFirstUpper()}")
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
-         Name = $"Get{backingFieldSymbol.Name.ToFirstUpper()}";
       }
+      
 
-      public string Name { get; }
-
-      public string ToCode()
+      public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
          codeBuilder.AppendLine($"protected {backingFieldSymbol.Type} {Name}()");
@@ -40,10 +41,8 @@ namespace FluentSetups.SourceGenerator.Models
          return codeBuilder.ToString();
       }
 
-      public bool IsUserDefined => false;
+      public override bool IsUserDefined => false;
 
-      public int ParameterCount => 0;
-
-      public string Category { get; set; }
+      public override int ParameterCount => 0;
    }
 }

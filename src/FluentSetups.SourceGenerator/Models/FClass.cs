@@ -12,6 +12,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System.Text;
 
    using Microsoft.CodeAnalysis;
+   using Microsoft.CodeAnalysis.CSharp;
 
    /// <summary>Model describing a setup class</summary>
    internal class FClass
@@ -213,12 +214,37 @@ namespace FluentSetups.SourceGenerator.Models
       {
          if (method == null)
             throw new ArgumentNullException(nameof(method));
-
+         
          if (methods.Contains(method))
             return false;
 
          methods.Add(method);
          return true;
+      }
+
+      private bool MethodsEqual(IFluentMethod existingMethod, IFluentMethod fluentMethod)
+      {
+         if (existingMethod.Name != fluentMethod.Name)
+            return false;
+
+         if (existingMethod.ParameterCount != fluentMethod.ParameterCount)
+            return false;
+
+         if (existingMethod.ParameterType == null)
+            return fluentMethod.ParameterType == null;
+
+         if (existingMethod.ParameterType is INamedTypeSymbol namedType)
+         {
+            if (namedType.IsGenericType && namedType.TypeArguments.Length == 1)
+            {
+               var genericArgument = namedType.TypeArguments[0];
+            }
+
+
+         }
+         //   return fluentMethod.ParameterType == null;
+
+         return existingMethod == fluentMethod;
       }
 
       private void AddMethodFromField(FField field)

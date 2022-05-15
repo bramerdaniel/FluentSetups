@@ -13,8 +13,8 @@ namespace FluentSetups.SourceGenerator.Models
 
    using Microsoft.CodeAnalysis;
 
-   [DebuggerDisplay("{Name}")]
-   internal class FMethod : IFluentMethod
+   [DebuggerDisplay("{Signature}")]
+   internal class FMethod : MethodBase
    {
       #region Constants and Fields
 
@@ -25,20 +25,16 @@ namespace FluentSetups.SourceGenerator.Models
       #region Constructors and Destructors
 
       public FMethod(IMethodSymbol methodSymbol)
+      : base(methodSymbol.Name , methodSymbol.Parameters.FirstOrDefault()?.Type)
       {
          this.methodSymbol = methodSymbol ?? throw new ArgumentNullException(nameof(methodSymbol));
-         Name = methodSymbol.Name;
-         ParameterType = methodSymbol.Parameters.FirstOrDefault()?.Type;
-         ParameterTypeName = ParameterType?.ToString();
          ParameterCount = methodSymbol.Parameters.Length;
          Category = ComputeCategory(Name);
       }
 
       public FMethod(string methodName, ITypeSymbol parameterType, ITypeSymbol returnType)
+      : base(methodName, parameterType)
       {
-         Name = methodName ?? throw new ArgumentNullException(nameof(methodName));
-         ParameterType = parameterType;
-         ParameterTypeName = parameterType?.ToString();
          ReturnType = returnType?.Name ?? "void";
          ParameterCount = parameterType == null ? 0 : 1;
          Category = ComputeCategory(Name);
@@ -48,7 +44,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region IFluentMethod Members
 
-      public virtual string ToCode()
+      public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
          codeBuilder.Append($"{ComputeModifier()} {ReturnType} {Name}");
@@ -66,23 +62,16 @@ namespace FluentSetups.SourceGenerator.Models
          return "internal";
       }
 
-      public bool IsUserDefined => methodSymbol != null;
+      public override bool IsUserDefined => methodSymbol != null;
 
-      /// <summary>Gets the name of the method.</summary>
-      public string Name { get; }
-
-      public int ParameterCount { get; }
-
-      public string Category { get; internal set; }
+      public override int ParameterCount { get; }
+      
 
       #endregion
 
       #region Public Properties
 
-      /// <summary>Gets the type of the first parameter parameter.</summary>
-      public ITypeSymbol ParameterType { get; }
-
-      public string ParameterTypeName { get; }
+      
 
       public string ReturnType { get; }
 
@@ -99,27 +88,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
-      public override bool Equals(object obj)
-      {
-         if (ReferenceEquals(null, obj))
-            return false;
-         if (ReferenceEquals(this, obj))
-            return true;
-         if (obj.GetType() != this.GetType())
-            return false;
-         return Equals((FMethod)obj);
-      }
 
-      public override int GetHashCode()
-      {
-         unchecked
-         {
-            var hashCode = ParameterType != null ? SymbolEqualityComparer.Default.GetHashCode(ParameterType) : 0;
-            hashCode = (hashCode * 397) ^ (Name != null ? Name.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ ParameterCount;
-            return hashCode;
-         }
-      }
 
       #endregion
 
@@ -135,10 +104,7 @@ namespace FluentSetups.SourceGenerator.Models
          codeBuilder.AppendLine("   return this;");
       }
 
-      protected bool Equals(FMethod other)
-      {
-         return Name == other.Name && ParameterCount == other.ParameterCount && ParameterTypeEquals(other);
-      }
+
 
       private string ComputeCategory(string methodName)
       {
@@ -146,17 +112,6 @@ namespace FluentSetups.SourceGenerator.Models
             return "TargetBuilder";
 
          return methodName;
-      }
-
-      private bool ParameterTypeEquals(FMethod other)
-      {
-         if (ParameterType == null && other.ParameterType == null)
-            return true;
-
-         if (ParameterType != null && other.ParameterType == null)
-            return false;
-
-         return ParameterType.Equals(other.ParameterType, SymbolEqualityComparer.Default);
       }
 
       #endregion
