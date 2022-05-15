@@ -15,8 +15,8 @@ namespace FluentSetups.SourceGenerator.Models
    {
       private readonly IFluentTypedMember backingFieldSymbol;
 
-      public FGetValueMethod(IFluentTypedMember backingFieldSymbol)
-         : base($"Get{backingFieldSymbol?.Name?.ToFirstUpper()}")
+      public FGetValueMethod(FClass setupClass, IFluentTypedMember backingFieldSymbol)
+         : base(setupClass, $"Get{backingFieldSymbol?.Name?.ToFirstUpper()}")
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
       }

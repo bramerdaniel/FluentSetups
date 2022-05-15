@@ -21,23 +21,25 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Constructors and Destructors
 
-      protected MethodBase(string name)
-         : this(name, (string)null)
-      {
-      }
-
       /// <summary>Initializes a new instance of the <see cref="MethodBase"/> class.</summary>
+      /// <param name="setupClass">The setup class this method belongs to.</param>
       /// <param name="name">The name of the method.</param>
       /// <param name="parameterTypeName">Name of the parameter type of the first parameter.</param>
       /// <exception cref="System.ArgumentNullException">name</exception>
-      protected MethodBase(string name, string parameterTypeName)
+      protected MethodBase(FClass setupClass, string name, string parameterTypeName)
       {
+         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
          Name = name ?? throw new ArgumentNullException(nameof(name));
          ParameterTypeName = parameterTypeName;
       }
 
-      protected MethodBase(string name, ITypeSymbol parameterType)
-         : this(name, parameterType?.ToString())
+      protected MethodBase(FClass setupClass, string name)
+         : this(setupClass, name, (string)null)
+      {
+      }
+
+      protected MethodBase(FClass setupClass, string name, ITypeSymbol parameterType)
+         : this(setupClass, name, parameterType?.ToString())
       {
          Name = name ?? throw new ArgumentNullException(nameof(name));
          ParameterType = parameterType;
@@ -66,10 +68,16 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string ParameterTypeName { get; }
 
+      public string ReturnTypeName { get; protected set; } = "void";
+
       /// <summary>Gets the signature of the method.</summary>
       public string Signature => signature ?? (signature = ComputeSignature());
 
-      public string ReturnType { get; set; }
+      #endregion
+
+      #region Properties
+
+      protected FClass SetupClass { get; }
 
       #endregion
 
@@ -116,19 +124,6 @@ namespace FluentSetups.SourceGenerator.Models
 
          builder.Append(")");
          return builder.ToString();
-      }
-
-      private bool ParameterTypeEquals(MethodBase other)
-      {
-         if (ParameterType == null)
-         {
-            if (other.ParameterType == null)
-               return true;
-
-            return false;
-         }
-
-         return ParameterType.Equals(other.ParameterType, SymbolEqualityComparer.Default);
       }
 
       #endregion

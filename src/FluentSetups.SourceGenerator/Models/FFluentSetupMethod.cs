@@ -16,10 +16,10 @@ namespace FluentSetups.SourceGenerator.Models
    {
       #region Constructors and Destructors
 
-      public FFluentSetupMethod(string methodName, ITypeSymbol parameterType, ITypeSymbol returnType)
-         : base(methodName, parameterType)
+      public FFluentSetupMethod(FClass setupClass, string methodName, ITypeSymbol parameterType, ITypeSymbol returnType)
+         : base(setupClass, methodName, parameterType)
       {
-         ReturnType = returnType?.Name ?? "void";
+         ReturnTypeName = returnType?.Name ?? "void";
          ParameterCount = parameterType == null ? 0 : 1;
          Category = ComputeCategory(Name);
       }
@@ -48,7 +48,7 @@ namespace FluentSetups.SourceGenerator.Models
       public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         codeBuilder.Append($"{ComputeModifier()} {ReturnType} {Name}");
+         codeBuilder.Append($"{ComputeModifier()} {ReturnTypeName} {Name}");
          codeBuilder.AppendLine(ParameterCount == 0 ? "()" : $"({ParameterTypeName} value)");
 
          codeBuilder.AppendLine("{");

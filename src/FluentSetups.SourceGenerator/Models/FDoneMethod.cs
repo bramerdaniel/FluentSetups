@@ -9,26 +9,58 @@ namespace FluentSetups.SourceGenerator.Models
    using System.Diagnostics;
    using System.Text;
 
-   using Microsoft.CodeAnalysis;
-
    [DebuggerDisplay("{Signature}")]
-   internal class FDoneMethod : FMethod
+   internal class FDoneMethod : MethodBase
    {
-      public FDoneMethod(IMethodSymbol methodSymbol)
-         : base(methodSymbol)
+      #region Constructors and Destructors
+
+      public FDoneMethod(FClass setupClass)
+         : base(setupClass, "Done", (string)null)
       {
+         ReturnTypeName = setupClass.TargetTypeName;
       }
 
-      public FDoneMethod(ITypeSymbol returnType)
-         : base("Done", null, returnType)
+      #endregion
+
+      #region Public Properties
+
+      public override bool IsUserDefined => false;
+
+      public override int ParameterCount => 0;
+
+      #endregion
+
+      #region Public Methods and Operators
+
+      public override string ToCode()
       {
+         var codeBuilder = new StringBuilder();
+         codeBuilder.Append($"{ComputeModifier()} {ReturnTypeName} {Name}");
+         codeBuilder.AppendLine(ParameterCount == 0 ? "()" : $"({ParameterTypeName} value)");
+
+         codeBuilder.AppendLine("{");
+         AppendMethodContent(codeBuilder);
+         codeBuilder.AppendLine("}");
+
+         return codeBuilder.ToString();
       }
 
-      protected override void AppendMethodContent(StringBuilder codeBuilder)
+      #endregion
+
+      #region Methods
+
+      protected void AppendMethodContent(StringBuilder codeBuilder)
       {
          codeBuilder.AppendLine("var target = CreateTarget();");
          codeBuilder.AppendLine("SetupTarget(target);");
          codeBuilder.AppendLine("return target;");
       }
+
+      protected virtual string ComputeModifier()
+      {
+         return "internal";
+      }
+
+      #endregion
    }
 }

@@ -12,26 +12,20 @@ namespace FluentSetups.SourceGenerator.Models
 
    using Microsoft.CodeAnalysis;
 
-   internal class FSetupTargetMethod : FMethod
+   internal class FSetupTargetMethod : MethodBase
    {
-      public FClass SetupClass { get; }
 
-      public FSetupTargetMethod(IMethodSymbol methodSymbol, FClass setupClass)
-         : base(methodSymbol)
-      {
-         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
-      }
 
       public FSetupTargetMethod(FClass setupClass)
-         : base("SetupTarget", setupClass?.Target?.TypeSymbol, null)
+         : base(setupClass, "SetupTarget", setupClass?.Target?.TypeSymbol)
       {
-         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
+         ReturnTypeName = "void";
       }
 
       public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         codeBuilder.Append($"{ComputeModifier()} {ReturnType} {Name}({ParameterTypeName} target)");
+         codeBuilder.Append($"{ComputeModifier()} {ReturnTypeName} {Name}({ParameterTypeName} target)");
          codeBuilder.AppendLine("{");
 
          foreach (var setMethod in SetupClass.Methods.OfType<FSetupMemberMethod>())
@@ -41,6 +35,10 @@ namespace FluentSetups.SourceGenerator.Models
 
          return codeBuilder.ToString();
       }
+
+      public override bool IsUserDefined => false;
+
+      public override int ParameterCount => 1;
 
       private string ComputeModifier()
       {

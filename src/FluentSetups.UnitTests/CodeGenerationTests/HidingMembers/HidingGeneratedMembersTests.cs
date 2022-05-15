@@ -98,6 +98,8 @@ public class HidingGeneratedMembersTests
       result.Should().NotHaveErrors().And
          .HaveClass("PersonSetup")
          .WithInternalMethod("WithName");
+
+      result.Print();
    }
 
    [TestMethod]
@@ -158,6 +160,8 @@ public class HidingGeneratedMembersTests
       result.Should().NotHaveErrors().And
          .HaveClass("PersonSetup")
          .WithMethod("Done");
+
+      result.Print();
    }
    
    [TestMethod]
@@ -187,6 +191,8 @@ public class HidingGeneratedMembersTests
          .HaveClass("PersonSetup")
          .WithMethod("Done")
          .WithMethod("Done", "bool");
+
+      result.Print();
    }
 
    [TestMethod]
@@ -216,6 +222,8 @@ public class HidingGeneratedMembersTests
          .HaveClass("PersonSetup")
          .WithMethod("CreateTarget")
          .WithMethod("Done");
+
+      result.Print();
    }
    
 }

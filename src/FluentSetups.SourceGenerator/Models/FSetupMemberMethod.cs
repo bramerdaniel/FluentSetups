@@ -21,13 +21,11 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Constructors and Destructors
 
-      public FSetupMemberMethod(IFluentTypedMember backingFieldSymbol, FField setupIndicatorField, FClass setupClass)
-         : base($"Setup{backingFieldSymbol?.Name?.ToFirstUpper()}", setupClass.Target.TypeSymbol ,null)
+      public FSetupMemberMethod(FClass setupClass, IFluentTypedMember backingFieldSymbol, FField setupIndicatorField)
+         : base(setupClass, $"Setup{backingFieldSymbol?.Name?.ToFirstUpper()}", setupClass.Target.TypeSymbol ,null)
       {
          this.backingFieldSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
          this.setupIndicatorField = setupIndicatorField ?? throw new ArgumentNullException(nameof(setupIndicatorField));
-         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
-         
       }
 
       #endregion
@@ -53,13 +51,7 @@ namespace FluentSetups.SourceGenerator.Models
       
 
       #endregion
-
-      #region Public Properties
-
-      public FClass SetupClass { get; }
-
-      #endregion
-
+      
       #region Methods
 
       protected override string ComputeModifier()

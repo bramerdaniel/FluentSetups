@@ -45,6 +45,8 @@ public class CreateTargetTests
          .WhereMethod("CreateTarget")
          .IsProtected()
          .Contains("var target = new Person(GetName(null));");
+
+      result.Print();
    }
 
    [TestMethod]
@@ -73,6 +75,8 @@ public class CreateTargetTests
          .WhereMethod("CreateTarget")
          .IsProtected()
          .Contains("var target = new Person();");
+
+      result.Print();
    }
    
    [TestMethod]
@@ -101,5 +105,7 @@ public class CreateTargetTests
          .WhereMethod("CreateTarget")
          .IsPrivate()
          .Contains("var target = new Person();");
+
+      result.Print();
    }
 }

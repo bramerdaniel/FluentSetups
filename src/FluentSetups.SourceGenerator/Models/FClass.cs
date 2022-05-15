@@ -233,21 +233,21 @@ namespace FluentSetups.SourceGenerator.Models
          if (string.IsNullOrWhiteSpace(field.TypeName))
             return;
 
-         var method = new FFluentSetupMethod(field.SetupMethodName, field.Type, ClassSymbol) { Source = field, Category = field.SetupMethodName };
+         var method = new FFluentSetupMethod(this, field.SetupMethodName, field.Type, ClassSymbol) { Source = field, Category = field.SetupMethodName };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetValueMethod(field) { Category = method.Category };
+            var fGetOrThrow = new FGetValueMethod(this, field) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueOrDefaultMethod(field, method.SetupIndicatorField) { Category = method.Category };
+            var getMember = new FGetValueOrDefaultMethod(this, field, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(getMember);
 
             if (CanAddSet(field))
             {
-               var setMember = new FSetupMemberMethod(field, method.SetupIndicatorField, this) { Category = method.Category };
+               var setMember = new FSetupMemberMethod(this, field, method.SetupIndicatorField) { Category = method.Category };
                AddMethod(setMember);
             }
          }
@@ -258,21 +258,21 @@ namespace FluentSetups.SourceGenerator.Models
          if (!property.RequiredSetupGeneration())
             return;
 
-         var method = new FFluentSetupMethod(property.GetSetupMethodName(), property.Type, ClassSymbol) { Source = property };
+         var method = new FFluentSetupMethod(this, property.GetSetupMethodName(), property.Type, ClassSymbol) { Source = property };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{property.Name.ToFirstLower()}WasSet");
             AddField(method.SetupIndicatorField);
 
-            var fGetOrThrow = new FGetValueMethod(property) { Category = method.Category };
+            var fGetOrThrow = new FGetValueMethod(this, property) { Category = method.Category };
             AddMethod(fGetOrThrow);
 
-            var getMember = new FGetValueOrDefaultMethod(property, method.SetupIndicatorField) { Category = method.Category };
+            var getMember = new FGetValueOrDefaultMethod(this, property, method.SetupIndicatorField) { Category = method.Category };
             AddMethod(getMember);
 
             if (CanAddSet(property))
             {
-               var setMember = new FSetupMemberMethod(property, method.SetupIndicatorField, this) { Category = method.Category };
+               var setMember = new FSetupMemberMethod(this, property, method.SetupIndicatorField) { Category = method.Category };
                AddMethod(setMember);
             }
          }
@@ -321,19 +321,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private FMethod CreateMethod(IMethodSymbol methodSymbol)
       {
-         if (TargetAvailable())
-         {
-            if (IsDoneMethod(methodSymbol))
-               return new FDoneMethod(methodSymbol);
-
-            if (IsCreateTargetMethod(methodSymbol))
-               return new FCreateTargetMethod(methodSymbol, Target);
-
-            if (IsSetupTargetMethod(methodSymbol))
-               return new FSetupTargetMethod(methodSymbol, this);
-         }
-
-         return new FMethod(methodSymbol);
+         return new FMethod(this, methodSymbol);
       }
 
       private void FillMembers()
@@ -496,7 +484,7 @@ namespace FluentSetups.SourceGenerator.Models
          if (!TargetCreationPossible(this))
             return;
 
-         AddMethod(new FDoneMethod(Target.TypeSymbol));
+         AddMethod(new FDoneMethod(this));
          AddMethod(new FCreateTargetMethod(this));
          AddMethod(new FSetupTargetMethod(this));
       }
