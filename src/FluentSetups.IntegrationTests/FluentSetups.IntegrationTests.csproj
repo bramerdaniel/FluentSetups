@@ -4,6 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
 		<IsPackable>false</IsPackable>
+		<AssemblyOriginatorKeyFile>EnsureHasStrongName.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -5,6 +5,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Version>$(FluentSetupsPackageVersion)</Version>
 		<Description>Helper utility for generating fluent setup classes from the existing code, using an ISourceGenerator</Description>
+		
 	</PropertyGroup>
 
 	<ItemGroup>
