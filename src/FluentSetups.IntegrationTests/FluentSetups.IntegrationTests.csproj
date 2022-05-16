@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
 		<IsPackable>false</IsPackable>
-		<AssemblyOriginatorKeyFile>EnsureHasStrongName.pfx</AssemblyOriginatorKeyFile>
+		<AssemblyOriginatorKeyFile>EnsureHasStrongName.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup>
