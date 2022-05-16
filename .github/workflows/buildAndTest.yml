@@ -22,6 +22,12 @@ jobs:
     - name: checkout branch
       uses: actions/checkout@v3
 
+    - name: Create Code Signing Certificate
+      run: |
+        New-Item -ItemType directory -Path certificate
+        Set-Content -Path certificate\certificate.txt -Value '${{ secrets.FLUENT_SETUP_CERTIFICATE }}'
+        certutil -decode certificate\certificate.txt certificate\certificate.pfx
+
     - name: setup NuGet.exe
       uses: NuGet/setup-nuget@v1.0.6
       with:
