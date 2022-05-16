@@ -27,7 +27,7 @@ jobs:
       run: |
         New-Item -ItemType directory -Path certificate
         Set-Content -Path certificate\FluentSetups.txt -Value '${{ secrets.FLUENT_SETUP_CERTIFICATE }}'
-        certutil -decode certificate\FluentSetups.txt certificate\FluentSetups.pfx
+        certutil -decode certificate\FluentSetups.txt certificate\FluentSetups.snk
 
     - name: show cert
       run: dir certificate

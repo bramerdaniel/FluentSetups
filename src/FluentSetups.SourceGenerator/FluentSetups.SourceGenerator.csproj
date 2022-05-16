@@ -4,8 +4,6 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<SignAssembly>True</SignAssembly>
-		<AssemblyOriginatorKeyFile>..\..\certificate\FluentSetups.pfx</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup>
