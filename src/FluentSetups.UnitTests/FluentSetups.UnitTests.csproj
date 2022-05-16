@@ -5,6 +5,8 @@
 		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
 		<IsPackable>false</IsPackable>
 		<LangVersion>10</LangVersion>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\certificate\FluentSetups.pfx</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup>
