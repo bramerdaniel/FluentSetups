@@ -22,14 +22,12 @@ jobs:
     - name: checkout branch
       uses: actions/checkout@v3
     
-    - name: show working dir
-      run: dir 
 
     - name: Create Code Signing Certificate
       run: |
         New-Item -ItemType directory -Path certificate
-        Set-Content -Path certificate\certificate.txt -Value '${{ secrets.FLUENT_SETUP_CERTIFICATE }}'
-        certutil -decode certificate\certificate.txt certificate\certificate.pfx
+        Set-Content -Path certificate\FluentSetups.txt -Value '${{ secrets.FLUENT_SETUP_CERTIFICATE }}'
+        certutil -decode certificate\FluentSetups.txt certificate\FluentSetups.pfx
 
     - name: show cert
       run: dir 
