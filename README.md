@@ -1,5 +1,7 @@
 # FluentSetups
 
+[![build workflow](https://github.com/bramerdaniel/FluentSetups/actions/workflows/buildAndTest.yml/badge.svg)](https://github.com/bramerdaniel/FluentSetups/actions/workflows/buildAndTest.yml)
+
 ## What is FluentSetups
 
 FluentSetups is a library that generates the boilerplate code for a fluent builder pattern ( I call it a fluent setup ).
