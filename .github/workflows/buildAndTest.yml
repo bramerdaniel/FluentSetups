@@ -30,7 +30,7 @@ jobs:
         certutil -decode certificate\FluentSetups.txt certificate\FluentSetups.pfx
 
     - name: show cert
-      run: dir 
+      run: dir certificate
 
     - name: setup NuGet.exe
       uses: NuGet/setup-nuget@v1.0.6
