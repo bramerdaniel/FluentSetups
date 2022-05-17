@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
+		<SignAssembly>False</SignAssembly>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="Setup.cs" />
@@ -15,9 +16,9 @@
 
 	<ItemGroup>
 
-		<PackageReference Include="ConsoLovers.ConsoleToolkit.Core"  />
+		<PackageReference Include="ConsoLovers.ConsoleToolkit.Core" />
 
-		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" >
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
