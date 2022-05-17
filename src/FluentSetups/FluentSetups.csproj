@@ -5,16 +5,16 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Version>$(FluentSetupsPackageVersion)</Version>
 		<PackageTags>Fluent FluentApi Builder Setup BuilderPattern Pattern</PackageTags>
-		<!--<PackageIconUrl>https://raw.githubusercontent.com/bramerdaniel/FluentSetups/development/doc/fluentIcon.ico</PackageIconUrl>-->
+		<PackageIconUrl>https://raw.githubusercontent.com/bramerdaniel/FluentSetups/master/doc/packageIcon.png</PackageIconUrl>
 		<Description>Helper utility for generating fluent setup classes from the existing code, using an ISourceGenerator</Description>
-		<PackageIcon>FS-A128x128.png</PackageIcon>
+		<PackageIcon>packageIcon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="$(SolutionDir)$(Configuration)\FluentSetups.SourceGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-		<None Include="..\..\doc\FS-A128x128.png" Visible="false">
+		<None Include="..\..\doc\packageIcon.png" >
 		  <Pack>True</Pack>
 		  <PackagePath>\</PackagePath>
 		</None>
