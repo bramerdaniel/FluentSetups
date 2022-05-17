@@ -9,6 +9,7 @@
 		<Description>Helper utility for generating fluent setup classes from the existing code, using an ISourceGenerator</Description>
 		<PackageIcon>FS-A128x128.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
