@@ -2,7 +2,7 @@
 <Project>
 	<!-- Properties are a Dictionary<string, string> they work like AddOrUpdate -->
 	<PropertyGroup>
-		<FluentSetupsPackageVersion>0.3.1-rc1</FluentSetupsPackageVersion>
+		<FluentSetupsPackageVersion>0.3.1</FluentSetupsPackageVersion>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\..\certificate\FluentSetups.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>

@@ -62,6 +62,8 @@ namespace FluentSetups.SourceGenerator.Models
       public IReadOnlyList<FField> Fields => fields;
 
       public bool IsPublic => ClassSymbol.DeclaredAccessibility == Accessibility.Public;
+      
+      public bool GenerationEnabled => ClassSymbol.DeclaringSyntaxReferences.Length == 1;
 
       public IReadOnlyList<IFluentMethod> Methods => methods;
 

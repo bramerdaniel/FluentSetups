@@ -23,7 +23,10 @@ namespace FluentSetups.SourceGenerator
       public IEnumerable<GeneratedSource> Execute(SetupModel setupModel)
       {
          foreach (var setupClass in setupModel.SetupClasses)
-            yield return GenerateSetupClass(setupClass);
+         {
+            if (setupClass.GenerationEnabled)
+               yield return GenerateSetupClass(setupClass);
+         }
 
          foreach (var entryClass in setupModel.EntryClasses)
             yield return GenerateEntryClass(entryClass);
