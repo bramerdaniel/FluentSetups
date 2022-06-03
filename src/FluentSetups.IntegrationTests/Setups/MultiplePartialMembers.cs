@@ -10,7 +10,7 @@ namespace FluentSetups.IntegrationTests.Setups;
 public partial class MultiplePartialMembers
 {
    [FluentMember]
-   private int value;
+   private string value = "string.Empty";
 }
 
 public partial class MultiplePartialMembers

@@ -46,10 +46,10 @@ namespace FluentSetups.SourceGenerator
 
       private static void ReportIgnore(GeneratedSource source, FClass ignoredClass)
       {
-         var missingReference = new DiagnosticDescriptor(id: "FSI0001", title: "FluentSetups source generator",
-            messageFormat: "Error while generating source '{0}'. Message: {1}",
+         var missingReference = new DiagnosticDescriptor(id: "FSW0001", title: "FluentSetups source generator",
+            messageFormat: "Generating source is skipped du tue multiple partial members",
             category: nameof(FluentSetupSourceGenerator),
-            defaultSeverity: DiagnosticSeverity.Info,
+            defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
 
          var location = CreateLocation(ignoredClass);
