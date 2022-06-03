@@ -23,10 +23,7 @@ namespace FluentSetups.SourceGenerator
       public IEnumerable<GeneratedSource> Execute(SetupModel setupModel)
       {
          foreach (var setupClass in setupModel.SetupClasses)
-         {
-            if (setupClass.GenerationEnabled)
-               yield return GenerateSetupClass(setupClass);
-         }
+            yield return GenerateSetupClass(setupClass);
 
          foreach (var entryClass in setupModel.EntryClasses)
             yield return GenerateEntryClass(entryClass);
@@ -38,13 +35,40 @@ namespace FluentSetups.SourceGenerator
 
       private static void ReportError(GeneratedSource source, Exception e)
       {
-         var missingReference = new DiagnosticDescriptor(id: "FS0002", title: "fluent source generator failed",
+         var missingReference = new DiagnosticDescriptor(id: "FSE0002", title: "fluent source generator failed",
             messageFormat: "Error while generating source '{0}'. Message: {1}",
             category: nameof(FluentSetupSourceGenerator),
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
-         source.Error = Diagnostic.Create(missingReference, Location.None, source.Name, e.Message);
+         source.AddDiagnostic(Diagnostic.Create(missingReference, Location.None, source.Name, e.Message));
+      }
+
+      private static void ReportIgnore(GeneratedSource source, FClass ignoredClass)
+      {
+         var missingReference = new DiagnosticDescriptor(id: "FSI0001", title: "FluentSetups source generator",
+            messageFormat: "Error while generating source '{0}'. Message: {1}",
+            category: nameof(FluentSetupSourceGenerator),
+            defaultSeverity: DiagnosticSeverity.Info,
+            isEnabledByDefault: true);
+
+         var location = CreateLocation(ignoredClass);
+         source.AddDiagnostic(Diagnostic.Create(missingReference, location));
+      }
+
+      private static Location CreateLocation(FClass ignoredClass)
+      {
+         var syntaxReference = ignoredClass.ClassSymbol.DeclaringSyntaxReferences.FirstOrDefault();
+         if(syntaxReference == null)
+            return Location.None;
+
+         var reference = ignoredClass.FluentSetupAttribute.ApplicationSyntaxReference;
+         if (reference == null)
+            return Location.None;
+
+         var span = reference.Span;
+         var location = Location.Create(syntaxReference.SyntaxTree, span);
+         return location;
       }
 
       private GeneratedSource GenerateEntryClass(SetupEntryClassModel classModel)
@@ -116,6 +140,13 @@ namespace FluentSetups.SourceGenerator
       private GeneratedSource GenerateSetupClass(FClass classModel)
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
+         if (!classModel.GenerationEnabled)
+         {
+            source.Disable();
+            ReportIgnore(source, classModel);
+            return source;
+         }
+
          try
          {
             var text = classModel.ToCode();
