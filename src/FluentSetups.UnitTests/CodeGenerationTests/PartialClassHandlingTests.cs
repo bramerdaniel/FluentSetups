@@ -49,6 +49,9 @@ public class PartialClassHandlingTests
          .WithoutMethod("Done")
          .WithoutMethod("SetupTarget")
          .WithoutMethod("WithName");
+
+      result.Should().NotHaveErrors();
+      result.Should().HaveDiagnostic("FSI0001");
    }
 
    [TestMethod]

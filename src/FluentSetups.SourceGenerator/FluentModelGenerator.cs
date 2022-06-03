@@ -58,17 +58,11 @@ namespace FluentSetups.SourceGenerator
 
       private static Location CreateLocation(FClass ignoredClass)
       {
-         var syntaxReference = ignoredClass.ClassSymbol.DeclaringSyntaxReferences.FirstOrDefault();
-         if(syntaxReference == null)
-            return Location.None;
-
          var reference = ignoredClass.FluentSetupAttribute.ApplicationSyntaxReference;
          if (reference == null)
             return Location.None;
 
-         var span = reference.Span;
-         var location = Location.Create(syntaxReference.SyntaxTree, span);
-         return location;
+         return Location.Create(reference.SyntaxTree, reference.Span);
       }
 
       private GeneratedSource GenerateEntryClass(SetupEntryClassModel classModel)

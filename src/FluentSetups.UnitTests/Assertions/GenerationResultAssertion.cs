@@ -46,6 +46,14 @@ namespace FluentSetups.UnitTests.Assertions
          return new ClassAssertion(Subject, classType);
       }
 
+      public AndConstraint<GenerationResultAssertion> HaveDiagnostic(string diagnosticId)
+      {
+         var diagnostic = Subject.GeneratedDiagnostics.FirstOrDefault(d => d.Id == diagnosticId);
+         Assert.IsNotNull(diagnostic, $"Diagnostic {diagnostic} could not be found.");
+
+         return new AndConstraint<GenerationResultAssertion>(this);
+      }
+
       public AndConstraint<GenerationResultAssertion> NotHaveErrors()
       {
          ThrowOnErrors(Subject.GeneratedDiagnostics);
