@@ -97,7 +97,7 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
-      private bool IsFluentSetupAttribute(AttributeData attributeData)
+      internal bool IsFluentSetupAttribute(AttributeData attributeData)
       {
          if (FluentSetupAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
             return true;
