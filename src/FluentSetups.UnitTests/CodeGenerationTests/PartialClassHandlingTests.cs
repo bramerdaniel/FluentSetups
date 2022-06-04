@@ -51,7 +51,7 @@ public class PartialClassHandlingTests
          .WithoutMethod("WithName");
 
       result.Should().NotHaveErrors();
-      result.Should().HaveDiagnostic("FSI0001");
+      result.Should().HaveDiagnostic("FSW0001");
    }
 
    [TestMethod]
