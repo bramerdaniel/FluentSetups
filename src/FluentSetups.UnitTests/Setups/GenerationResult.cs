@@ -1,12 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GenerationResult.cs" company="consolovers">
-//   Copyright (c) daniel bramer 2022 - 2022
+// <copyright file="GenerationResult.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.UnitTests.Setups;
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -18,23 +17,25 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 internal class GenerationResult
 {
-   #region Constructors and Destructors
+   #region Constants and Fields
 
-   public GenerationResult(Compilation compilation, IReadOnlyList<SyntaxTree> syntaxTrees)
-   {
-      Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
-      SyntaxTrees = syntaxTrees ?? throw new ArgumentNullException(nameof(syntaxTrees));
-   }
+   private IReadOnlyList<SyntaxTree> inputSyntaxTrees;
+
+   private IReadOnlyList<SyntaxTree> outputSyntaxTrees;
 
    #endregion
 
    #region Public Properties
 
-   public Compilation Compilation { get; }
-
    public ImmutableArray<Diagnostic> GeneratedDiagnostics { get; set; }
 
-   public IReadOnlyList<SyntaxTree> SyntaxTrees { get; }
+   public Compilation InputCompilation { get; set; }
+
+   public IReadOnlyList<SyntaxTree> InputSyntaxTrees => inputSyntaxTrees ??= InputCompilation.SyntaxTrees.ToArray();
+
+   public Compilation OutputCompilation { get; set; }
+
+   public IReadOnlyList<SyntaxTree> OutputSyntaxTrees => outputSyntaxTrees ??= OutputCompilation.SyntaxTrees.ToArray();
 
    #endregion
 
@@ -42,11 +43,9 @@ internal class GenerationResult
 
    public void FailWith(string id, string hint)
    {
-      if (!Compilation.GetDiagnostics().Any(d => d.Id == id))
+      if (!OutputCompilation.GetDiagnostics().Any(d => d.Id == id))
          Assert.Fail($"The expected diagnostic {id} was not found. Hint : {hint}");
    }
-
-   #endregion
 
    public void Print()
    {
@@ -59,7 +58,7 @@ internal class GenerationResult
          builder.AppendLine("### GENERATED CODE ###");
          builder.AppendLine();
 
-         foreach (var resultSyntaxTree in SyntaxTrees.Skip(1))
+         foreach (var resultSyntaxTree in OutputSyntaxTrees.Skip(1))
          {
             builder.AppendLine(resultSyntaxTree.ToString());
             builder.AppendLine();
@@ -69,4 +68,6 @@ internal class GenerationResult
          return builder.ToString();
       }
    }
+
+   #endregion
 }

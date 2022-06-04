@@ -1,8 +1,6 @@
-<!-- the .props are all imported at the start of each project file-->
 <Project>
-	<!-- Properties are a Dictionary<string, string> they work like AddOrUpdate -->
 	<PropertyGroup>
-		<FluentSetupsPackageVersion>0.3.1-rc1</FluentSetupsPackageVersion>
+		<FluentSetupsPackageVersion>0.3.1-rc6</FluentSetupsPackageVersion>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\..\certificate\FluentSetups.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>

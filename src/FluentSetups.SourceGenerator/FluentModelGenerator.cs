@@ -33,15 +33,36 @@ namespace FluentSetups.SourceGenerator
 
       #region Methods
 
-      private static void ReportError(GeneratedSource source, Exception e)
+      private static void ReportUnknownError(GeneratedSource source, Exception e)
       {
-         var missingReference = new DiagnosticDescriptor(id: "FS0002", title: "fluent source generator failed",
+         var missingReference = new DiagnosticDescriptor(id: "FSE0002", title: "FluentSetups source generator",
             messageFormat: "Error while generating source '{0}'. Message: {1}",
             category: nameof(FluentSetupSourceGenerator),
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
-         source.Error = Diagnostic.Create(missingReference, Location.None, source.Name, e.Message);
+         source.AddDiagnostic(Diagnostic.Create(missingReference, Location.None, source.Name, e.Message));
+      }
+
+      private static void ReportIgnore(GeneratedSource source, FClass ignoredClass)
+      {
+         var missingReference = new DiagnosticDescriptor(id: "FSI0001", title: "FluentSetups source generator",
+            messageFormat: "Fluent setup generation for class {0} is skipped du tue multiple partial members.",
+            category: nameof(FluentSetupSourceGenerator),
+            defaultSeverity: DiagnosticSeverity.Info,
+            isEnabledByDefault: true);
+
+         var location = CreateLocation(ignoredClass);
+         source.AddDiagnostic(Diagnostic.Create(missingReference, location, ignoredClass.ClassName));
+      }
+
+      private static Location CreateLocation(FClass ignoredClass)
+      {
+         var reference = ignoredClass.FluentSetupAttribute.ApplicationSyntaxReference;
+         if (reference == null)
+            return Location.None;
+
+         return Location.Create(reference.SyntaxTree, reference.Span);
       }
 
       private GeneratedSource GenerateEntryClass(SetupEntryClassModel classModel)
@@ -67,7 +88,7 @@ namespace FluentSetups.SourceGenerator
          }
          catch (Exception e)
          {
-            ReportError(source, e);
+            ReportUnknownError(source, e);
          }
 
          return source;
@@ -113,6 +134,13 @@ namespace FluentSetups.SourceGenerator
       private GeneratedSource GenerateSetupClass(FClass classModel)
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
+         if (!classModel.GenerationEnabled)
+         {
+            source.Disable();
+            ReportIgnore(source, classModel);
+            return source;
+         }
+
          try
          {
             var text = classModel.ToCode();
@@ -121,7 +149,7 @@ namespace FluentSetups.SourceGenerator
          }
          catch (Exception e)
          {
-            ReportError(source, e);
+            ReportUnknownError(source, e);
          }
 
          return source;

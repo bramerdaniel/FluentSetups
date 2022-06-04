@@ -45,14 +45,11 @@ namespace FluentSetups.SourceGenerator
 
       private static void AddSourceOrReportError(GeneratorExecutionContext context, GeneratedSource generatedSource)
       {
-         if (generatedSource.Error == null)
-         {
+         if (generatedSource.Enabled)
             context.AddSource(generatedSource.Name, SourceText.From(generatedSource.Code, Encoding.UTF8));
-         }
-         else
-         {
-            context.ReportDiagnostic(generatedSource.Error);
-         }
+
+         foreach (var diagnostic in generatedSource.Diagnostics)
+            context.ReportDiagnostic(diagnostic);
       }
 
       private void MissingReferenceDiagnostic(GeneratorExecutionContext context, string attributeName)
