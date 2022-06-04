@@ -20,8 +20,6 @@ namespace FluentSetups.SourceGenerator.Models
 
       private readonly List<FField> fields = new List<FField>(5);
 
-      private readonly AttributeData fluentSetupAttribute;
-
       private readonly List<IFluentMethod> methods = new List<IFluentMethod>(5);
 
       private readonly List<FProperty> properties = new List<FProperty>(5);
@@ -33,8 +31,8 @@ namespace FluentSetups.SourceGenerator.Models
       internal FClass(FluentGeneratorContext context, ITypeSymbol classSymbol, AttributeData fluentSetupAttribute)
       {
          Context = context;
-         this.ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
-         this.fluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
+         ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
+         this.FluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
 
          ClassName = classSymbol.Name;
          ContainingNamespace = ComputeNamespace();
@@ -62,6 +60,8 @@ namespace FluentSetups.SourceGenerator.Models
       public IReadOnlyList<FField> Fields => fields;
 
       public bool IsPublic => ClassSymbol.DeclaredAccessibility == Accessibility.Public;
+      
+      public bool GenerationEnabled => ClassSymbol.DeclaringSyntaxReferences.Length == 1;
 
       public IReadOnlyList<IFluentMethod> Methods => methods;
 
@@ -81,7 +81,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private string ComputeSetupMethod()
       {
-         return fluentSetupAttribute.GetSetupMethod()
+         return FluentSetupAttribute.GetSetupMethod()
                 ?? TargetTypeName
                 ?? ComputeEntryMethodName();
       }
@@ -95,6 +95,9 @@ namespace FluentSetups.SourceGenerator.Models
       }
 
       public ITypeSymbol ClassSymbol { get; }
+
+      /// <summary>Gets the fluent setup attribute that was placed onto the input source.</summary>
+      public AttributeData FluentSetupAttribute { get; }
 
       #endregion
 
@@ -383,11 +386,11 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void InitializeTarget()
       {
-         var targetType = fluentSetupAttribute.GetTargetType();
+         var targetType = FluentSetupAttribute.GetTargetType();
          if (targetType.IsNull)
             return;
 
-         var targetMode = fluentSetupAttribute.GetTargetMode();
+         var targetMode = FluentSetupAttribute.GetTargetMode();
          if (targetMode.Value is int enumValue)
             TargetMode = (TargetGenerationMode)enumValue;
 

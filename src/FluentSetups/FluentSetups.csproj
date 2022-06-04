@@ -10,11 +10,14 @@
 		<PackageIcon>packageIcon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReleaseNotes>0.3.0 to 0.3.1
+- Multiple partial members defined by the user, skipp source generation for the fluent setup class.
+- Improvements for reporting diagnostics. </PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="$(SolutionDir)$(Configuration)\FluentSetups.SourceGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-		<None Include="..\..\doc\packageIcon.png" >
+		<None Include="..\..\doc\packageIcon.png">
 		  <Pack>True</Pack>
 		  <PackagePath>\</PackagePath>
 		</None>

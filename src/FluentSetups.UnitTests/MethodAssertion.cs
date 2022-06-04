@@ -156,11 +156,11 @@ internal class MethodAssertion : ReferenceTypeAssertions<IMethodSymbol, MethodAs
       var builder = new StringBuilder();
       builder.AppendLine();
       builder.AppendLine("### INPUT ###");
-      builder.AppendLine(generationResult.SyntaxTrees.First().ToString());
+      builder.AppendLine(generationResult.OutputSyntaxTrees.First().ToString());
       builder.AppendLine();
       builder.AppendLine("### OUTPUT ###");
 
-      foreach (var resultSyntaxTree in generationResult.SyntaxTrees.Skip(1))
+      foreach (var resultSyntaxTree in generationResult.OutputSyntaxTrees.Skip(1))
       {
          builder.AppendLine(resultSyntaxTree.ToString());
          builder.AppendLine();

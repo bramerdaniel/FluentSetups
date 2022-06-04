@@ -40,16 +40,24 @@ namespace FluentSetups.UnitTests.Assertions
 
       public ClassAssertion HaveClass(string className)
       {
-         var classType = Subject.Compilation.GetTypeByMetadataName(className);
+         var classType = Subject.OutputCompilation.GetTypeByMetadataName(className);
 
-         Assert.IsNotNull(classType, $"The class {className} could not be found. {Environment.NewLine}{Subject.SyntaxTrees.Last().ToString()}");
+         Assert.IsNotNull(classType, $"The class {className} could not be found. {Environment.NewLine}{Subject.OutputSyntaxTrees.Last().ToString()}");
          return new ClassAssertion(Subject, classType);
+      }
+
+      public AndConstraint<GenerationResultAssertion> HaveDiagnostic(string diagnosticId)
+      {
+         var diagnostic = Subject.GeneratedDiagnostics.FirstOrDefault(d => d.Id == diagnosticId);
+         Assert.IsNotNull(diagnostic, $"Diagnostic {diagnostic} could not be found.");
+
+         return new AndConstraint<GenerationResultAssertion>(this);
       }
 
       public AndConstraint<GenerationResultAssertion> NotHaveErrors()
       {
          ThrowOnErrors(Subject.GeneratedDiagnostics);
-         ThrowOnErrors(Subject.Compilation.GetDiagnostics());
+         ThrowOnErrors(Subject.OutputCompilation.GetDiagnostics());
 
          return new AndConstraint<GenerationResultAssertion>(this);
       }
@@ -57,7 +65,7 @@ namespace FluentSetups.UnitTests.Assertions
       public AndConstraint<GenerationResultAssertion> NotHaveWarnings()
       {
          ThrowOnWarnings(Subject.GeneratedDiagnostics);
-         ThrowOnWarnings(Subject.Compilation.GetDiagnostics());
+         ThrowOnWarnings(Subject.OutputCompilation.GetDiagnostics());
 
          return new AndConstraint<GenerationResultAssertion>(this);
       }

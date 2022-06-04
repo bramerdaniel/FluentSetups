@@ -89,11 +89,19 @@ jobs:
     - name: checkout branch
       uses: actions/checkout@v3
 
+    #- name: download artifacts
+    #  uses: actions/download-artifact@v3.0.0
+    #  with:
+    #    name: nugetPackage
+    #    path: src\FluentSetups.IntegrationTests\packages
+
+    # the output directory of the FluentSetup project,
+    # this makes it possible to use that also for local usage
     - name: download artifacts
       uses: actions/download-artifact@v3.0.0
       with:
         name: nugetPackage
-        path: src\FluentSetups.IntegrationTests\packages
+        path: src\Debug 
     
     - name: show working dir
       run: dir
