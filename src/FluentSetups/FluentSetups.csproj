@@ -10,9 +10,12 @@
 		<PackageIcon>packageIcon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReleaseNotes>0.3.0 to 0.3.1
+		<PackageReleaseNotes>0.3.1 to 0.3.2
+- Added diagnostic analyzer for multiple partial members defined by the user.
+0.3.0 to 0.3.1
 - Multiple partial members defined by the user, skipp source generation for the fluent setup class.
-- Improvements for reporting diagnostics. </PackageReleaseNotes>
+- Improvements for reporting diagnostics.
+		</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>

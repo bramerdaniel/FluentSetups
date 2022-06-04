@@ -8,6 +8,7 @@ namespace FluentSetups.UnitTests.Assertions
 {
    using System;
    using System.Collections.Generic;
+   using System.Collections.Immutable;
    using System.Linq;
    using System.Text;
 
@@ -49,10 +50,17 @@ namespace FluentSetups.UnitTests.Assertions
       public AndConstraint<GenerationResultAssertion> HaveDiagnostic(string diagnosticId)
       {
          var diagnostic = Subject.GeneratedDiagnostics.FirstOrDefault(d => d.Id == diagnosticId);
-         Assert.IsNotNull(diagnostic, $"Diagnostic {diagnostic} could not be found.");
+         Assert.IsNotNull(diagnostic, $"Diagnostic {diagnostic} could not be found.{CreateAllFound(Subject.GeneratedDiagnostics)}");
 
          return new AndConstraint<GenerationResultAssertion>(this);
+
+         string CreateAllFound(ImmutableArray<Diagnostic> generatedDiagnostics)
+         {
+            return $"{Environment.NewLine}{string.Join(Environment.NewLine, generatedDiagnostics)}";
+         }
       }
+
+
 
       public AndConstraint<GenerationResultAssertion> NotHaveErrors()
       {
