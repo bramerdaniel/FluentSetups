@@ -58,7 +58,7 @@ jobs:
       uses: actions/upload-artifact@v3.0.0
       with:
         name: binaries
-        path: ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\*
+        path: ${{ env.SOLUTION_DIRECTORY }}\Release\net48\*
         retention-days: 1      
 
 
@@ -88,12 +88,6 @@ jobs:
     steps:
     - name: checkout branch
       uses: actions/checkout@v3
-
-    #- name: download artifacts
-    #  uses: actions/download-artifact@v3.0.0
-    #  with:
-    #    name: nugetPackage
-    #    path: src\FluentSetups.IntegrationTests\packages
 
     # the output directory of the FluentSetup project,
     # this makes it possible to use that also for local usage

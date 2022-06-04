@@ -16,4 +16,12 @@
 		<PackageReference Include="FluentSetups" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <EditorConfigFiles Remove="C:\Users\bramerd\source\repos\FluentSetups\src\FluentSetups.IntegrationTests\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="C:\Users\bramerd\source\repos\FluentSetups\src\FluentSetups.IntegrationTests\.editorconfig" />
+	</ItemGroup>
+
 </Project>

@@ -14,4 +14,8 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Analyzers\" />
+	</ItemGroup>
+
 </Project>
