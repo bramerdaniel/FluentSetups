@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<FluentSetupsPackageVersion>0.3.1-rc6</FluentSetupsPackageVersion>
+		<FluentSetupsPackageVersion>0.3.1</FluentSetupsPackageVersion>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\..\certificate\FluentSetups.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
