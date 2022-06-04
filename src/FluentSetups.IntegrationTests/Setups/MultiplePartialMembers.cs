@@ -14,6 +14,5 @@ public partial class MultiplePartialMembers
 }
 
 public partial class MultiplePartialMembers
-{
-
-}
+{ 
+} 

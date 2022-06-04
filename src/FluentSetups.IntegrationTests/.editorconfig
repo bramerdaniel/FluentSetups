@@ -134,10 +134,11 @@ csharp_style_namespace_declarations = block_scoped:silent
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
-###############################
-# VB Coding Conventions       #
-###############################
 
-[*.vb]
-# Modifier preferences
-visual_basic_preferred_modifier_order = Partial,Default,Private,Protected,Public,Friend,NotOverridable,Overridable,MustOverride,Overloads,Overrides,MustInherit,NotInheritable,Static,Shared,Shadows,ReadOnly,WriteOnly,Dim,Const,WithEvents,Widening,Narrowing,Custom,Async:suggestion
+# Default severity for analyzer diagnostics with category 'FluentSetups'
+# dotnet_analyzer_diagnostic.category-FluentSetups.severity = suggestion
+dotnet_diagnostic.FSI0001.severity = warning
+
+
+
+
