@@ -45,17 +45,10 @@ namespace FluentSetups.SourceGenerator
          source.AddDiagnostic(Diagnostic.Create(missingReference, Location.None, source.Name, e.Message));
       }
 
-      [Conditional("DEBUG")]
       private static void ReportIgnore(GeneratedSource source, FClass ignoredClass)
       {
-         var missingReference = new DiagnosticDescriptor(id: "FSI0001", title: "FluentSetups source generator",
-            messageFormat: "Fluent setup generation for class {0} is skipped du tue multiple partial members.",
-            category: nameof(FluentSetupSourceGenerator),
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
-
-         var location = CreateLocation(ignoredClass);
-         source.AddDiagnostic(Diagnostic.Create(missingReference, location, ignoredClass.ClassName));
+         ////var location = CreateLocation(ignoredClass);
+         ////source.AddDiagnostic(Diagnostic.Create(FluentSetupDiagnostics.MultiplePartialParts, location, ignoredClass.ClassName));
       }
 
       private static Location CreateLocation(FClass ignoredClass)
