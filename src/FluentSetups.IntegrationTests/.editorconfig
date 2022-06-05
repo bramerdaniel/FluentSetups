@@ -135,10 +135,3 @@ csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
 
-# Default severity for analyzer diagnostics with category 'FluentSetups'
-# dotnet_analyzer_diagnostic.category-FluentSetups.severity = suggestion
-dotnet_diagnostic.FSI0001.severity = warning
-
-
-
-
