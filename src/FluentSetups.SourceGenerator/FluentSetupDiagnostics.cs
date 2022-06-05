@@ -19,5 +19,12 @@ namespace FluentSetups.SourceGenerator
          category: "FluentSetups",
          defaultSeverity: DiagnosticSeverity.Info,
          isEnabledByDefault: true);
+
+      internal static readonly DiagnosticDescriptor NotSupportedNestedSetup = new DiagnosticDescriptor(id: "FSW0001",
+         title: "FluentSetups source generator",
+         messageFormat: "Fluent setup generation for nested classes is not supported",
+         category: "FluentSetups",
+         defaultSeverity: DiagnosticSeverity.Warning,
+         isEnabledByDefault: true);
    }
 }

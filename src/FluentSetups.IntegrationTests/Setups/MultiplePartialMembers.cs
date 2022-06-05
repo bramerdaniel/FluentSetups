@@ -4,9 +4,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace FluentSetups.IntegrationTests.Setups;
 
+#pragma warning disable CS0414
 [FluentSetup]
+[SuppressMessage("IDE", "IDE0044:Add readonly modifier")]
+[SuppressMessage("IDE", "IDE0051:Remove unused private members")]
 public partial class MultiplePartialMembers
 {
    [FluentMember]
@@ -14,5 +19,5 @@ public partial class MultiplePartialMembers
 }
 
 public partial class MultiplePartialMembers
-{ 
-} 
+{
+}

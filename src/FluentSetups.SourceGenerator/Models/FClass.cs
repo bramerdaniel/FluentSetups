@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FClass.cs" company="consolovers">
-//   Copyright (c) daniel bramer 2022 - 2022
+// <copyright file="FClass.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ namespace FluentSetups.SourceGenerator.Models
       {
          Context = context;
          ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
-         this.FluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
+         FluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
 
          ClassName = classSymbol.Name;
          ContainingNamespace = ComputeNamespace();
@@ -49,6 +49,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string ClassName { get; }
 
+      public ITypeSymbol ClassSymbol { get; }
+
       public string ContainingNamespace { get; }
 
       public FluentGeneratorContext Context { get; }
@@ -59,15 +61,32 @@ namespace FluentSetups.SourceGenerator.Models
 
       public IReadOnlyList<FField> Fields => fields;
 
+      /// <summary>Gets the fluent setup attribute that was placed onto the input source.</summary>
+      public AttributeData FluentSetupAttribute { get; }
+
+      public GeneratorMode GenerationMode
+      {
+         get
+         {
+            if (ClassSymbol.ContainingType != null)
+               return GeneratorMode.None;
+
+            if (ClassSymbol.DeclaringSyntaxReferences.Length > 1)
+               return GeneratorMode.EntryMethod;
+
+            return GeneratorMode.SetupAndEntryMethod;
+         }
+      }
+
       public bool IsPublic => ClassSymbol.DeclaredAccessibility == Accessibility.Public;
-      
-      public bool GenerationEnabled => ClassSymbol.DeclaringSyntaxReferences.Length == 1;
 
       public IReadOnlyList<IFluentMethod> Methods => methods;
 
       public string Modifier { get; }
 
       public IReadOnlyList<FProperty> Properties => properties;
+
+      public string SetupMethod => ComputeSetupMethod();
 
       public FTarget Target { get; private set; }
 
@@ -76,28 +95,6 @@ namespace FluentSetups.SourceGenerator.Models
       public string TargetTypeName => Target?.TypeName;
 
       public string TargetTypeNamespace { get; set; }
-
-      public string SetupMethod => ComputeSetupMethod();
-
-      private string ComputeSetupMethod()
-      {
-         return FluentSetupAttribute.GetSetupMethod()
-                ?? TargetTypeName
-                ?? ComputeEntryMethodName();
-      }
-
-      private string ComputeEntryMethodName()
-      {
-         if (ClassName.EndsWith("Setup"))
-            return ClassName.Substring(0, ClassName.Length - 5);
-
-         return ClassName;
-      }
-
-      public ITypeSymbol ClassSymbol { get; }
-
-      /// <summary>Gets the fluent setup attribute that was placed onto the input source.</summary>
-      public AttributeData FluentSetupAttribute { get; }
 
       #endregion
 
@@ -220,7 +217,11 @@ namespace FluentSetups.SourceGenerator.Models
          if (string.IsNullOrWhiteSpace(field.TypeName))
             return;
 
-         var method = new FFluentSetupMethod(this, field.SetupMethodName, field.Type, ClassSymbol) { Source = field, Category = field.SetupMethodName };
+         var method = new FFluentSetupMethod(this, field.SetupMethodName, field.Type, ClassSymbol)
+         {
+            Source = field,
+            Category = field.SetupMethodName
+         };
          if (AddMethod(method))
          {
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
@@ -294,10 +295,25 @@ namespace FluentSetups.SourceGenerator.Models
             sourceBuilder.AppendLine("}");
       }
 
+      private string ComputeEntryMethodName()
+      {
+         if (ClassName.EndsWith("Setup"))
+            return ClassName.Substring(0, ClassName.Length - 5);
+
+         return ClassName;
+      }
+
       private string ComputeNamespace()
       {
          var namespaceSymbol = ClassSymbol.ContainingNamespace;
          return namespaceSymbol.IsGlobalNamespace ? null : namespaceSymbol.ToString();
+      }
+
+      private string ComputeSetupMethod()
+      {
+         return FluentSetupAttribute.GetSetupMethod()
+                ?? TargetTypeName
+                ?? ComputeEntryMethodName();
       }
 
       private bool ContainsUserDefinedTargetBuilder()

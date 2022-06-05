@@ -94,13 +94,16 @@ namespace FluentSetups.SourceGenerator
          var addedMethods = new HashSet<string>();
          foreach (var setupClass in classModel.SetupClasses)
          {
-            var requestedName = setupClass.SetupMethod;
-            var generatedName = GetName(addedMethods, requestedName);
+            if (setupClass.GenerationMode.HasFlag(GeneratorMode.EntryMethod))
+            {
+               var requestedName = setupClass.SetupMethod;
+               var generatedName = GetName(addedMethods, requestedName);
 
-            sourceBuilder.AppendLine($"/// <summary>Creates a new setup for the {setupClass.ClassName} class</summary>");
-            sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {generatedName}()");
-            sourceBuilder.AppendLine($" => new {setupClass.ClassName}();");
-            sourceBuilder.AppendLine();
+               sourceBuilder.AppendLine($"/// <summary>Creates a new setup for the {setupClass.ClassName} class</summary>");
+               sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {generatedName}()");
+               sourceBuilder.AppendLine($" => new {setupClass.ClassName}();");
+               sourceBuilder.AppendLine();
+            }
          }
       }
 
@@ -129,7 +132,7 @@ namespace FluentSetups.SourceGenerator
       private GeneratedSource GenerateSetupClass(FClass classModel)
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
-         if (!classModel.GenerationEnabled)
+         if (!classModel.GenerationMode.HasFlag(GeneratorMode.Setup))
          {
             source.Disable();
             ReportIgnore(source, classModel);

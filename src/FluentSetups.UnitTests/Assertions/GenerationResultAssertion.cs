@@ -47,6 +47,14 @@ namespace FluentSetups.UnitTests.Assertions
          return new ClassAssertion(Subject, classType);
       }
 
+      public AndConstraint<GenerationResultAssertion> NotHaveClass(string className)
+      {
+         var classType = Subject.OutputCompilation.GetTypeByMetadataName(className);
+
+         Assert.IsNull(classType, $"The class {className} was found but it should not exist. {Environment.NewLine}{Subject.OutputSyntaxTrees.Last()}");
+         return new AndConstraint<GenerationResultAssertion>(this);
+      }
+
       public AndConstraint<GenerationResultAssertion> HaveDiagnostic(string diagnosticId)
       {
          var diagnostic = Subject.GeneratedDiagnostics.FirstOrDefault(d => d.Id == diagnosticId);
