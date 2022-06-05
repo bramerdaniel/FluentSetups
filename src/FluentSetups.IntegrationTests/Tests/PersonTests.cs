@@ -27,5 +27,24 @@ public class PersonTests
       person.Age.Should().Be(34);
    }
 
+   [TestMethod]
+   public void SetupPersonWithDefaultName()
+   {
+       var person = Setup.PersonWithDefaultName()
+           .Done();
 
+       person.FirstName.Should().Be("John");
+       person.LastName.Should().Be("Doe");
+   }
+
+   [TestMethod]
+   public void SetupPersonWithCustomDefaultName()
+   {
+       var person = Setup.Person()
+           .WithDefaults()
+           .Done();
+
+       person.FirstName.Should().Be("Lila");
+       person.LastName.Should().Be("Sheer");
+   }
 }

@@ -166,4 +166,73 @@ public class DefaultValueTests
       result.Should().HaveClass("MyTests.PersonSetup")
          .WithoutMethod("GetNumber" ,"System.Func<int>");
    }
+
+   [TestMethod]
+   public void EnsureDefaultValueWithStringEmptyIsCreatedCorrectly()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+   
+                       [FluentSetup]
+                       public partial class PersonSetup
+                       {
+                           [FluentMember]
+                           private string name = string.Empty;
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.PersonSetup")
+         .WhereMethod("GetName")
+         .IsProtected()
+         .Contains("return name;");
+   }
+
+   [TestMethod]
+   public void EnsureDefaultValueWorksCorrectlyForSetupClassesWithDifferentNamePattern()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+
+                       public class Color
+                       {
+                          public string Name { get; set; }
+
+                          public int Opacity { get; set; }
+                       }
+
+                       [FluentSetup(typeof(Color))]
+                       public partial class ColorSetup
+                       {
+                       }
+
+                       [FluentSetup(typeof(Color), SetupMethod = ""ColorWithDefaults"")]
+                       public partial class ColorWithDefaultsSetup
+                       {
+                          [FluentMember]
+                          private string name = string.Empty;
+                       
+                          [FluentMember]
+                          private int opacity = -1;
+                       }
+}";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+      
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.ColorWithDefaultsSetup")
+         .WhereMethod("GetName")
+         .IsProtected()
+         .Contains("return name;");
+
+      result.Print();
+   }
 }
