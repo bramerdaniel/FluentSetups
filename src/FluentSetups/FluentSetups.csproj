@@ -10,7 +10,9 @@
 		<PackageIcon>packageIcon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReleaseNotes>0.3.2 to 0.3.3
+		<PackageReleaseNotes>0.3.3 to 0.3.4
+- Bugfix for nested classes with the FluentSetup attribute.
+0.3.2 to 0.3.3
 - Bugfix for missing default value when no constant was used.
 0.3.1 to 0.3.2
 - Added diagnostic analyzer for multiple partial members defined by the user.
