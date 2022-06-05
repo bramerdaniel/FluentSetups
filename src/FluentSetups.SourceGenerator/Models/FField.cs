@@ -160,10 +160,10 @@ namespace FluentSetups.SourceGenerator.Models
       {
          if (fieldSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is VariableDeclaratorSyntax fieldSyntax)
          {
-            if (fieldSyntax.Initializer?.Value is LiteralExpressionSyntax literalExpression)
+            if (fieldSyntax.Initializer != null)
             {
                HasDefaultValue = true;
-               DefaultValue = literalExpression.ToString();
+               DefaultValue = fieldSyntax.Initializer.ToString();
             }
          }
       }
