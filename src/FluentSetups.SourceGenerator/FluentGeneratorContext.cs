@@ -53,10 +53,8 @@ namespace FluentSetups.SourceGenerator
             FluentMemberAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName),
             BooleanType = compilation.GetTypeByMetadataName("System.Boolean"),
             VoidType = compilation.GetTypeByMetadataName("System.Void")
-      };
+         };
       }
-
-      
 
       public SetupClassInfo CreateFluentSetupInfo(ClassDeclarationSyntax setupCandidate)
       {

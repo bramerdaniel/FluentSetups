@@ -9,9 +9,14 @@ namespace FluentSetups.IntegrationTests.Setups;
 using FluentSetups.IntegrationTests.Targets;
 
 [FluentSetup(typeof(Person))]
-internal partial class PersonSetup 
+internal partial class PersonSetup
 {
-   [FluentMember]
-   public string FirstName { get; set; }
+    [FluentMember]
+    public string FirstName { get; set; }
 
+    public PersonSetup WithDefaults()
+    {
+        return WithFirstName("Lila")
+            .WithLastName("Sheer");
+    }
 }

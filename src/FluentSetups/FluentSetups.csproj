@@ -10,7 +10,9 @@
 		<PackageIcon>packageIcon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReleaseNotes>0.3.1 to 0.3.2
+		<PackageReleaseNotes>0.3.2 to 0.3.3
+- Bugfix for missing default value when no constant was used.
+0.3.1 to 0.3.2
 - Added diagnostic analyzer for multiple partial members defined by the user.
 0.3.0 to 0.3.1
 - Multiple partial members defined by the user, skipp source generation for the fluent setup class.
