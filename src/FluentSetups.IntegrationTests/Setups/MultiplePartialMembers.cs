@@ -8,14 +8,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FluentSetups.IntegrationTests.Setups;
 
-#pragma warning disable CS0414
 [FluentSetup]
 [SuppressMessage("IDE", "IDE0044:Add readonly modifier")]
-[SuppressMessage("IDE", "IDE0051:Remove unused private members")]
+[SuppressMessage("IDE", "IDE0052:Remove unused private members")]
 public partial class MultiplePartialMembers
 {
-   [FluentMember]
-   private string value = "string.Empty";
+    [FluentMember]
+#pragma warning disable CS0414
+    private string value = string.Empty;
+#pragma warning restore CS0414
 }
 
 public partial class MultiplePartialMembers

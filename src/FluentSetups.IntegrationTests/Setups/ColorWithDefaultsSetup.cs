@@ -8,9 +8,12 @@ using FluentSetups.IntegrationTests.Targets;
 
 namespace FluentSetups.IntegrationTests.Setups
 {
+#pragma warning disable CS0414
     [FluentSetup(typeof(Color), SetupMethod = "ColorWithDefaults")]
     public partial class ColorWithDefaultsSetup
     {
+        private bool nameWasSet;
+
         [FluentMember]
         private string name = string.Empty;
 
@@ -22,4 +25,5 @@ namespace FluentSetups.IntegrationTests.Setups
             return -1;
         }
     }
+#pragma warning restore CS0414
 }

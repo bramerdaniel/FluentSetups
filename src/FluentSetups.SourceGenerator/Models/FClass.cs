@@ -107,6 +107,9 @@ namespace FluentSetups.SourceGenerator.Models
 
          AppendRequiredUsingDirectives(sourceBuilder);
 
+         if (Fields.Any(x => x.HasDefaultValue))
+            sourceBuilder.AppendLine("#pragma warning disable CS0414");
+
          OpenClass(sourceBuilder);
          GenerateSetupMembers(sourceBuilder);
          CloseClass(sourceBuilder);
