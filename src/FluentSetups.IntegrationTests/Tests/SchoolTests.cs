@@ -20,12 +20,14 @@ namespace FluentSetups.IntegrationTests.Tests
         [TestMethod]
         public void SetupSchool()
         {
+            var children = new List<Child>
+            {
+                new() { Name = "Rob" },
+                new() { Name = "Bob" }
+            };
+
             var school = Setup.School()
-                .WithChildren(new List<Child>
-                {
-                    new() { Name = "Rob" },
-                    new() { Name = "Bob" }
-                })
+                .WithChildren(children)
                 .Done();
 
             school.Children.Should().HaveCount(2);
@@ -40,8 +42,34 @@ namespace FluentSetups.IntegrationTests.Tests
                 .WithChild(new Child{ Name = "John" })
                 .Done();
 
-            school.Children.Should().HaveCount(2);
+            school.Children.Should().HaveCount(3);
+        }
+        
+        [TestMethod]
+        public void SetupTargetsWithIEnumerableConstructor()
+        {
+            var persons = new List<Person>
+            {
+                new() { FirstName = "John", LastName = "Doe" },
+                new() { FirstName = "Fred", LastName = "Roberts" }
+            };
 
+            var room = Setup.Room()
+                .WithPeople(persons)
+                .Done();
+
+            room.People.Should().HaveCount(2);
+        }
+
+        [TestMethod]
+        public void SetupSingleTargetWithIEnumerableConstructor()
+        {
+            var room = Setup.Room()
+                .WithPerson(new Person { FirstName = "John", LastName = "Doe" })
+                .WithPerson(new Person { FirstName = "Fred", LastName = "Roberts" })
+                .Done();
+
+            room.People.Should().HaveCount(2);
         }
     }
 

@@ -9,8 +9,6 @@ namespace FluentSetups.SourceGenerator.Models
    using System;
    using System.Text;
 
-   using Microsoft.CodeAnalysis;
-
    internal class FWithListElementMethod : MethodBase
    {
       #region Constants and Fields
@@ -28,12 +26,11 @@ namespace FluentSetups.SourceGenerator.Models
          
          if (!backingFieldSymbol.IsListMember)
             throw new ArgumentException("Only list members are supported");
-
       }
 
       private static string ComputeWithElementName(IFluentTypedMember backingFieldSymbol)
       {
-         var fieldName = backingFieldSymbol.Name?.ToFirstUpper();
+         var fieldName = backingFieldSymbol.Name.ToFirstUpper();
          if (fieldName.EndsWith("s"))
             return $"With{fieldName.Substring(0, fieldName.Length - 1)}";
 
@@ -55,7 +52,7 @@ namespace FluentSetups.SourceGenerator.Models
       public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         codeBuilder.AppendLine($"{SetupClass.Modifier} {SetupClass.ClassSymbol} {Name}({backingFieldListSymbol.ElementType} value)");
+         codeBuilder.AppendLine($"{SetupClass.Modifier} {SetupClass.ClassSymbol.Name} {Name}({backingFieldListSymbol.ElementType.Name} value)");
          codeBuilder.AppendLine("{");
          GenerateContent(codeBuilder);
          codeBuilder.AppendLine("}");

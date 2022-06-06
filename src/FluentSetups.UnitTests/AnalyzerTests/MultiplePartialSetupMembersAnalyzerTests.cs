@@ -38,6 +38,7 @@ public class MultiplePartialSetupMembersAnalyzerTests : FluentSetupAnalyzerTest<
                       ";
 
       var descriptor = new MultiplePartialSetupMembersAnalyzer().SupportedDiagnostics.First();
+
       ExpectDiagnostic(descriptor, d => d.WithLocation(0).WithArguments("PersonSetup").WithSeverity(DiagnosticSeverity.Info));
       await RunAsync(code);
    }

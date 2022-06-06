@@ -8,6 +8,7 @@ namespace FluentSetups.UnitTests.AnalyzerTests;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 using Microsoft.CodeAnalysis;
@@ -46,13 +47,17 @@ public class FluentSetupAnalyzerTest<T>
          TestState =
          {
             Sources = { code },
-            AdditionalReferences = { MetadataReference.CreateFromFile(typeof(FluentSetupAttribute).Assembly.Location) }
+            AdditionalReferences = { MetadataReference.CreateFromFile(typeof(FluentSetupAttribute).Assembly.Location) },
          }
-         
       };
 
+#if NET6_0
+      // I did not know how to ger rid of the compiler error CS1705 
+      analyzerTest.CompilerDiagnostics = CompilerDiagnostics.None;
+#endif
+
       analyzerTest.ExpectedDiagnostics.AddRange(ExpectedDiagnostics);
-      
+
 
       await analyzerTest.RunAsync();
    }
