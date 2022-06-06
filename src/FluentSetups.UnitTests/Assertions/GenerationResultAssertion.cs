@@ -94,7 +94,7 @@ namespace FluentSetups.UnitTests.Assertions
       {
          var builder = new StringBuilder();
          builder.AppendLine("MESSAGE");
-         builder.AppendLine(errorDiagnostic.GetMessage());
+         builder.AppendLine($"{errorDiagnostic.Id}: {errorDiagnostic.GetMessage()}");     
          builder.AppendLine("SOURCE");
          builder.AppendLine(errorDiagnostic.Location.SourceTree?.ToString());
          return builder.ToString();

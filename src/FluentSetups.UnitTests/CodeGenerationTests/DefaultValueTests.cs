@@ -48,6 +48,35 @@ public class DefaultValueTests
    }
 
    [TestMethod]
+   public void EnsureSetupDoesNotCauseWarningsForUnusedFields()
+   {
+      var code = @"namespace RonnyTheRobber
+                   {   
+                      using FluentSetups;
+
+                      internal class Person 
+                      {  
+                         public string Name{ get; set; }
+                      }
+
+                      [FluentSetup(typeof(Person))]
+                      internal partial class PersonSetup
+                      {
+                          [FluentMember]
+                          private string name = ""Robert"";
+                      }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveWarnings();
+
+      result.Print();
+   }
+
+   [TestMethod]
    public void EnsureSetupNameIsGeneratedCorrectlyForPropertiesWithDefaultValues()
    {
       var code = @"namespace RonnyTheRobber
