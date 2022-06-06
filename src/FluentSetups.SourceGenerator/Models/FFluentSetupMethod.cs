@@ -74,7 +74,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       protected virtual string ComputeModifier()
       {
-         return "internal";
+         return SetupClass.Modifier;
       }
 
       private string ComputeCategory(string methodName)

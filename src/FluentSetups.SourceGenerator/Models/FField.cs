@@ -24,6 +24,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       private bool generateFluentSetup;
 
+      private ITypeSymbol elementType;
+
       #endregion
 
       #region Constructors and Destructors
@@ -39,6 +41,7 @@ namespace FluentSetups.SourceGenerator.Models
          SetupMethodName = ComputeSetupNameFromAttribute(memberAttribute) ?? $"With{WithUpperCase(fieldSymbol)}";
          RequiredNamespace = ComputeRequiredNamespace(fieldSymbol);
          ComputeDefaultValue();
+         IsListMember = IsList();
       }
 
       public FField(ITypeSymbol type, string name)
@@ -49,6 +52,7 @@ namespace FluentSetups.SourceGenerator.Models
          TypeName = Type.ToString();
          SetupMethodName = $"With{WithUpperCase(name)}";
          RequiredNamespace = type.ContainingNamespace.IsGlobalNamespace ? null : type.ContainingNamespace.ToString();
+         IsListMember = IsList();
       }
 
       #endregion
@@ -68,6 +72,17 @@ namespace FluentSetups.SourceGenerator.Models
 
       /// <summary>Gets a value indicating whether this instance has default value.</summary>
       public bool HasDefaultValue { get; private set; }
+
+      public bool IsListMember { get; }
+
+      public ITypeSymbol ElementType => elementType ?? (elementType = ComputeElementType());
+
+      private ITypeSymbol ComputeElementType()
+      {
+         if (Type is INamedTypeSymbol namedType && namedType.TypeArguments.Length == 1)
+            return namedType.TypeArguments[0];
+         return null;
+      }
 
       #endregion
 
@@ -144,6 +159,20 @@ namespace FluentSetups.SourceGenerator.Models
       private static string ComputeRequiredNamespace(IFieldSymbol fieldSymbol)
       {
          return fieldSymbol.Type.ContainingNamespace.IsGlobalNamespace ? null : fieldSymbol.Type.ContainingNamespace.ToString();
+      }
+
+      private bool IsList()
+      {
+         if (Type.ContainingNamespace.ToString() != "System.Collections.Generic")
+            return false;
+
+         if (Type.Name.StartsWith("IList"))
+            return true;
+
+         if (Type.Name.StartsWith("List"))
+            return true;
+
+         return false;
       }
 
       private static string WithUpperCase(IFieldSymbol fieldSymbol)

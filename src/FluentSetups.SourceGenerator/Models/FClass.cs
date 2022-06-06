@@ -225,8 +225,15 @@ namespace FluentSetups.SourceGenerator.Models
             Source = field,
             Category = field.SetupMethodName
          };
+
          if (AddMethod(method))
          {
+            if (field.IsListMember)
+            {
+               var withElement = new FWithListElementMethod(this, field) { Category = method.Category };
+               AddMethod(withElement);
+            }
+
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
             AddField(method.SetupIndicatorField);
 
@@ -246,6 +253,8 @@ namespace FluentSetups.SourceGenerator.Models
             }
          }
       }
+
+
 
       private void AddSetupMethodFromProperty(FProperty property)
       {
@@ -279,6 +288,7 @@ namespace FluentSetups.SourceGenerator.Models
       {
          sourceBuilder.AppendLine("using System;");
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
+         sourceBuilder.AppendLine("using System.Collections.Generic;");
          sourceBuilder.AppendLine("using FluentSetups;");
          if (TargetAvailable() && !string.IsNullOrWhiteSpace(TargetTypeNamespace))
             sourceBuilder.AppendLine($"using {TargetTypeNamespace};");
