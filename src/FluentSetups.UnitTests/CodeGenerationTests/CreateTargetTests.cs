@@ -41,7 +41,7 @@ public class CreateTargetTests
          .HaveClass("MyTests.BagSetup")
          .WhereMethod("CreateTarget")
          .IsProtected()
-         .Contains("var target = new Person(GetName());");
+         .Contains("var target = new Bag(GetValues());");
 
       result.Print();
    } 
