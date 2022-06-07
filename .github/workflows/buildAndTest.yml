@@ -109,6 +109,9 @@ jobs:
     - name: show working dir
       run: dir
 
+    - name: show nuget packages
+      run: dir src\Debug\*.nupkg /B
+
     - name: setup NuGet.exe
       uses: NuGet/setup-nuget@v1.0.6
       with:
