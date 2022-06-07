@@ -80,7 +80,7 @@ namespace FluentSetups.SourceGenerator
 
       internal static string GetSetupMethod(this AttributeData attribute)
       {
-         if (TryGetNamedArgument(attribute, "EntryMethod", out var targetType) && targetType.Kind == TypedConstantKind.Primitive)
+         if (TryGetNamedArgument(attribute, "SetupMethod", out var targetType) && targetType.Kind == TypedConstantKind.Primitive)
             return targetType.Value?.ToString();
          
          return null;
