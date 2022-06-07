@@ -11,9 +11,5 @@ namespace FluentSetups.IntegrationTests.Setups
     [FluentSetup(typeof(Room))]
     public partial class RoomSetup
     {
-        public RoomSetup WithPerson(Person person)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

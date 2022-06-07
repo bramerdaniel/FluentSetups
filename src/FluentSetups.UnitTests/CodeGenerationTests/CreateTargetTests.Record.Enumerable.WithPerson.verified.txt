@@ -1,0 +1,8 @@
+﻿public BagSetup WithPerson(SomeNamespace.Person value)
+{
+    if (people == null)
+        people = new List<SomeNamespace.Person>();
+    people.Add(value);
+    peopleWasSet = true;
+    return this;
+}

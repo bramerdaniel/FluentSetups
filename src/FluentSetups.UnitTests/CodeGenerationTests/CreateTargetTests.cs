@@ -16,7 +16,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VerifyTests;
 
 [TestClass]
-public class CreateTargetTests : VerifyMSTest.VerifyBase
+public class CreateTargetTests : VerifyBase
 {
 #if NET6_0
 
@@ -47,10 +47,91 @@ public class CreateTargetTests : VerifyMSTest.VerifyBase
          .Contains("var target = new Bag(GetValues());");
 
       result.Print();
-   } 
+   }
+
+   [TestMethod]
+   public async Task EnsureRecordsWithEnumerableWorkCorrectly()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+                       using System.Collections.Generic;
+
+                       public record Bag(IEnumerable<string> Values);
+   
+                       [FluentSetup(typeof(Bag))]
+                       public partial class BagSetup
+                       {
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors();
+
+      var withValuesCode = await result.Should()
+         .HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithValues")
+         .GetCodeAsync();
+      await Verify(withValuesCode).UseMethodName("Record.Enumerable.WithValues");
+
+      var withValueCode = await result.Should()
+         .HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithValue")
+         .GetCodeAsync();
+      await Verify(withValueCode).UseMethodName("Record.Enumerable.WithValue");
+
+      result.Print();
+   }
+
+   [TestMethod]
+   public async Task EnsureRecordsWithEnumerableOfPeopleWorkCorrectly()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+                       using System.Collections.Generic;
+                       using SomeNamespace;
+
+                       public record Bag(IEnumerable<Person> people);
+   
+                       [FluentSetup(typeof(Bag))]
+                       public partial class BagSetup
+                       {
+                       }
+                   }";
+
+      var personCode = @"namespace SomeNamespace
+                         {
+                             public class Person { }
+                         }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .WithSource(personCode)
+         .Done();
+
+      result.Should().NotHaveErrors();
+
+      var withValuesCode = await result.Should()
+         .HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithPeople")
+         .GetCodeAsync();
+      await Verify(withValuesCode).UseMethodName("Record.Enumerable.WithPeople");
+
+      var withValueCode = await result.Should()
+         .HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithPerson")
+         .GetCodeAsync();
+      await Verify(withValueCode).UseMethodName("Record.Enumerable.WithPerson");
+
+      result.Print();
+   }
 
 #endif
-   
+
    [TestMethod]
    public void EnsureCreateTargetMethodIsCreatedCorrectlyForTarget()
    {

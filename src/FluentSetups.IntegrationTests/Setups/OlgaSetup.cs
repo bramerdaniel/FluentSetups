@@ -17,7 +17,7 @@ namespace FluentSetups.IntegrationTests.Setups
       }
    }
 
-   [FluentSetup(typeof(Olga))]    
+   [FluentSetup(typeof(Olga), SetupMethod = "Olga1")]    
    public partial class AnotherOlgaSetup
    {
       private void SetupTarget(Olga target)
