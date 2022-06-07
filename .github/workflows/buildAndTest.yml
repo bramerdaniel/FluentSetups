@@ -54,6 +54,15 @@ jobs:
         path: ${{ env.SOLUTION_DIRECTORY }}\Release\*.nupkg
         retention-days: 1
 
+    - name: setup VSTest.console.exe
+      uses: darenm/Setup-VSTest@v1
+
+    - name: run net48 unit tests
+      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net48\FluentSetups.UnitTests.dll
+    
+    - name: run net6.0 unit tests
+      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
+
     - name: upload binaries
       uses: actions/upload-artifact@v3.0.0
       with:
@@ -62,25 +71,25 @@ jobs:
         retention-days: 1      
 
 
-  unit-tests:
-    needs: build
-    runs-on: windows-latest
-    steps:
+  #unit-tests:
+  #  needs: build
+  #  runs-on: windows-latest
+  #  steps:
 
-    - name: download artifacts
-      uses: actions/download-artifact@v3.0.0
-      with:
-        name: binaries
-        path: testBinaries
+  #  - name: download artifacts
+  #    uses: actions/download-artifact@v3.0.0
+  #    with:
+  #      name: binaries
+  #      path: testBinaries
     
-    - name: show binaries
-      run: dir testBinaries
+  #  - name: show binaries
+  #    run: dir testBinaries
  
-    - name: setup VSTest.console.exe
-      uses: darenm/Setup-VSTest@v1
+  #  - name: setup VSTest.console.exe
+  #    uses: darenm/Setup-VSTest@v1
 
-    - name: run unit tests
-      run: vstest.console.exe testBinaries\FluentSetups.UnitTests.dll
+  #  - name: run unit tests
+  #    run: vstest.console.exe testBinaries\FluentSetups.UnitTests.dll
     
   integration-tests:
     needs: build
@@ -125,7 +134,7 @@ jobs:
       run: dir
 
   publish:
-    needs: [unit-tests, integration-tests]
+    needs: [integration-tests]
     runs-on: windows-latest
     if: ${{ github.ref == 'refs/heads/master' }}
     steps:
