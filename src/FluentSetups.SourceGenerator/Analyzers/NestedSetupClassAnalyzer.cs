@@ -1,12 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NestedSetupClassAnalyzer.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="NestedSetupClassAnalyzer.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.SourceGenerator.Analyzers
 {
-   using System;
    using System.Collections.Immutable;
    using System.Linq;
 
@@ -19,7 +18,8 @@ namespace FluentSetups.SourceGenerator.Analyzers
       #region Public Properties
 
       /// <summary>Returns a set of descriptors for the diagnostics that this analyzer is capable of producing.</summary>
-      public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(FluentSetupDiagnostics.NotSupportedNestedSetup);
+      public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+         ImmutableArray.Create(FluentSetupDiagnostics.NotSupportedNestedSetup);
 
       #endregion
 
@@ -45,6 +45,14 @@ namespace FluentSetups.SourceGenerator.Analyzers
 
       #region Methods
 
+      private static Location FindLocation(AttributeData attributeData, INamedTypeSymbol ownerClass)
+      {
+         if (attributeData.ApplicationSyntaxReference != null)
+            return Location.Create(attributeData.ApplicationSyntaxReference.SyntaxTree, attributeData.ApplicationSyntaxReference.Span);
+
+         return ownerClass.Locations.FirstOrDefault() ?? Location.None;
+      }
+
       private void AnalyzeSymbol(SymbolAnalysisContext context, INamedTypeSymbol fluentSetupAttribute)
       {
          var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
@@ -67,14 +75,6 @@ namespace FluentSetups.SourceGenerator.Analyzers
          {
             return fluentSetupAttribute.Equals(candidate.AttributeClass, SymbolEqualityComparer.Default);
          }
-      }
-
-      private static Location FindLocation(AttributeData attributeData, INamedTypeSymbol ownerClass)
-      {
-         if (attributeData.ApplicationSyntaxReference != null)
-            return Location.Create(attributeData.ApplicationSyntaxReference.SyntaxTree, attributeData.ApplicationSyntaxReference.Span);
-
-         return ownerClass.Locations.FirstOrDefault() ?? Location.None;
       }
 
       #endregion

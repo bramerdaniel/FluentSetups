@@ -4,8 +4,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace FluentSetups.IntegrationTests.Targets;
 
+
+record Spider(IEnumerable<string> Legs);
+
+[FluentSetup(typeof(Spider))]
+public partial class SpiderSetup
+{
+    [FluentMember]
+    private List<string> legs;
+}
 
 public class Olga
 {

@@ -1,14 +1,12 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ListGenerationTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="ListGenerationTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.UnitTests.CodeGenerationTests;
 
 using FluentSetups.UnitTests.Setups;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class ListGenerationTests : VerifyBase
@@ -58,47 +56,6 @@ public class ListGenerationTests : VerifyBase
 
       await Verify(withValueCode)
          .UseMethodName("Ctor.Enumerable.WithValue");
-
-      result.Print();
-   }
-
-   [TestMethod]
-   public async Task EnsureListSetupForTargetEnumerableCorrectly()
-   {
-      var code = @"namespace MyTests
-                   {
-                       using FluentSetups;
-                       using System.Collections.Generic;
-
-                       public class Bag
-                       {
-                          public IEnumerable<string> Values { get; set; }
-                       }
-   
-                       [FluentSetup(typeof(Bag))]
-                       public partial class BagSetup
-                       {
-                       }
-                   }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithSource(code)
-         .Done();
-      result.Should().NotHaveErrors();
-
-      var withElements = await result.Should().NotHaveErrors().And
-         .HaveClass("MyTests.BagSetup")
-         .WhereMethod("WithValues")
-         .GetCodeAsync();
-
-      await Verify(withElements).UseMethodName("TargetProperty.Enumerable.WithElements");
-
-      var methodCode = await result.Should().HaveClass("MyTests.BagSetup")
-         .WhereMethod("WithValue")
-         .GetCodeAsync();
-
-      await Verify(methodCode)
-         .UseMethodName("TargetProperty.Enumerable.WithElement");
 
       result.Print();
    }
@@ -196,48 +153,6 @@ public class ListGenerationTests : VerifyBase
    }
 
    [TestMethod]
-   public void EnsureSetupForListIsGeneratedCorrectly()
-   {
-      var code = @"namespace MyTests
-                   {
-                       using System.Collections.Generic;
-                       using FluentSetups;
-
-                       public class Bag
-                       {
-                           public IList<int> Elements{ get; set; }
-                       }
-   
-                       [FluentSetup(typeof(Bag))]
-                       public partial class BagSetup
-                       {  
-                          [FluentMember]
-                          private IList<int> elements;
-                       }
-                   }";
-
-      var result = Setup.SourceGeneratorTest()
-         .WithSource(code)
-         .Done();
-
-
-      result.Should().NotHaveErrors().And
-         .HaveClass("MyTests.BagSetup")
-         .WhereMethod("WithElements")
-         .IsPublic();
-
-      result.Should().HaveClass("MyTests.BagSetup")
-         .WhereMethod("WithElement")
-         .IsPublic()
-         .Contains("if (elements == null)")
-         .Contains("elements = new List<int>()")
-         .Contains("elements.Add(value);");
-
-      result.Print();
-
-   }
-
-   [TestMethod]
    public async Task EnsureListSetupForEnumerableIsGeneratedCorrectly()
    {
       var code = @"namespace MyTests
@@ -276,6 +191,87 @@ public class ListGenerationTests : VerifyBase
          .GetCodeAsync();
       await Verify(methodCode)
          .UseMethodName("Field.Enumerable.WithElement");
+
+      result.Print();
+   }
+
+   [TestMethod]
+   public async Task EnsureListSetupForTargetEnumerableCorrectly()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+                       using System.Collections.Generic;
+
+                       public class Bag
+                       {
+                          public IEnumerable<string> Values { get; set; }
+                       }
+   
+                       [FluentSetup(typeof(Bag))]
+                       public partial class BagSetup
+                       {
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+      result.Should().NotHaveErrors();
+
+      var withElements = await result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithValues")
+         .GetCodeAsync();
+
+      await Verify(withElements).UseMethodName("TargetProperty.Enumerable.WithElements");
+
+      var methodCode = await result.Should().HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithValue")
+         .GetCodeAsync();
+
+      await Verify(methodCode)
+         .UseMethodName("TargetProperty.Enumerable.WithElement");
+
+      result.Print();
+   }
+
+   [TestMethod]
+   public void EnsureSetupForListIsGeneratedCorrectly()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using System.Collections.Generic;
+                       using FluentSetups;
+
+                       public class Bag
+                       {
+                           public IList<int> Elements{ get; set; }
+                       }
+   
+                       [FluentSetup(typeof(Bag))]
+                       public partial class BagSetup
+                       {  
+                          [FluentMember]
+                          private IList<int> elements;
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithElements")
+         .IsPublic();
+
+      result.Should().HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithElement")
+         .IsPublic()
+         .Contains("if (elements == null)")
+         .Contains("elements = new List<int>()")
+         .Contains("elements.Add(value);");
 
       result.Print();
    }

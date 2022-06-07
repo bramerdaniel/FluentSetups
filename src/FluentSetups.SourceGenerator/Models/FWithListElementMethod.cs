@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FWithListElementMethod.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FWithListElementMethod.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -23,10 +23,36 @@ namespace FluentSetups.SourceGenerator.Models
          : base(setupClass, ComputeWithElementName(backingFieldSymbol), setupClass.Target.TypeSymbol)
       {
          backingFieldListSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
-         
+
          if (!backingFieldSymbol.IsListMember)
             throw new ArgumentException("Only list members are supported");
       }
+
+      #endregion
+
+      #region Public Properties
+
+      public override bool IsUserDefined => false;
+
+      public override int ParameterCount => 1;
+
+      #endregion
+
+      #region Public Methods and Operators
+
+      public override string ToCode()
+      {
+         var codeBuilder = new StringBuilder();
+         codeBuilder.AppendLine($"{SetupClass.Modifier} {SetupClass.ClassSymbol.Name} {Name}({backingFieldListSymbol.ElementType} value)");
+         codeBuilder.AppendLine("{");
+         GenerateContent(codeBuilder);
+         codeBuilder.AppendLine("}");
+         return codeBuilder.ToString();
+      }
+
+      #endregion
+
+      #region Methods
 
       private static string ComputeWithElementName(IFluentTypedMember backingFieldSymbol)
       {
@@ -45,21 +71,6 @@ namespace FluentSetups.SourceGenerator.Models
          }
       }
 
-      #endregion
-
-      #region IFluentMethod Members
-
-      public override string ToCode()
-      {
-         var codeBuilder = new StringBuilder();
-         codeBuilder.AppendLine($"{SetupClass.Modifier} {SetupClass.ClassSymbol.Name} {Name}({backingFieldListSymbol.ElementType} value)");
-         codeBuilder.AppendLine("{");
-         GenerateContent(codeBuilder);
-         codeBuilder.AppendLine("}");
-         return codeBuilder.ToString();
-      }
-
-
       private void GenerateContent(StringBuilder codeBuilder)
       {
          var listName = backingFieldListSymbol.Name;
@@ -69,15 +80,6 @@ namespace FluentSetups.SourceGenerator.Models
          codeBuilder.AppendLine($"{listName}WasSet = true;");
          codeBuilder.AppendLine("return this;");
       }
-
-      public override bool IsUserDefined => false;
-
-      public override int ParameterCount => 1;
-
-
-      #endregion
-
-      #region Methods
 
       #endregion
    }

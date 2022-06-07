@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentSetupDiagnostics.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FluentSetupDiagnostics.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,8 @@ namespace FluentSetups.SourceGenerator
    [SuppressMessage("MicrosoftCodeAnalysisReleaseTracking", "RS2008:Enable analyzer release tracking")]
    public static class FluentSetupDiagnostics
    {
+      #region Constants and Fields
+
       internal static readonly DiagnosticDescriptor MultiplePartialParts = new DiagnosticDescriptor(id: "FSI0001",
          title: "FluentSetups source generator",
          messageFormat: "Fluent setup generation for class '{0}' is skipped du tue multiple partial members",
@@ -26,5 +28,7 @@ namespace FluentSetups.SourceGenerator
          category: "FluentSetups",
          defaultSeverity: DiagnosticSeverity.Warning,
          isEnabledByDefault: true);
+
+      #endregion
    }
 }

@@ -1,15 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentSetupAnalyzerTest.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FluentSetupAnalyzerTest.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.UnitTests.AnalyzerTests;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
@@ -46,8 +41,7 @@ public class FluentSetupAnalyzerTest<T>
       {
          TestState =
          {
-            Sources = { code },
-            AdditionalReferences = { MetadataReference.CreateFromFile(typeof(FluentSetupAttribute).Assembly.Location) },
+            Sources = { code }, AdditionalReferences = { MetadataReference.CreateFromFile(typeof(FluentSetupAttribute).Assembly.Location) },
          }
       };
 
@@ -57,7 +51,6 @@ public class FluentSetupAnalyzerTest<T>
 #endif
 
       analyzerTest.ExpectedDiagnostics.AddRange(ExpectedDiagnostics);
-
 
       await analyzerTest.RunAsync();
    }

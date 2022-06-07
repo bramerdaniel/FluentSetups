@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FClass.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FClass.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -45,11 +45,19 @@ namespace FluentSetups.SourceGenerator.Models
 
       #endregion
 
-      #region Public Properties
+      #region IFluentSetupClass Members
 
       public string ClassName { get; }
 
       public INamedTypeSymbol ClassSymbol { get; }
+
+      public string Modifier { get; }
+
+      public string EntryMethod => ComputeSetupMethod();
+
+      #endregion
+
+      #region Public Properties
 
       public string ContainingNamespace { get; }
 
@@ -82,11 +90,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public IReadOnlyList<IFluentMethod> Methods => methods;
 
-      public string Modifier { get; }
-
       public IReadOnlyList<FProperty> Properties => properties;
-
-      public string EntryMethod => ComputeSetupMethod();
 
       public FTarget Target { get; private set; }
 
@@ -178,22 +182,22 @@ namespace FluentSetups.SourceGenerator.Models
          switch (member)
          {
             case IFieldSymbol fieldSymbol:
-               {
-                  var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
-                  fields.Add(field);
-                  break;
-               }
+            {
+               var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
+               fields.Add(field);
+               break;
+            }
             case IPropertySymbol propertySymbol:
-               {
-                  var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
-                  properties.Add(property);
-                  break;
-               }
+            {
+               var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
+               properties.Add(property);
+               break;
+            }
             case IMethodSymbol methodSymbol:
-               {
-                  methods.Add(CreateMethod(methodSymbol));
-                  break;
-               }
+            {
+               methods.Add(CreateMethod(methodSymbol));
+               break;
+            }
          }
       }
 
@@ -222,8 +226,7 @@ namespace FluentSetups.SourceGenerator.Models
 
          var method = new FFluentSetupMethod(this, field.SetupMethodName, field.Type, ClassSymbol)
          {
-            Source = field,
-            Category = field.SetupMethodName
+            Source = field, Category = field.SetupMethodName
          };
 
          if (AddMethod(method))
@@ -253,8 +256,6 @@ namespace FluentSetups.SourceGenerator.Models
             }
          }
       }
-
-
 
       private void AddSetupMethodFromProperty(FProperty property)
       {
@@ -324,9 +325,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private string ComputeSetupMethod()
       {
-         return FluentSetupAttribute.GetSetupMethod()
-                ?? TargetTypeName
-                ?? ComputeEntryMethodName();
+         return FluentSetupAttribute.GetSetupMethod() ?? TargetTypeName ?? ComputeEntryMethodName();
       }
 
       private bool ContainsUserDefinedTargetBuilder()
@@ -356,8 +355,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       private AttributeData FindMemberAttribute(ISymbol symbol)
       {
-         return symbol.GetAttributes().Where(x => x.AttributeClass != null)
-            .FirstOrDefault(attribute => Context.FluentMemberAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default));
+         return symbol.GetAttributes().Where(x => x.AttributeClass != null).FirstOrDefault(attribute =>
+            Context.FluentMemberAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default));
       }
 
       private void GenerateFields(StringBuilder sourceBuilder)
@@ -383,9 +382,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void GenerateSetupMethods(StringBuilder sourceBuilder)
       {
-         var methodGroups = Methods.Where(x => !x.IsUserDefined)
-            .GroupBy(x => x.Category)
-            .ToArray();
+         var methodGroups = Methods.Where(x => !x.IsUserDefined).GroupBy(x => x.Category).ToArray();
 
          foreach (var methodGroup in methodGroups)
          {
@@ -469,7 +466,7 @@ namespace FluentSetups.SourceGenerator.Models
 
          foreach (var constructorParameter in Target.Constructor.Parameters)
          {
-            var backingField = FField.ForConstructorParameter(constructorParameter);
+            var backingField = FField.ForConstructorParameter(constructorParameter, Context);
             if (AddField(backingField))
                AddMethodFromField(backingField);
          }
@@ -491,7 +488,7 @@ namespace FluentSetups.SourceGenerator.Models
             }
             else
             {
-               var backingField = FField.ForTargetProperty(property);
+               var backingField = FField.ForTargetProperty(property, Context);
                if (AddField(backingField))
                   AddMethodFromField(backingField);
             }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MultiplePartialSetupMembersAnalyzer.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="MultiplePartialSetupMembersAnalyzer.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,11 +16,11 @@ namespace FluentSetups.SourceGenerator.Analyzers
    [DiagnosticAnalyzer(LanguageNames.CSharp)]
    public class MultiplePartialSetupMembersAnalyzer : DiagnosticAnalyzer
    {
-
       #region Public Properties
 
       /// <summary>Returns a set of descriptors for the diagnostics that this analyzer is capable of producing.</summary>
-      public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(FluentSetupDiagnostics.MultiplePartialParts);
+      public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+         ImmutableArray.Create(FluentSetupDiagnostics.MultiplePartialParts);
 
       #endregion
 
@@ -29,7 +29,7 @@ namespace FluentSetups.SourceGenerator.Analyzers
       public override void Initialize(AnalysisContext context)
       {
          context.EnableConcurrentExecution();
-         
+
          context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
          context.RegisterCompilationStartAction(compilationContext =>
          {
@@ -39,7 +39,7 @@ namespace FluentSetups.SourceGenerator.Analyzers
             {
                return;
             }
-            
+
             // Register an action that accesses the immutable state and reports diagnostics.
             compilationContext.RegisterSymbolAction(symbolContext => AnalyzeSymbol(symbolContext, fluentSetupAttribute), SymbolKind.NamedType);
          });
@@ -60,10 +60,6 @@ namespace FluentSetups.SourceGenerator.Analyzers
          return false;
       }
 
-
-
-
-
       private void AnalyzeSymbol(SymbolAnalysisContext context, INamedTypeSymbol fluentSetupAttribute)
       {
          var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
@@ -81,7 +77,8 @@ namespace FluentSetups.SourceGenerator.Analyzers
             if (reference == null)
                return;
 
-            var diagnostic = Diagnostic.Create(FluentSetupDiagnostics.MultiplePartialParts, Location.Create(reference.SyntaxTree, reference.Span), namedTypeSymbol.Name);
+            var diagnostic = Diagnostic.Create(FluentSetupDiagnostics.MultiplePartialParts, Location.Create(reference.SyntaxTree, reference.Span),
+               namedTypeSymbol.Name);
             context.ReportDiagnostic(diagnostic);
          }
 

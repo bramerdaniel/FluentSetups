@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HidingEntryMethodTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="HidingEntryMethodTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,8 @@ using FluentSetups.UnitTests.Setups;
 [TestClass]
 public class HidingEntryMethodTests
 {
+   #region Public Methods and Operators
+
    [TestMethod]
    public void EnsureNoEntryMethodIsGeneratedWhenDefinedByUser()
    {
@@ -27,7 +29,7 @@ public class HidingEntryMethodTests
                    }
                   ";
 
-      var setup= @"namespace Root;
+      var setup = @"namespace Root;
                    
                    internal partial class Setup
                    {
@@ -49,4 +51,6 @@ public class HidingEntryMethodTests
 
       result.Print();
    }
+
+   #endregion
 }

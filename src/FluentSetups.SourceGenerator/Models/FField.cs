@@ -114,29 +114,31 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Public Methods and Operators
 
-      public static FField ForConstructorParameter(IParameterSymbol parameterSymbol)
+      public static FField ForConstructorParameter(IParameterSymbol parameterSymbol, FluentGeneratorContext context)
       {
-         if (TryMapToList(parameterSymbol.Type, out var mappedType))
+         if (TryMapToList(parameterSymbol.Type, context,  out var mappedType))
             return new FField(mappedType, parameterSymbol.Name.ToFirstLower()) { generateFluentSetup = true };
          return new FField(parameterSymbol.Type, parameterSymbol.Name.ToFirstLower()) { generateFluentSetup = true };
       }
 
-      public static FField ForTargetProperty(FTargetProperty property)
+      public static FField ForTargetProperty(FTargetProperty property, FluentGeneratorContext context)
       {
-         if (TryMapToList(property.Type, out var mappedType))
+         if (TryMapToList(property.Type, context, out var mappedType))
             return new FField(mappedType, property.Name.ToFirstLower()) { generateFluentSetup = true };
          return new FField(property.Type, property.Name.ToFirstLower()) { generateFluentSetup = true };
       }
 
-      private static bool TryMapToList(ITypeSymbol type, out INamedTypeSymbol mappedField)
+      private static bool TryMapToList(ITypeSymbol type, FluentGeneratorContext context, out INamedTypeSymbol mappedField)
       {
          mappedField = null;
          if (type is INamedTypeSymbol namedType && IsEnumerable(type))
          {
             if (namedType.TypeArguments.Length != 1)
+            {
                return false;
+            }
 
-            var genericList = type.ContainingAssembly.GetTypeByMetadataName("System.Collections.Generic.List`1");
+            var genericList = context.Compilation.GetTypeByMetadataName("System.Collections.Generic.List`1");
             if (genericList == null)
                return false;
 

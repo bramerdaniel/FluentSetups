@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EEntryClass.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="EEntryClass.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #endregion
 
-      #region IFluentClass Members
+      #region IFluentEntryClass Members
 
       /// <summary>Gets or sets the modifier.</summary>
       public string Modifier { get; }
@@ -50,12 +50,12 @@ namespace FluentSetups.SourceGenerator.Models
       /// <summary>Gets the class symbol for the existing part of the setup class.</summary>
       public INamedTypeSymbol ClassSymbol { get; }
 
+      /// <summary>Gets the name of the fluent entry class.</summary>
+      public string ClassName { get; }
+
       #endregion
 
       #region Public Properties
-
-      /// <summary>Gets the name of the fluent entry class.</summary>
-      public string ClassName { get; }
 
       /// <summary>Gets the namespace the fluent entry class will be generated into.</summary>
       public string ContainingNamespace { get; }
@@ -148,8 +148,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       private IFluentMethod CreateEntryMethod(FClass setupClass)
       {
-         return setupClass.GenerationMode.HasFlag(GeneratorMode.EntryMethod) 
-            ? new EEntryMethod(this, setupClass) 
+         return setupClass.GenerationMode.HasFlag(GeneratorMode.EntryMethod)
+            ? new EEntryMethod(this, setupClass)
             : null;
       }
 
