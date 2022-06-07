@@ -12,7 +12,7 @@ on:
 env:
   SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
-  INTEGRATION_TEST_SOLUTION : src/FluentSetups.IntegrationTests/FluentSetups.IntegrationTests.sln
+  INTEGRATION_TEST_SOLUTION : src/FluentSetups.IntegrationTests.sln
   
 jobs:
   build:

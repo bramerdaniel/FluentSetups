@@ -16,10 +16,9 @@ namespace FluentSetups.IntegrationTests.Tests
         #region Public Methods and Operators
 
         [TestMethod]
-        public void SetupColorWithDefaultName() 
+        public void SetupColorWithDefaultName()
         {
-            var color = Setup.ColorWithDefaults()
-                .Done();
+            var color = Setup.ColorWithDefaults().Done();
 
             color.Name.Should().Be(string.Empty);
             color.Opacity.Should().Be(-1);
