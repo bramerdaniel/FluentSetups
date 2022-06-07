@@ -1,0 +1,6 @@
+﻿internal BagSetup WithElements(System.Collections.Generic.IList<int> value)
+{
+    elements = value;
+    elementsWasSet = true;
+    return this;
+}

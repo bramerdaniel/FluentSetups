@@ -10,10 +10,13 @@ using System.Diagnostics;
 
 using FluentSetups.UnitTests.Setups;
 
+using Microsoft;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using VerifyTests;
+
 [TestClass]
-public class CreateTargetTests
+public class CreateTargetTests : VerifyMSTest.VerifyBase
 {
 #if NET6_0
 
@@ -25,7 +28,7 @@ public class CreateTargetTests
                        using FluentSetups;
                        using System.Collections.Generic;
 
-                       public record Bag(IEnumerable<string> Values);
+                       public record Bag(IList<string> Values);
    
                        [FluentSetup(typeof(Bag))]
                        public partial class BagSetup
@@ -142,5 +145,5 @@ public class CreateTargetTests
          .Contains("var target = new Person();");
 
       result.Print();
-   }
+   }  
 }

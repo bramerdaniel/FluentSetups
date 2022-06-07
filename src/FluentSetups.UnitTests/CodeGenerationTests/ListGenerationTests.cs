@@ -11,9 +11,51 @@ using FluentSetups.UnitTests.Setups;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
-public class ListGenerationTests
+public class ListGenerationTests : VerifyBase
 {
    #region Public Methods and Operators
+
+   [TestMethod]
+   [Ignore]
+   public async Task EnsureListSetupForTargetEnumerableCorrectly()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using FluentSetups;
+                       using System.Collections.Generic;
+
+                       public class Bag
+                       {
+                          public IEnumerable<string> Values { get; set; }
+                       }
+   
+                       [FluentSetup(typeof(Bag))]
+                       public partial class BagSetup
+                       {
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+      result.Should().NotHaveErrors();
+
+      var withElements = await result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithElements")
+         .GetCodeAsync();
+
+      await Verify(withElements).UseMethodName("EnumerableTargetProperty.WithElements");
+
+      var methodCode = await result.Should().HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithElement")
+         .GetCodeAsync();
+
+      await Verify(methodCode)
+         .UseFileName("EnumerableTargetProperty.WithElement");
+
+      result.Print();
+   }
 
    [TestMethod]
    public void EnsureFullListSetupIsGeneratedCorrectly()
@@ -44,12 +86,12 @@ public class ListGenerationTests
       var result = Setup.SourceGeneratorTest()
          .WithSource(code)
          .Done();
-      
+
       result.Should().NotHaveErrors().And
          .HaveClass("MyTests.SchoolSetup")
          .WhereMethod("WithChildren")
          .IsPublic();
-      
+
       result.Should().NotHaveErrors().And
          .HaveClass("MyTests.SchoolSetup")
          .WithMethod("WithChildren")
@@ -58,11 +100,10 @@ public class ListGenerationTests
          .Contains("children.Add(value);");
 
       result.Print();
-
    }
-   
+
    [TestMethod]
-   public void EnsureInternalSetupForListIsGeneratedCorrectly()
+   public async Task EnsureInternalSetupForListIsGeneratedCorrectly()
    {
       var code = @"namespace MyTests
                    {
@@ -98,9 +139,16 @@ public class ListGenerationTests
          .Contains("elements = new List<int>()")
          .Contains("elements.Add(value);");
 
+      var methodCode = await result.Should().HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithElement")
+         .GetCodeAsync();
+
+      await Verify(methodCode)
+         .UseMethodName("WithElement");
+
       result.Print();
-   }   
-   
+   }
+
    [TestMethod]
    public void EnsureSetupForListIsGeneratedCorrectly()
    {
@@ -143,6 +191,49 @@ public class ListGenerationTests
 
    }
 
+   [TestMethod]
+   public async Task EnsureListSetupForEnumerableIsGeneratedCorrectly()
+   {
+      var code = @"namespace MyTests
+                   {
+                       using System.Collections.Generic;
+                       using FluentSetups;
+
+                       public class Bag
+                       {
+                           public IEnumerable<int> Elements{ get; set; }
+                       }
+   
+                       [FluentSetup(typeof(Bag))]
+                       internal partial class BagSetup
+                       {  
+                          [FluentMember]
+                          private IList<int> elements;
+                       }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveErrors();
+
+      var withElements = await result.Should().NotHaveErrors().And
+         .HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithElements")
+         .GetCodeAsync();
+
+      await Verify(withElements).UseMethodName("EnumerableField.WithElements");
+
+      var methodCode = await result.Should().HaveClass("MyTests.BagSetup")
+         .WhereMethod("WithElement")
+         .GetCodeAsync();
+
+      await Verify(methodCode)
+         .UseFileName("EnumerableField.WithElement");
+
+      result.Print();
+   }
 
    #endregion
 }

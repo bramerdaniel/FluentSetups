@@ -52,7 +52,7 @@ namespace FluentSetups.SourceGenerator.Models
       public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
-         codeBuilder.AppendLine($"{SetupClass.Modifier} {SetupClass.ClassSymbol.Name} {Name}({backingFieldListSymbol.ElementType.Name} value)");
+         codeBuilder.AppendLine($"{SetupClass.Modifier} {SetupClass.ClassSymbol.Name} {Name}({backingFieldListSymbol.ElementType} value)");
          codeBuilder.AppendLine("{");
          GenerateContent(codeBuilder);
          codeBuilder.AppendLine("}");

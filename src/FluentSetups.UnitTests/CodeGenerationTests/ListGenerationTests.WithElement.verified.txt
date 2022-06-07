@@ -1,0 +1,8 @@
+﻿internal BagSetup WithElement(int value)
+{
+    if (elements == null)
+        elements = new List<int>();
+    elements.Add(value);
+    elementsWasSet = true;
+    return this;
+}

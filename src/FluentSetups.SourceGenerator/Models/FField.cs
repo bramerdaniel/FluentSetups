@@ -172,6 +172,9 @@ namespace FluentSetups.SourceGenerator.Models
          if (Type.Name.StartsWith("List"))
             return true;
 
+         if (Type.Name.StartsWith("IEnumerable"))
+            return true;
+
          return false;
       }
 
