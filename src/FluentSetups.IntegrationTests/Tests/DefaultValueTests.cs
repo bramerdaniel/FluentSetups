@@ -1,88 +1,111 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefaultValueTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="DefaultValueTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Reflection;
+
+using FluentAssertions;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace FluentSetups.IntegrationTests.Tests
 {
-   using System;
-   using System.Reflection;
+    [TestClass]
+    public class DefaultValueTests
+    {
+        #region Public Methods and Operators
 
-   using FluentAssertions;
+        [TestMethod]
+        public void EnsureDefaultFieldValuesWorkCorrectly()
+        {
+            var target = Setup.DefaultField().Done();
+            target.Age.Should().Be(10);
+        }
 
-   using Microsoft.VisualStudio.TestTools.UnitTesting;
+        [TestMethod]
+        public void EnsureDefaultPropertyValuesWorkCorrectly()
+        {
+            var target = Setup.DefaultProperty().Done();
+            target.Age.Should().Be(20);
+        }
 
-   [TestClass]
-   public class DefaultValueTests
-   {
-      [TestMethod]
-      public void EnsureDefaultFieldValuesWorkCorrectly()
-      {
-         var target = Setup.DefaultField().Done();
-         target.Age.Should().Be(10);
-      }
+        [TestMethod]
+        public void EnsureGetAgeReturnsDefaultValueForFields()
+        {
+            var target = Setup.DefaultField();
+            var getAge = target.GetType().GetMethod("GetAge", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(getAge);
+            var age = (int)getAge.Invoke(target, new object[] { })!;
 
-      [TestMethod]
-      public void EnsureDefaultPropertyValuesWorkCorrectly()
-      {
-         var target = Setup.DefaultProperty().Done();
-         target.Age.Should().Be(20);
-      }
+            age.Should().Be(10);
+        }
 
-      [TestMethod]
-      public void EnsureGetAgeReturnsDefaultValueForFields()
-      {
-         var target = Setup.DefaultField();
-         var getAge = target.GetType().GetMethod("GetAge", BindingFlags.Instance | BindingFlags.NonPublic);
-         Assert.IsNotNull(getAge);
-         var age= (int)getAge.Invoke(target, new object[] { })!;
+        [TestMethod]
+        public void EnsureGetAgeReturnsDefaultValueForProperties()
+        {
+            var target = Setup.DefaultProperty();
+            var getAge = target.GetType().GetMethod("GetAge", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(getAge);
+            var age = (int)getAge.Invoke(target, new object[] { })!;
 
-         age.Should().Be(10);
-      }
+            age.Should().Be(20);
+        }
 
-      [TestMethod]
-      public void EnsureGetAgeReturnsDefaultValueForProperties()
-      {
-         var target = Setup.DefaultProperty();
-         var getAge = target.GetType().GetMethod("GetAge", BindingFlags.Instance | BindingFlags.NonPublic);
-         Assert.IsNotNull(getAge);
-         var age = (int)getAge.Invoke(target, new object[] { })!;
+        #endregion
+    }
 
-         age.Should().Be(20);
-      }
-   }
+    [FluentSetup(typeof(DefaultTarget), SetupMethod = "DefaultField")]
+    internal partial class DefaultField
+    {
+        #region Constants and Fields
 
-   [FluentSetup(typeof(DefaultTarget), SetupMethod = "DefaultField")]
-   internal partial class DefaultField
-   {
-      [FluentMember]
-      private int age = 10;
+        [FluentMember]
+        private int age = 10;
 
-      protected void SetAgeWasSet()
-      {
-         if (ageWasSet)
-            throw new InvalidOperationException();
-         ageWasSet = true;
-      }
-   }
+        #endregion
 
-   [FluentSetup(typeof(DefaultTarget), SetupMethod = "DefaultProperty")]
-   internal partial class DefaultProperty
-   {
-      [FluentMember]
-      private int Age { get; set; } = 20;
+        #region Methods
 
-      protected void SetAgeWasSet()
-      {
-         if (ageWasSet)
-            throw new InvalidOperationException();
-         ageWasSet = true;
-      }
-   }
+        protected void SetAgeWasSet()
+        {
+            if (ageWasSet)
+                throw new InvalidOperationException();
+            ageWasSet = true;
+        }
 
-   internal class DefaultTarget
-   {
-      public int Age { get; set; }
-   }
+        #endregion
+    }
+
+    [FluentSetup(typeof(DefaultTarget), SetupMethod = "DefaultProperty")]
+    internal partial class DefaultProperty
+    {
+        #region Properties
+
+        [FluentMember] private int Age { get; set; } = 20;
+
+        #endregion
+
+        #region Methods
+
+        protected void SetAgeWasSet()
+        {
+            if (ageWasSet)
+                throw new InvalidOperationException();
+            ageWasSet = true;
+        }
+
+        #endregion
+    }
+
+    internal class DefaultTarget
+    {
+        #region Public Properties
+
+        public int Age { get; set; }
+
+        #endregion
+    }
 }

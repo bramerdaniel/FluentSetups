@@ -1,22 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MultiPropTarget.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="MultiPropTarget.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace FluentSetups.IntegrationTests.Targets;
-
 using System;
+
+namespace FluentSetups.IntegrationTests.Targets;
 
 public class MultiPropTarget
 {
-   #region Public Properties
+    #region Public Properties
 
-   public int Kind { get; set; }
+    public int Kind { get; set; }
 
-   public string Name { get; set; }
+    public string Name { get; set; }
 
-   public Type PropertyType { get; set; }
+    public Type PropertyType { get; set; }
 
-   #endregion
+    #endregion
 }

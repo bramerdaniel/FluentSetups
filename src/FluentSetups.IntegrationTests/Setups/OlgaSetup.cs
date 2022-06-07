@@ -1,28 +1,36 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OlgaSetup.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="OlgaSetup.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using FluentSetups.IntegrationTests.Targets;
+
 namespace FluentSetups.IntegrationTests.Setups
 {
-   using FluentSetups.IntegrationTests.Targets;
+    [FluentSetup(typeof(Olga))]
+    public partial class OlgaSetup
+    {
+        #region Methods
 
-   [FluentSetup(typeof(Olga))]
-   public partial class OlgaSetup
-   {
-      private void SetupTarget(Olga target)
-      {
-         target.LastName = "OlgaSetup";
-      }
-   }
+        private void SetupTarget(Olga target)
+        {
+            target.LastName = "OlgaSetup";
+        }
 
-   [FluentSetup(typeof(Olga), SetupMethod = "Olga1")]    
-   public partial class AnotherOlgaSetup
-   {
-      private void SetupTarget(Olga target)
-      {
-         target.LastName = "AnotherOlgaSetup";
-      }
-   }
+        #endregion
+    }
+
+    [FluentSetup(typeof(Olga), SetupMethod = "Olga1")]
+    public partial class AnotherOlgaSetup
+    {
+        #region Methods
+
+        private void SetupTarget(Olga target)
+        {
+            target.LastName = "AnotherOlgaSetup";
+        }
+
+        #endregion
+    }
 }

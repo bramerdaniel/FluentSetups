@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SchoolTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SchoolTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,14 +17,12 @@ namespace FluentSetups.IntegrationTests.Tests
     [TestClass]
     public class ListSetupTests
     {
+        #region Public Methods and Operators
+
         [TestMethod]
         public void SetupSchool()
         {
-            var children = new List<Child>
-            {
-                new() { Name = "Rob" },
-                new() { Name = "Bob" }
-            };
+            var children = new List<Child> { new() { Name = "Rob" }, new() { Name = "Bob" } };
 
             var school = Setup.School()
                 .WithChildren(children)
@@ -37,28 +35,12 @@ namespace FluentSetups.IntegrationTests.Tests
         public void SetupSchoolWithSingleChildren()
         {
             var school = Setup.School()
-                .WithChild(new Child{ Name = "Rob" })
-                .WithChild(new Child{ Name = "Bob" })
-                .WithChild(new Child{ Name = "John" })
+                .WithChild(new Child { Name = "Rob" })
+                .WithChild(new Child { Name = "Bob" })
+                .WithChild(new Child { Name = "John" })
                 .Done();
 
             school.Children.Should().HaveCount(3);
-        }
-        
-        [TestMethod]
-        public void SetupTargetsWithIEnumerableConstructor()
-        {
-            var persons = new List<Person>
-            {
-                new() { FirstName = "John", LastName = "Doe" },
-                new() { FirstName = "Fred", LastName = "Roberts" }
-            };
-
-            var room = Setup.Room()
-                .WithPeople(persons)
-                .Done();
-
-            room.People.Should().HaveCount(2);
         }
 
         [TestMethod]
@@ -71,6 +53,19 @@ namespace FluentSetups.IntegrationTests.Tests
 
             room.People.Should().HaveCount(2);
         }
-    }
 
+        [TestMethod]
+        public void SetupTargetsWithIEnumerableConstructor()
+        {
+            var persons = new List<Person> { new() { FirstName = "John", LastName = "Doe" }, new() { FirstName = "Fred", LastName = "Roberts" } };
+
+            var room = Setup.Room()
+                .WithPeople(persons)
+                .Done();
+
+            room.People.Should().HaveCount(2);
+        }
+
+        #endregion
+    }
 }
