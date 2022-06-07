@@ -35,6 +35,9 @@ jobs:
         nuget-version: latest
         nuget-api-key: ${{secrets.NUGET_API_KEY}}
     
+    - name: create Debug
+      run: mkdir ${{ env.SOLUTION_DIRECTORY }}\Debug
+
     - name: restore NuGet packages
       run: nuget restore ${{ env.SOLUTION_PATH }}
     
