@@ -9,7 +9,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System.Linq;
    using System.Text;
 
-   internal class FSetupTargetMethod : MethodBase
+   internal class FSetupTargetMethod : SetupMethodBase
    {
       #region Constructors and Destructors
 

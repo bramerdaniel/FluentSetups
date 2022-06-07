@@ -14,7 +14,7 @@ namespace FluentSetups.SourceGenerator.Models
    using Microsoft.CodeAnalysis;
 
    /// <summary>Model describing a setup class</summary>
-   internal class FClass
+   internal class FClass : IFluentSetupClass
    {
       #region Constants and Fields
 
@@ -28,7 +28,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Constructors and Destructors
 
-      internal FClass(FluentGeneratorContext context, ITypeSymbol classSymbol, AttributeData fluentSetupAttribute)
+      internal FClass(FluentGeneratorContext context, INamedTypeSymbol classSymbol, AttributeData fluentSetupAttribute)
       {
          Context = context;
          ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
@@ -49,7 +49,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string ClassName { get; }
 
-      public ITypeSymbol ClassSymbol { get; }
+      public INamedTypeSymbol ClassSymbol { get; }
 
       public string ContainingNamespace { get; }
 
@@ -86,7 +86,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public IReadOnlyList<FProperty> Properties => properties;
 
-      public string SetupMethod => ComputeSetupMethod();
+      public string EntryMethod => ComputeSetupMethod();
 
       public FTarget Target { get; private set; }
 
@@ -491,7 +491,7 @@ namespace FluentSetups.SourceGenerator.Models
             }
             else
             {
-               var backingField = FField.ForProperty(property);
+               var backingField = FField.ForTargetProperty(property);
                if (AddField(backingField))
                   AddMethodFromField(backingField);
             }

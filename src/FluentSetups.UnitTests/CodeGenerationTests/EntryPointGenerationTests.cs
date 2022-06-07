@@ -229,7 +229,7 @@ public class EntryPointGenerationTests
                       {
                       }
 
-                      [FluentSetup(typeof(Person), SetupMethod = ""Custom"")]
+                      [FluentSetup(typeof(Person), EntryMethod = ""Custom"")]
                       public partial class Second
                       {
                       }

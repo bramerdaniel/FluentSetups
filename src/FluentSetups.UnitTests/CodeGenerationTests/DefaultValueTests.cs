@@ -241,7 +241,7 @@ public class DefaultValueTests
                        {
                        }
 
-                       [FluentSetup(typeof(Color), SetupMethod = ""ColorWithDefaults"")]
+                       [FluentSetup(typeof(Color), EntryMethod = ""ColorWithDefaults"")]
                        public partial class ColorWithDefaultsSetup
                        {
                           [FluentMember]

@@ -42,7 +42,7 @@ namespace FluentSetups
       /// This is by default the name of the target type if specified.
       /// <code>&lt;EntryClassName&gt;.&lt;SetupMethod&gt;()</code> e.g.
       /// <code>Setup.MyClass()</code></summary>
-      public string SetupMethod { get; set; }
+      public string EntryMethod { get; set; }
 
       /// <summary>Gets the name of the setup class this class is generated inside.</summary>
       public string EntryClassName { get; set; }

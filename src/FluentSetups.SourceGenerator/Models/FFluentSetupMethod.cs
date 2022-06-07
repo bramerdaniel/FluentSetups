@@ -12,7 +12,7 @@ namespace FluentSetups.SourceGenerator.Models
    using Microsoft.CodeAnalysis;
 
    [DebuggerDisplay("{Signature}")]
-   internal class FFluentSetupMethod : MethodBase
+   internal class FFluentSetupMethod : SetupMethodBase
    {
       #region Constructors and Destructors
 

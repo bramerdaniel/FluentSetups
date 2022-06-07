@@ -9,7 +9,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System;
    using System.Text;
 
-   internal class FWithListElementMethod : MethodBase
+   internal class FWithListElementMethod : SetupMethodBase
    {
       #region Constants and Fields
 

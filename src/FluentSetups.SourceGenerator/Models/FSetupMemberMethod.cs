@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FSetupMemberMethod.cs" company="consolovers">
-//   Copyright (c) daniel bramer 2022 - 2022
+// <copyright file="FSetupMemberMethod.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,7 +9,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System;
    using System.Text;
 
-   internal class FSetupMemberMethod : MethodBase
+   internal class FSetupMemberMethod : SetupMethodBase
    {
       #region Constants and Fields
 
@@ -30,8 +30,16 @@ namespace FluentSetups.SourceGenerator.Models
 
       #endregion
 
-      #region IFluentMethod Members
-      
+      #region Public Properties
+
+      public override bool IsUserDefined => false;
+
+      public override int ParameterCount => 1;
+
+      #endregion
+
+      #region Public Methods and Operators
+
       public override string ToCode()
       {
          var codeBuilder = new StringBuilder();
@@ -40,6 +48,18 @@ namespace FluentSetups.SourceGenerator.Models
          GenerateContent(codeBuilder);
          codeBuilder.AppendLine("}");
          return codeBuilder.ToString();
+      }
+
+      #endregion
+
+      #region Methods
+
+      private string ComputeModifier()
+      {
+         if (SetupClass is FClass setupClass && setupClass.Target.IsInternal && setupClass.IsPublic)
+            return "private";
+
+         return "protected";
       }
 
       private void GenerateContent(StringBuilder codeBuilder)
@@ -52,22 +72,6 @@ namespace FluentSetups.SourceGenerator.Models
          }
 
          codeBuilder.AppendLine($"target.{backingFieldSymbol.Name.ToFirstUpper()} = {backingFieldSymbol.Name};");
-      }
-
-      public override bool IsUserDefined => false;
-
-      public override int ParameterCount => 1;
-      
-
-      #endregion
-      
-      #region Methods
-
-      protected string ComputeModifier()
-      {
-         if (SetupClass.Target.IsInternal && SetupClass.IsPublic)
-            return "private";
-         return "protected";
       }
 
       #endregion

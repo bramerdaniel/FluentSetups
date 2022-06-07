@@ -131,7 +131,7 @@ namespace FluentSetups.SourceGenerator
          setupClassInfo = null;
          var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
 
-         if (!(semanticModel.GetDeclaredSymbol(candidate) is ITypeSymbol classSymbol))
+         if (!(semanticModel.GetDeclaredSymbol(candidate) is INamedTypeSymbol classSymbol))
             return false;
 
          var fluentAttribute = classSymbol.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
