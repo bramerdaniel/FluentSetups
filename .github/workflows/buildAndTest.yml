@@ -134,7 +134,7 @@ jobs:
       uses: darenm/Setup-VSTest@v1
 
     - name: run integration tests
-      run: vstest.console.exe src/FluentSetups.IntegrationTests/Release/net6.0/FluentSetups.IntegrationTests.dll
+      run: vstest.console.exe src/Release/net6.0/FluentSetups.IntegrationTests.dll
 
     - name: show working dir
       run: dir
