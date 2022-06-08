@@ -1,32 +1,36 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OverrideCreateTargetTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="OverrideCreateTargetTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
-namespace FluentSetups.IntegrationTests.Tests;
 
 using FluentAssertions;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+namespace FluentSetups.IntegrationTests.Tests;
+
 [TestClass]
 public class OverrideCreateTargetTests
 {
-   [TestMethod]
-   public void EnsureOverwrittenDoneCompiles()
-   {
-      var setup = Setup.CustomPerson()
-         .WithFirstName("Robert")
-         .WithLastName("Ramirez");
+    #region Public Methods and Operators
 
-      setup.CreateTargetCalled.Should().BeFalse();
+    [TestMethod]
+    public void EnsureOverwrittenDoneCompiles()
+    {
+        var setup = Setup.CustomPerson()
+            .WithFirstName("Robert")
+            .WithLastName("Ramirez");
 
-      var person = setup.Done();
+        setup.CreateTargetCalled.Should().BeFalse();
 
-      setup.CreateTargetCalled.Should().BeTrue();
-      person.FirstName.Should().Be("Robert");
-      person.LastName.Should().Be("Ramirez");
-      person.Age.Should().Be(10);
-   }
+        var person = setup.Done();
+
+        setup.CreateTargetCalled.Should().BeTrue();
+        person.FirstName.Should().Be("Robert");
+        person.LastName.Should().Be("Ramirez");
+        person.Age.Should().Be(10);
+    }
+
+    #endregion
 }

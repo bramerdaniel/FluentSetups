@@ -76,6 +76,9 @@ namespace FluentSetups.SourceGenerator.Models
          if (targetMember.SetMethod.DeclaredAccessibility != Accessibility.Public)
             return false;
 
+         if (targetMember.SetMethod.IsInitOnly)
+            return false;
+
          return true;
       }
 

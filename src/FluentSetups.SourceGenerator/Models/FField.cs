@@ -24,6 +24,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       private bool generateFluentSetup;
 
+      private ITypeSymbol elementType;
+
       #endregion
 
       #region Constructors and Destructors
@@ -39,6 +41,7 @@ namespace FluentSetups.SourceGenerator.Models
          SetupMethodName = ComputeSetupNameFromAttribute(memberAttribute) ?? $"With{WithUpperCase(fieldSymbol)}";
          RequiredNamespace = ComputeRequiredNamespace(fieldSymbol);
          ComputeDefaultValue();
+         IsListMember = IsList(Type);
       }
 
       public FField(ITypeSymbol type, string name)
@@ -49,7 +52,9 @@ namespace FluentSetups.SourceGenerator.Models
          TypeName = Type.ToString();
          SetupMethodName = $"With{WithUpperCase(name)}";
          RequiredNamespace = type.ContainingNamespace.IsGlobalNamespace ? null : type.ContainingNamespace.ToString();
+         IsListMember = IsList(Type);
       }
+
 
       #endregion
 
@@ -68,6 +73,17 @@ namespace FluentSetups.SourceGenerator.Models
 
       /// <summary>Gets a value indicating whether this instance has default value.</summary>
       public bool HasDefaultValue { get; private set; }
+
+      public bool IsListMember { get; }
+
+      public ITypeSymbol ElementType => elementType ?? (elementType = ComputeElementType());
+
+      private ITypeSymbol ComputeElementType()
+      {
+         if (Type is INamedTypeSymbol namedType && namedType.TypeArguments.Length == 1)
+            return namedType.TypeArguments[0];
+         return null;
+      }
 
       #endregion
 
@@ -92,20 +108,44 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string SetupMethodName { get; set; }
 
-      public string TypeName { get; set; }
+      public string TypeName { get; }
 
       #endregion
 
       #region Public Methods and Operators
 
-      public static FField ForConstructorParameter(IParameterSymbol parameterSymbol)
+      public static FField ForConstructorParameter(IParameterSymbol parameterSymbol, FluentGeneratorContext context)
       {
+         if (TryMapToList(parameterSymbol.Type, context,  out var mappedType))
+            return new FField(mappedType, parameterSymbol.Name.ToFirstLower()) { generateFluentSetup = true };
          return new FField(parameterSymbol.Type, parameterSymbol.Name.ToFirstLower()) { generateFluentSetup = true };
       }
 
-      public static FField ForProperty(FTargetProperty property)
+      public static FField ForTargetProperty(FTargetProperty property, FluentGeneratorContext context)
       {
+         if (TryMapToList(property.Type, context, out var mappedType))
+            return new FField(mappedType, property.Name.ToFirstLower()) { generateFluentSetup = true };
          return new FField(property.Type, property.Name.ToFirstLower()) { generateFluentSetup = true };
+      }
+
+      private static bool TryMapToList(ITypeSymbol type, FluentGeneratorContext context, out INamedTypeSymbol mappedField)
+      {
+         mappedField = null;
+         if (type is INamedTypeSymbol namedType && IsEnumerable(type))
+         {
+            if (namedType.TypeArguments.Length != 1)
+            {
+               return false;
+            }
+
+            var genericList = context.Compilation.GetTypeByMetadataName("System.Collections.Generic.List`1");
+            if (genericList == null)
+               return false;
+
+            mappedField = genericList.Construct(namedType.TypeArguments[0]);
+         }
+
+         return mappedField != null;
       }
 
       public override bool Equals(object obj)
@@ -144,6 +184,34 @@ namespace FluentSetups.SourceGenerator.Models
       private static string ComputeRequiredNamespace(IFieldSymbol fieldSymbol)
       {
          return fieldSymbol.Type.ContainingNamespace.IsGlobalNamespace ? null : fieldSymbol.Type.ContainingNamespace.ToString();
+      }
+
+      private static bool IsList(ITypeSymbol typeSymbol)
+      {
+         if (typeSymbol.ContainingNamespace.ToString() != "System.Collections.Generic")
+            return false;
+
+         if (typeSymbol.Name.StartsWith("IList"))
+            return true;
+
+         if (typeSymbol.Name.StartsWith("List"))
+            return true;
+
+         if (typeSymbol.Name.StartsWith("IEnumerable"))
+            return true;
+
+         return false;
+      }
+
+      private static bool IsEnumerable(ITypeSymbol typeSymbol)
+      {
+         if (typeSymbol.ContainingNamespace.ToString() != "System.Collections.Generic")
+            return false;
+
+         if (typeSymbol.Name.StartsWith("IEnumerable"))
+            return true;
+
+         return false;
       }
 
       private static string WithUpperCase(IFieldSymbol fieldSymbol)

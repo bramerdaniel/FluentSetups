@@ -38,6 +38,10 @@ namespace FluentSetups.SourceGenerator.Models
       // TODO handel this
       public bool HasDefaultValue { get; } = false;
 
+      public bool IsListMember { get; }
+
+      public ITypeSymbol ElementType { get; }
+
       public string ToCode()
       {
          return "NOT SUPPORTED";

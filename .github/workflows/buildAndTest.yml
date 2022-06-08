@@ -12,7 +12,7 @@ on:
 env:
   SOLUTION_DIRECTORY : src
   SOLUTION_PATH : src/FluentSetups.sln
-  INTEGRATION_TEST_SOLUTION : src/FluentSetups.IntegrationTests/FluentSetups.IntegrationTests.sln
+  INTEGRATION_TEST_SOLUTION : src/FluentSetups.IntegrationTests.sln
   
 jobs:
   build:
@@ -30,11 +30,14 @@ jobs:
         dir certificate
 
     - name: setup NuGet.exe
-      uses: NuGet/setup-nuget@v1.0.6
+      uses: NuGet/setup-nuget@v1.0.6 
       with:
         nuget-version: latest
         nuget-api-key: ${{secrets.NUGET_API_KEY}}
     
+    - name: create Debug
+      run: mkdir ${{ env.SOLUTION_DIRECTORY }}\Debug
+
     - name: restore NuGet packages
       run: nuget restore ${{ env.SOLUTION_PATH }}
     
@@ -54,6 +57,15 @@ jobs:
         path: ${{ env.SOLUTION_DIRECTORY }}\Release\*.nupkg
         retention-days: 1
 
+    - name: setup VSTest.console.exe
+      uses: darenm/Setup-VSTest@v1
+
+    - name: run net48 unit tests
+      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net48\FluentSetups.UnitTests.dll
+    
+    - name: run net6.0 unit tests
+      run: vstest.console.exe ${{ env.SOLUTION_DIRECTORY }}\Release\net6.0\FluentSetups.UnitTests.dll
+
     - name: upload binaries
       uses: actions/upload-artifact@v3.0.0
       with:
@@ -62,25 +74,25 @@ jobs:
         retention-days: 1      
 
 
-  unit-tests:
-    needs: build
-    runs-on: windows-latest
-    steps:
+  #unit-tests:
+  #  needs: build
+  #  runs-on: windows-latest
+  #  steps:
 
-    - name: download artifacts
-      uses: actions/download-artifact@v3.0.0
-      with:
-        name: binaries
-        path: testBinaries
+  #  - name: download artifacts
+  #    uses: actions/download-artifact@v3.0.0
+  #    with:
+  #      name: binaries
+  #      path: testBinaries
     
-    - name: show binaries
-      run: dir testBinaries
+  #  - name: show binaries
+  #    run: dir testBinaries
  
-    - name: setup VSTest.console.exe
-      uses: darenm/Setup-VSTest@v1
+  #  - name: setup VSTest.console.exe
+  #    uses: darenm/Setup-VSTest@v1
 
-    - name: run unit tests
-      run: vstest.console.exe testBinaries\FluentSetups.UnitTests.dll
+  #  - name: run unit tests
+  #    run: vstest.console.exe testBinaries\FluentSetups.UnitTests.dll
     
   integration-tests:
     needs: build
@@ -99,6 +111,9 @@ jobs:
     
     - name: show working dir
       run: dir
+
+    #- name: show nuget packages
+    #  run: dir src\Debug\*.nupkg /B
 
     - name: setup NuGet.exe
       uses: NuGet/setup-nuget@v1.0.6
@@ -119,13 +134,13 @@ jobs:
       uses: darenm/Setup-VSTest@v1
 
     - name: run integration tests
-      run: vstest.console.exe src/FluentSetups.IntegrationTests/Release/net6.0/FluentSetups.IntegrationTests.dll
+      run: vstest.console.exe src/Release/net6.0/FluentSetups.IntegrationTests.dll
 
     - name: show working dir
       run: dir
 
   publish:
-    needs: [unit-tests, integration-tests]
+    needs: [integration-tests]
     runs-on: windows-latest
     if: ${{ github.ref == 'refs/heads/master' }}
     steps:

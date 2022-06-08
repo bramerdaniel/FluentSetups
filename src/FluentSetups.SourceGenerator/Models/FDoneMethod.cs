@@ -10,7 +10,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System.Text;
 
    [DebuggerDisplay("{Signature}")]
-   internal class FDoneMethod : MethodBase
+   internal sealed class FDoneMethod : MethodBase
    {
       #region Constructors and Destructors
 
@@ -49,14 +49,14 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Methods
 
-      protected void AppendMethodContent(StringBuilder codeBuilder)
+      private void AppendMethodContent(StringBuilder codeBuilder)
       {
          codeBuilder.AppendLine("var target = CreateTarget();");
          codeBuilder.AppendLine("SetupTarget(target);");
          codeBuilder.AppendLine("return target;");
       }
 
-      protected virtual string ComputeModifier()
+      private string ComputeModifier()
       {
          return "internal";
       }

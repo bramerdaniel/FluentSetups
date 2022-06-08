@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CtorArgs.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="CtorArgs.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,24 +8,24 @@ namespace FluentSetups.IntegrationTests.Targets;
 
 public class CtorArgs
 {
-   #region Constructors and Destructors
+    #region Constructors and Destructors
 
-   public CtorArgs(string first, int second, bool third)
-   {
-      First = first;
-      Second = second;
-      Third = third;
-   }
+    public CtorArgs(string first, int second, bool third)
+    {
+        First = first;
+        Second = second;
+        Third = third;
+    }
 
-   #endregion
+    #endregion
 
-   #region Public Properties
+    #region Public Properties
 
-   public string First { get; }
+    public string First { get; }
 
-   public int Second { get; }
+    public int Second { get; }
 
-   public bool Third { get; }
+    public bool Third { get; }
 
-   #endregion
+    #endregion
 }

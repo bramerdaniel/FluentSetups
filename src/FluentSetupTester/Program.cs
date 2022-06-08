@@ -55,7 +55,10 @@ namespace FluentSetupTester
 
       static void Main()
       {
-         var syntaxTrees = ParseInput("FluentSetupTester.Setup.cs", "FluentSetupTester.ToolSetup.cs");
+         var syntaxTrees = ParseInput("FluentSetupTester.Setup.cs"
+            , "FluentSetupTester.People.cs"
+            , "FluentSetupTester.ToolSetup.cs"
+         );
 
          var (diagnostics, output) = RunSourceGenerator(syntaxTrees);
          if (diagnostics.Length > 0)

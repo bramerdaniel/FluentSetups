@@ -5,10 +5,12 @@
 		<SignAssembly>False</SignAssembly>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="People.cs" />
 	  <Compile Remove="Setup.cs" />
 	  <Compile Remove="ToolSetup.cs" />
 	</ItemGroup>
 	<ItemGroup>
+	  <EmbeddedResource Include="People.cs" />
 	  <EmbeddedResource Include="Setup.cs" />
 	  <EmbeddedResource Include="ToolSetup.cs" />
 	</ItemGroup>

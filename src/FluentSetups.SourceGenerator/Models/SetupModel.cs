@@ -17,7 +17,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string DefaultEntryNamespace { get; set; }
 
-      public IList<SetupEntryClassModel> EntryClasses { get; private set; }
+      public IList<EEntryClass> EntryClasses { get; private set; }
 
       public IList<FClass> SetupClasses { get; private set; }
 
@@ -46,54 +46,34 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Methods
 
-      internal static string ComputeModifier(INamedTypeSymbol typeSymbol)
-      {
-         if (typeSymbol != null)
-         {
-            switch (typeSymbol.DeclaredAccessibility)
-            {
-               case Accessibility.NotApplicable:
-               case Accessibility.Private:
-                  return "private";
-               case Accessibility.ProtectedAndInternal:
-                  return "protected internal";
-               case Accessibility.Protected:
-                  return "protected";
-               case Accessibility.Internal:
-                  return "internal";
-               case Accessibility.ProtectedOrInternal:
-                  return "internal";
-               case Accessibility.Public:
-                  return "public";
-            }
-         }
-
-         return "internal";
-      }
-
-      internal static string ComputeModifier(string targetNamespace, string targetName, FluentGeneratorContext context)
-      {
-         var existingType = context.Compilation.GetTypeByMetadataName($"{targetNamespace}.{targetName}");
-         return ComputeModifier(existingType);
-      }
-
-      private static IEnumerable<SetupEntryClassModel> CreateEntryClasses(IEnumerable<FClass> setupClasses, FluentGeneratorContext context)
+      private static IEnumerable<EEntryClass> CreateEntryClasses(IEnumerable<FClass> setupClasses, FluentGeneratorContext context)
       {
          foreach (var namespaceGroup in setupClasses.GroupBy(x => x.EntryClassNamespace))
          {
             var includingNamespace = namespaceGroup.Key;
 
-            foreach (var setupClassModel in namespaceGroup.GroupBy(x => x.EntryClassName))
+            foreach (var setupClassModels in namespaceGroup.GroupBy(x => x.EntryClassName))
             {
-               yield return new SetupEntryClassModel
+               var existingClass = FindExistingClass(context, includingNamespace, setupClassModels.Key);
+               if (existingClass != null)
                {
-                  ContainingNamespace = includingNamespace,
-                  ClassName = setupClassModel.Key,
-                  SetupClasses = setupClassModel.ToArray(),
-                  Modifier = ComputeModifier(includingNamespace, setupClassModel.Key, context)
-               };
+                  yield return new EEntryClass(existingClass, setupClassModels.ToArray());
+               }
+               else
+               {
+                  yield return new EEntryClass(includingNamespace, setupClassModels.Key, setupClassModels.ToArray());
+               }
             }
          }
+      }
+
+      private static INamedTypeSymbol FindExistingClass(FluentGeneratorContext context, string containingNamespace, string className)
+      {
+         var fullyQualifiedMetadataName = string.IsNullOrWhiteSpace(containingNamespace)
+            ? className 
+            : $"{containingNamespace}.{className}";
+
+         return context.Compilation.GetTypeByMetadataName(fullyQualifiedMetadataName);
       }
 
       #endregion

@@ -94,12 +94,12 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
       var methods = Subject.GetMembers(methodName).OfType<IMethodSymbol>()
          .Where(x => x.Parameters.Length == parameterTypes.Length).ToArray();
 
-      Assert.IsTrue(methods.Length > 0, $"The method {methodName} with {parameterTypes.Length} parameters could not be found");
+      Assert.IsTrue(methods.Length > 0, $"The method {methodName} with {parameterTypes.Length} parameters could not be found.{GetGeneratedCode()}");
 
       if (methods.Any(x => HasSignature(x, parameterTypes)))
          return this;
 
-      Assert.Fail("Could not find a method with matching signature");
+      Assert.Fail($"Could not find a method with matching signature{GetGeneratedCode()}");
       return null;
    }
 
