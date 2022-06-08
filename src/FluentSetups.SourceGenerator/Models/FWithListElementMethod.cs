@@ -57,18 +57,7 @@ namespace FluentSetups.SourceGenerator.Models
       private static string ComputeWithElementName(IFluentTypedMember backingFieldSymbol)
       {
          var fieldName = backingFieldSymbol.Name.ToFirstUpper();
-         if (fieldName.EndsWith("s"))
-            return $"With{fieldName.Substring(0, fieldName.Length - 1)}";
-
-         switch (fieldName)
-         {
-            case "Children":
-               return "WithChild";
-            case "People":
-               return "WithPerson";
-            default:
-               return $"With{fieldName}";
-         }
+         return $"With{Vocabularies.Default.Singularize(fieldName, false)}";
       }
 
       private void GenerateContent(StringBuilder codeBuilder)
