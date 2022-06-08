@@ -16,6 +16,7 @@ namespace FluentSetups.SourceGenerator
    /// </summary>
    [SuppressMessage("ReSharper", "UnusedMember.Global")]
    [SuppressMessage("ReSharper", "CommentTypo")]
+   [SuppressMessage("ReSharper", "IdentifierTypo")]
    public class Vocabulary
    {
       #region Constants and Fields
@@ -89,23 +90,17 @@ namespace FluentSetups.SourceGenerator
       {
          var s = LetterS(word);
          if (s != null)
-         {
-            return s + "s";
-         }
+            return $"{s}s";
 
          var result = ApplyRules(plurals, word, false);
 
          if (inputIsKnownToBeSingular)
-         {
             return result ?? word;
-         }
 
          var asSingular = ApplyRules(singulars, word, false);
          var asSingularAsPlural = ApplyRules(plurals, asSingular, false);
          if (asSingular != null && asSingular != word && asSingular + "s" != word && asSingularAsPlural == word && result != word)
-         {
             return word;
-         }
 
          return result;
       }
@@ -114,21 +109,17 @@ namespace FluentSetups.SourceGenerator
       /// <param name="word">Word to be singularized</param>
       /// <param name="inputIsKnownToBePlural">Normally you call Singularize on plural words; but if you're unsure call it with false</param>
       /// <param name="skipSimpleWords">Skip singularizing single words that have an 's' on the end</param>
-      /// <returns></returns>
+      /// <returns>The singularized word</returns>
       public string Singularize(string word, bool inputIsKnownToBePlural = true, bool skipSimpleWords = false)
       {
          var s = LetterS(word);
          if (s != null)
-         {
             return s;
-         }
 
          var result = ApplyRules(singulars, word, skipSimpleWords);
 
          if (inputIsKnownToBePlural)
-         {
             return result ?? word;
-         }
 
          // the Plurality is unknown so we should check all possibilities
          var asPlural = ApplyRules(plurals, word, false);
@@ -148,31 +139,23 @@ namespace FluentSetups.SourceGenerator
       private string ApplyRules(IList<Rule> rules, string word, bool skipFirstRule)
       {
          if (word == null)
-         {
             return null;
-         }
 
          if (word.Length < 1)
-         {
             return word;
-         }
 
          if (IsUncountable(word))
-         {
             return word;
-         }
 
          var result = word;
          var end = skipFirstRule ? 1 : 0;
          for (var i = rules.Count - 1; i >= end; i--)
          {
             if ((result = rules[i].Apply(word)) != null)
-            {
                break;
-            }
          }
 
-         return result != null ? MatchUpperCase(word, result) : result;
+         return result != null ? MatchUpperCase(word, result) : null;
       }
 
       private bool IsUncountable(string word)
@@ -194,7 +177,7 @@ namespace FluentSetups.SourceGenerator
 
       #endregion
 
-      private class Rule
+      private sealed class Rule
       {
          #region Constants and Fields
 
@@ -218,12 +201,7 @@ namespace FluentSetups.SourceGenerator
 
          public string Apply(string word)
          {
-            if (!regex.IsMatch(word))
-            {
-               return null;
-            }
-
-            return regex.Replace(word, replacement);
+            return !regex.IsMatch(word) ? null : regex.Replace(word, replacement);
          }
 
          #endregion

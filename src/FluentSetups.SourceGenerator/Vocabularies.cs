@@ -99,10 +99,7 @@ namespace FluentSetups.SourceGenerator
          defaultVocabulary.AddIrregular("database", "databases");
          defaultVocabulary.AddIrregular("zombie", "zombies");
          defaultVocabulary.AddIrregular("personnel", "personnel");
-         //Fix #789
          defaultVocabulary.AddIrregular("cache", "caches");
-
-         //Fix 975
          defaultVocabulary.AddIrregular("ex", "exes", matchEnding: false);
          defaultVocabulary.AddIrregular("is", "are", matchEnding: false);
          defaultVocabulary.AddIrregular("that", "those", matchEnding: false);
@@ -152,8 +149,6 @@ namespace FluentSetups.SourceGenerator
          defaultVocabulary.AddUncountable("scissors");
          defaultVocabulary.AddUncountable("means");
          defaultVocabulary.AddUncountable("mail");
-
-         //Fix 1132
          defaultVocabulary.AddUncountable("metadata");
 
          return defaultVocabulary;
