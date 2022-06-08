@@ -6,14 +6,9 @@
 
 namespace FluentSetups.UnitTests.CodeGenerationTests;
 
-using System.Diagnostics;
-
 using FluentSetups.UnitTests.Setups;
 
-using Microsoft;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using VerifyTests;
 
 [TestClass]
 public class CreateTargetTests : VerifyBase
