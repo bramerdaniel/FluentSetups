@@ -130,16 +130,6 @@ internal class MethodAssertion : ReferenceTypeAssertions<IMethodSymbol, MethodAs
       return this;
    }
 
-   public async Task Verify(VerifyBase verifyBase)
-   {
-      var syntaxReference = Subject.DeclaringSyntaxReferences.FirstOrDefault();
-      if (syntaxReference == null)
-         throw new AssertFailedException("Syntax reference could not be found");
-
-      var code = (await syntaxReference.GetSyntaxAsync()).NormalizeWhitespace().ToString();
-      await verifyBase.Verify(code);
-   }
-
    public async Task<string> GetCodeAsync()
    {
       var syntaxReference = Subject.DeclaringSyntaxReferences.First();

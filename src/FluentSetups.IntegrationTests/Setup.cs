@@ -1,15 +1,15 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentListAttribute.cs" company="consolovers">
+// <copyright file="Setup.cs" company="consolovers">
 //   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace FluentSetups
-{
-   using System;
+using FluentSetups.IntegrationTests.Setups;
 
-   [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-   public class FluentListAttribute : FluentMemberAttribute
-   {
-   }
+namespace FluentSetups.IntegrationTests
+{
+    public partial class Setup
+    {
+        public static MugliSetup Mugli() => new MugliSetup().WithLightPower(20);
+    }
 }
