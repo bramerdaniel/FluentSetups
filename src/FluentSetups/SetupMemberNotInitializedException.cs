@@ -9,10 +9,14 @@ namespace FluentSetups
    using System;
    using System.Diagnostics.CodeAnalysis;
 
+   using JetBrains.Annotations;
+
    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+   [UsedImplicitly]
    public class SetupMemberNotInitializedException : Exception
    {
       /// <summary>Gets the name of the member.</summary>
+      [UsedImplicitly]
       public string MemberName { get; }
 
       #region Constructors and Destructors
