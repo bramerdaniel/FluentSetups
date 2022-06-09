@@ -43,7 +43,7 @@ namespace FluentSetups.UnitTests.Assertions
       {
          var classType = Subject.OutputCompilation.GetTypeByMetadataName(className);
 
-         Assert.IsNotNull(classType, $"The class {className} could not be found. {Environment.NewLine}{Subject.OutputSyntaxTrees.Last().ToString()}");
+         Assert.IsNotNull(classType, $"The class {className} could not be found. {Environment.NewLine}{Subject.OutputSyntaxTrees.Last()}");
          return new ClassAssertion(Subject, classType);
       }
 
@@ -61,14 +61,12 @@ namespace FluentSetups.UnitTests.Assertions
          Assert.IsNotNull(diagnostic, $"Diagnostic {diagnostic} could not be found.{CreateAllFound(Subject.GeneratedDiagnostics)}");
 
          return new AndConstraint<GenerationResultAssertion>(this);
-
-         string CreateAllFound(ImmutableArray<Diagnostic> generatedDiagnostics)
-         {
-            return $"{Environment.NewLine}{string.Join(Environment.NewLine, generatedDiagnostics)}";
-         }
       }
 
-
+      private static string CreateAllFound(ImmutableArray<Diagnostic> generatedDiagnostics)
+      {
+         return $"{Environment.NewLine}{string.Join(Environment.NewLine, generatedDiagnostics)}";
+      }
 
       public AndConstraint<GenerationResultAssertion> NotHaveErrors()
       {
@@ -100,14 +98,14 @@ namespace FluentSetups.UnitTests.Assertions
          return builder.ToString();
       }
 
-      private void ThrowOnErrors(IEnumerable<Diagnostic> diagnostics)
+      private static void ThrowOnErrors(IEnumerable<Diagnostic> diagnostics)
       {
          var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity == DiagnosticSeverity.Error);
          if (errorDiagnostic != null)
             throw new AssertFailedException(CreateMessage(errorDiagnostic));
       }
 
-      private void ThrowOnWarnings(IEnumerable<Diagnostic> diagnostics)
+      private static void ThrowOnWarnings(IEnumerable<Diagnostic> diagnostics)
       {
          var errorDiagnostic = diagnostics.FirstOrDefault(x => x.Severity >= DiagnosticSeverity.Warning);
          if (errorDiagnostic != null)

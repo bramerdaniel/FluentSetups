@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FClass.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="FClass.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace FluentSetups.SourceGenerator.Models
    using Microsoft.CodeAnalysis;
 
    /// <summary>Model describing a setup class</summary>
-   internal class FClass
+   internal class FClass : IFluentSetupClass
    {
       #region Constants and Fields
 
@@ -28,7 +28,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Constructors and Destructors
 
-      internal FClass(FluentGeneratorContext context, ITypeSymbol classSymbol, AttributeData fluentSetupAttribute)
+      internal FClass(FluentGeneratorContext context, INamedTypeSymbol classSymbol, AttributeData fluentSetupAttribute)
       {
          Context = context;
          ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
@@ -37,19 +37,27 @@ namespace FluentSetups.SourceGenerator.Models
          ClassName = classSymbol.Name;
          ContainingNamespace = ComputeNamespace();
          Modifier = ComputeModifier(classSymbol);
-         EntryClassName = fluentSetupAttribute.GetSetupEntryClassName();
-         EntryClassNamespace = fluentSetupAttribute.GetSetupEntryNameSpace() ?? classSymbol.ContainingAssembly.MetadataName;
+         EntryClassName = fluentSetupAttribute.GetSetupEntryClassName(context.GetFluentRootName("Setup"));
+         EntryClassNamespace = fluentSetupAttribute.GetSetupEntryNameSpace(context.GetFluentRootNamespace(classSymbol.ContainingAssembly.MetadataName)) ;
 
          FillMembers();
       }
 
       #endregion
 
-      #region Public Properties
+      #region IFluentSetupClass Members
 
       public string ClassName { get; }
 
-      public ITypeSymbol ClassSymbol { get; }
+      public INamedTypeSymbol ClassSymbol { get; }
+
+      public string Modifier { get; }
+
+      public string EntryMethod => ComputeSetupMethod();
+
+      #endregion
+
+      #region Public Properties
 
       public string ContainingNamespace { get; }
 
@@ -82,11 +90,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public IReadOnlyList<IFluentMethod> Methods => methods;
 
-      public string Modifier { get; }
-
       public IReadOnlyList<FProperty> Properties => properties;
-
-      public string SetupMethod => ComputeSetupMethod();
 
       public FTarget Target { get; private set; }
 
@@ -178,22 +182,22 @@ namespace FluentSetups.SourceGenerator.Models
          switch (member)
          {
             case IFieldSymbol fieldSymbol:
-               {
-                  var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
-                  fields.Add(field);
-                  break;
-               }
+            {
+               var field = new FField(fieldSymbol, FindMemberAttribute(fieldSymbol));
+               fields.Add(field);
+               break;
+            }
             case IPropertySymbol propertySymbol:
-               {
-                  var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
-                  properties.Add(property);
-                  break;
-               }
+            {
+               var property = new FProperty(propertySymbol, FindMemberAttribute(propertySymbol));
+               properties.Add(property);
+               break;
+            }
             case IMethodSymbol methodSymbol:
-               {
-                  methods.Add(CreateMethod(methodSymbol));
-                  break;
-               }
+            {
+               methods.Add(CreateMethod(methodSymbol));
+               break;
+            }
          }
       }
 
@@ -222,11 +226,17 @@ namespace FluentSetups.SourceGenerator.Models
 
          var method = new FFluentSetupMethod(this, field.SetupMethodName, field.Type, ClassSymbol)
          {
-            Source = field,
-            Category = field.SetupMethodName
+            Source = field, Category = field.SetupMethodName
          };
+
          if (AddMethod(method))
          {
+            if (field.IsListMember)
+            {
+               var withElement = new FWithListElementMethod(this, field) { Category = method.Category };
+               AddMethod(withElement);
+            }
+
             method.SetupIndicatorField = new FField(Context.BooleanType, $"{field.Name}WasSet");
             AddField(method.SetupIndicatorField);
 
@@ -279,6 +289,7 @@ namespace FluentSetups.SourceGenerator.Models
       {
          sourceBuilder.AppendLine("using System;");
          sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
+         sourceBuilder.AppendLine("using System.Collections.Generic;");
          sourceBuilder.AppendLine("using FluentSetups;");
          if (TargetAvailable() && !string.IsNullOrWhiteSpace(TargetTypeNamespace))
             sourceBuilder.AppendLine($"using {TargetTypeNamespace};");
@@ -314,9 +325,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private string ComputeSetupMethod()
       {
-         return FluentSetupAttribute.GetSetupMethod()
-                ?? TargetTypeName
-                ?? ComputeEntryMethodName();
+         return FluentSetupAttribute.GetSetupMethod() ?? TargetTypeName ?? ComputeEntryMethodName();
       }
 
       private bool ContainsUserDefinedTargetBuilder()
@@ -346,8 +355,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       private AttributeData FindMemberAttribute(ISymbol symbol)
       {
-         return symbol.GetAttributes().Where(x => x.AttributeClass != null)
-            .FirstOrDefault(attribute => Context.FluentMemberAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default));
+         return symbol.GetAttributes().Where(x => x.AttributeClass != null).FirstOrDefault(attribute =>
+            Context.FluentMemberAttribute.Equals(attribute.AttributeClass, SymbolEqualityComparer.Default));
       }
 
       private void GenerateFields(StringBuilder sourceBuilder)
@@ -373,9 +382,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void GenerateSetupMethods(StringBuilder sourceBuilder)
       {
-         var methodGroups = Methods.Where(x => !x.IsUserDefined)
-            .GroupBy(x => x.Category)
-            .ToArray();
+         var methodGroups = Methods.Where(x => !x.IsUserDefined).GroupBy(x => x.Category).ToArray();
 
          foreach (var methodGroup in methodGroups)
          {
@@ -459,7 +466,7 @@ namespace FluentSetups.SourceGenerator.Models
 
          foreach (var constructorParameter in Target.Constructor.Parameters)
          {
-            var backingField = FField.ForConstructorParameter(constructorParameter);
+            var backingField = FField.ForConstructorParameter(constructorParameter, Context);
             if (AddField(backingField))
                AddMethodFromField(backingField);
          }
@@ -481,7 +488,7 @@ namespace FluentSetups.SourceGenerator.Models
             }
             else
             {
-               var backingField = FField.ForProperty(property);
+               var backingField = FField.ForTargetProperty(property, Context);
                if (AddField(backingField))
                   AddMethodFromField(backingField);
             }

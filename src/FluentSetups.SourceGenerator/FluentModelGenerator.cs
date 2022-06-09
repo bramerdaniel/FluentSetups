@@ -8,9 +8,6 @@ namespace FluentSetups.SourceGenerator
 {
    using System;
    using System.Collections.Generic;
-   using System.Diagnostics;
-   using System.Linq;
-   using System.Text;
 
    using FluentSetups.SourceGenerator.Models;
 
@@ -60,25 +57,12 @@ namespace FluentSetups.SourceGenerator
          return Location.Create(reference.SyntaxTree, reference.Span);
       }
 
-      private GeneratedSource GenerateEntryClass(SetupEntryClassModel classModel)
+      private GeneratedSource GenerateEntryClass(EEntryClass classModel)
       {
          var source = new GeneratedSource { Name = $"{classModel.ClassName}.generated.cs" };
          try
          {
-            var sourceBuilder = new StringBuilder();
-            sourceBuilder.AppendLine($"namespace {classModel.ContainingNamespace}");
-            sourceBuilder.AppendLine("{");
-            GenerateRequiredNamespaces(classModel, sourceBuilder);
-
-            sourceBuilder.AppendLine("/// <summary>Automatic generated class part by fluent setups</summary>");
-            sourceBuilder.AppendLine("[CompilerGenerated]");
-            sourceBuilder.AppendLine($"{classModel.Modifier} partial class {classModel.ClassName}");
-            sourceBuilder.AppendLine("{");
-            GenerateEntryPoints(classModel, sourceBuilder);
-            sourceBuilder.AppendLine("}");
-
-            sourceBuilder.AppendLine("}");
-            var syntaxTree = CSharpSyntaxTree.ParseText(sourceBuilder.ToString()).GetRoot().NormalizeWhitespace();
+            var syntaxTree = CSharpSyntaxTree.ParseText(classModel.ToCode()).GetRoot().NormalizeWhitespace();
             source.Code = syntaxTree.ToString();
          }
          catch (Exception e)
@@ -87,46 +71,6 @@ namespace FluentSetups.SourceGenerator
          }
 
          return source;
-      }
-
-      private void GenerateEntryPoints(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
-      {
-         var addedMethods = new HashSet<string>();
-         foreach (var setupClass in classModel.SetupClasses)
-         {
-            if (setupClass.GenerationMode.HasFlag(GeneratorMode.EntryMethod))
-            {
-               var requestedName = setupClass.SetupMethod;
-               var generatedName = GetName(addedMethods, requestedName);
-
-               sourceBuilder.AppendLine($"/// <summary>Creates a new setup for the {setupClass.ClassName} class</summary>");
-               sourceBuilder.Append($"{classModel.Modifier} static {setupClass.ClassName} {generatedName}()");
-               sourceBuilder.AppendLine($" => new {setupClass.ClassName}();");
-               sourceBuilder.AppendLine();
-            }
-         }
-      }
-
-      private string GetName(HashSet<string> existingMethods, string requestedName)
-      {
-         var name = requestedName;
-         var counter = 1;
-         while (existingMethods.Contains(name))
-            name = $"{requestedName}{counter++}";
-
-         existingMethods.Add(name);
-         return name;
-      }
-
-      private void GenerateRequiredNamespaces(SetupEntryClassModel classModel, StringBuilder sourceBuilder)
-      {
-         sourceBuilder.AppendLine("using System.Runtime.CompilerServices;");
-
-         var namespaces = classModel.SetupClasses.Where(x => !string.IsNullOrWhiteSpace(x.ContainingNamespace))
-            .Select(x => x.ContainingNamespace).Distinct();
-
-         foreach (var requiredNamespace in namespaces)
-            sourceBuilder.AppendLine($"using {requiredNamespace};");
       }
 
       private GeneratedSource GenerateSetupClass(FClass classModel)

@@ -4,14 +4,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using JetBrains.Annotations;
+
 namespace FluentSetups
 {
    public enum TargetMode
    {
       /// <summary>The fluent setup engine will decide whether it can create the target or not.</summary>
-      Automatic,
+      [UsedImplicitly] Automatic,
 
       /// <summary>No methods for creating the setup target object will be generated.</summary>
-      Disabled
+      [UsedImplicitly] Disabled
    }
 }

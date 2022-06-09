@@ -1,27 +1,29 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SinglePropTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="SinglePropTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
-namespace FluentSetups.IntegrationTests.Tests;
 
 using FluentAssertions;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+namespace FluentSetups.IntegrationTests.Tests;
+
 [TestClass]
 public class SinglePropTests
 {
-   [TestMethod]
-   public void CreateSingleProp()
-   {
-      var car = Setup.SinglePropTarget()
-         .WithBrand("BMW")
-         .Done();
+    #region Public Methods and Operators
 
-      car.Brand.Should().Be("BMW");
-   }
+    [TestMethod]
+    public void CreateSingleProp()
+    {
+        var car = Setup.SinglePropTarget()
+            .WithBrand("BMW")
+            .Done();
 
+        car.Brand.Should().Be("BMW");
+    }
 
+    #endregion
 }

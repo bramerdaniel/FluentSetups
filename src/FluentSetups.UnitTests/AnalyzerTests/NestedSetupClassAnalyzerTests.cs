@@ -1,19 +1,17 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NestedSetupClassAnalyzerTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="NestedSetupClassAnalyzerTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.UnitTests.AnalyzerTests;
 
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 
 using FluentSetups.SourceGenerator;
 using FluentSetups.SourceGenerator.Analyzers;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 [SuppressMessage("Blocker Code Smell", "S2699:Tests should include assertions")]

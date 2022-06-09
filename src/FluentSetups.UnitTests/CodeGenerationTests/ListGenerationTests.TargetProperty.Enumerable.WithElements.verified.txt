@@ -1,0 +1,6 @@
+﻿public BagSetup WithValues(System.Collections.Generic.List<string> value)
+{
+    values = value;
+    valuesWasSet = true;
+    return this;
+}

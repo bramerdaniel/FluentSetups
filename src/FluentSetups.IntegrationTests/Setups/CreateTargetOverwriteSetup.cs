@@ -1,27 +1,29 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreateTargetOverwriteSetup.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="CreateTargetOverwriteSetup.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace FluentSetups.IntegrationTests.Setups;
-
 using FluentSetups.IntegrationTests.Targets;
 
+namespace FluentSetups.IntegrationTests.Setups;
+
 [FluentSetup(typeof(Person), SetupMethod = "CustomPerson")]
-internal partial class CreateTargetOverwriteSetup 
+internal partial class CreateTargetOverwriteSetup
 {
-   public bool CreateTargetCalled { get; set; }
+    #region Public Properties
 
-   internal Person CreateTarget()
-   {
-      CreateTargetCalled = true;
-      return new Person
-      {
-         FirstName = GetLastName(null),
-         LastName = GetFirstName(null),
-         Age = GetAge(() => 10)
-      };
-   }
+    public bool CreateTargetCalled { get; set; }
 
+    #endregion
+
+    #region Methods
+
+    internal Person CreateTarget()
+    {
+        CreateTargetCalled = true;
+        return new Person { FirstName = GetLastName(null), LastName = GetFirstName(null), Age = GetAge(() => 10) };
+    }
+
+    #endregion
 }

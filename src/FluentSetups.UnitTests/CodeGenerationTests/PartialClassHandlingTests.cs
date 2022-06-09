@@ -1,14 +1,12 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PartialClassHandlingTests.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="PartialClassHandlingTests.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace FluentSetups.UnitTests.CodeGenerationTests;
 
 using FluentSetups.UnitTests.Setups;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 public class PartialClassHandlingTests

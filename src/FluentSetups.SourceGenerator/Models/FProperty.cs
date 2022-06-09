@@ -52,7 +52,11 @@ namespace FluentSetups.SourceGenerator.Models
       public ITypeSymbol Type => propertySymbol.Type;
 
       // TODO handel this
-      public bool HasDefaultValue { get; private set; } 
+      public bool HasDefaultValue { get; private set; }
+
+      public bool IsListMember { get; }
+
+      public ITypeSymbol ElementType { get; }
 
       public string Name { get; set; }
 

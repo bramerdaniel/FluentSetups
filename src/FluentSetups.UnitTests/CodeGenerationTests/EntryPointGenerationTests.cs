@@ -284,6 +284,78 @@ public class EntryPointGenerationTests
          .WithStaticMethod("Person")
          .WithStaticMethod("Car");
    }
+  
+   [TestMethod]
+   public void EnsureFluentRootCanBeSpecified()
+   {
+      var code = @"namespace SetupNameSpace
+                   {
+                      using FluentSetups;
+
+                      [FluentRoot]
+                      public partial class Create
+                      {
+                      }
+
+                      [FluentSetup(typeof(Person))]
+                      public partial class PersonSetup
+                      {
+                      }
+
+                      public class Person { }
+                   }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+
+      result.Should().NotHaveWarnings().And
+         .HaveClass("SetupNameSpace.Create")
+         .WithStaticMethod("Person");
+      
+      result.Should()
+         .NotHaveClass("RootNamespace.Create");
+   }  
+   
+   [TestMethod]
+   public void EnsureFluentRootBeSpecifiedInADifferentNamespace()
+   {
+      var code = @"namespace SetupNameSpace
+                   {
+                      using FluentSetups;
+
+                      [FluentSetup(typeof(Person))]
+                      public partial class PersonSetup
+                      {
+                      }
+
+                      public class Person { }
+                   }";
+      
+      var root = @"namespace HereGoesTheRoot
+                   {
+                      using FluentSetups;
+
+                      [FluentRoot]
+                      public partial class Create
+                      {
+                      }
+                   }";
+      
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .WithSource(root)
+         .Done();
+
+      result.Should().NotHaveWarnings().And
+         .HaveClass("HereGoesTheRoot.Create")
+         .WithStaticMethod("Person");
+      
+      result.Should()
+         .NotHaveClass("RootNamespace.Create");
+      
+      result.Print();
+   }
 
    #endregion
 }

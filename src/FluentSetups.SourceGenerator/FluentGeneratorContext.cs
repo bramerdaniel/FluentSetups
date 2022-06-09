@@ -6,142 +6,171 @@
 
 namespace FluentSetups.SourceGenerator
 {
-   using System;
-   using System.Collections.Generic;
-   using System.Linq;
+    using System;
+    using System.Collections.Generic;
 
-   using Microsoft.CodeAnalysis;
-   using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-   internal struct FluentGeneratorContext
-   {
-      #region Public Properties
+    internal class FluentGeneratorContext
+    {
+        #region Public Properties
 
-      public ITypeSymbol BooleanType { get; set; }
+        public ITypeSymbol BooleanType { get; private set; }
 
-      public INamedTypeSymbol VoidType { get; set; }
+        public Compilation Compilation { get; private set; }
 
-      public Compilation Compilation { get; set; }
+        public FluentRootInfo FluentRoot { get; set; }
 
-      #endregion
+        public INamedTypeSymbol VoidType { get; private set; }
 
-      #region Properties
+        #endregion
 
-      internal static string FluentEntryNamespaceAttributeName => "FluentSetups.FluentEntryNamespaceAttribute";
+        #region Properties
 
-      internal static string FluentMemberAttributeName => "FluentSetups.FluentMemberAttribute";
+        internal static string FluentMemberAttributeName => "FluentSetups.FluentMemberAttribute";
 
-      internal static string FluentSetupAttributeName => "FluentSetups.FluentSetupAttribute";
+        internal static string FluentRootAttributeName => "FluentSetups.FluentRootAttribute";
 
-      internal INamedTypeSymbol FluentEntryNamespaceAttribute { get; set; }
+        internal static string FluentSetupAttributeName => "FluentSetups.FluentSetupAttribute";
 
-      internal INamedTypeSymbol FluentMemberAttribute { get; set; }
+        internal INamedTypeSymbol FluentMemberAttribute { get; private set; }
 
-      internal INamedTypeSymbol FluentSetupAttribute { get; set; }
+        internal INamedTypeSymbol FluentRootAttribute { get; private set; }
 
-      #endregion
+        internal INamedTypeSymbol FluentSetupAttribute { get; private set; }
 
-      #region Public Methods and Operators
+        #endregion
 
-      public static FluentGeneratorContext FromCompilation(Compilation compilation)
-      {
-         return new FluentGeneratorContext
-         {
-            Compilation = compilation,
-            FluentEntryNamespaceAttribute = compilation.GetTypeByMetadataName(FluentEntryNamespaceAttributeName),
-            FluentSetupAttribute = compilation.GetTypeByMetadataName(FluentSetupAttributeName),
-            FluentMemberAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName),
-            BooleanType = compilation.GetTypeByMetadataName("System.Boolean"),
-            VoidType = compilation.GetTypeByMetadataName("System.Void")
-         };
-      }
+        #region Public Methods and Operators
 
-      public SetupClassInfo CreateFluentSetupInfo(ClassDeclarationSyntax setupCandidate)
-      {
-         if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
-            return classInfo;
+        public static FluentGeneratorContext FromCompilation(Compilation compilation)
+        {
+            return new FluentGeneratorContext
+            {
+                Compilation = compilation,
+                FluentRootAttribute = compilation.GetTypeByMetadataName(FluentRootAttributeName),
+                FluentSetupAttribute = compilation.GetTypeByMetadataName(FluentSetupAttributeName),
+                FluentMemberAttribute = compilation.GetTypeByMetadataName(FluentMemberAttributeName),
+                BooleanType = compilation.GetTypeByMetadataName("System.Boolean"),
+                VoidType = compilation.GetTypeByMetadataName("System.Void")
+            };
+        }
 
-         throw new ArgumentException($"The specified {nameof(ClassDeclarationSyntax)} is not a fluent setup class", nameof(setupCandidate));
-      }
+        public SetupClassInfo CreateFluentSetupInfo(ClassDeclarationSyntax setupCandidate)
+        {
+            if (InspectAndInitialize(setupCandidate, out SetupClassInfo classInfo))
+                return classInfo;
 
-      public IEnumerable<SetupClassInfo> FindFluentSetups(IEnumerable<ClassDeclarationSyntax> setupCandidates)
-      {
-         foreach (var setupCandidate in setupCandidates)
-         {
-            if (TryGetSetupClass(setupCandidate, out SetupClassInfo classInfo))
-               yield return classInfo;
-         }
-      }
+            throw new ArgumentException($"The specified {nameof(ClassDeclarationSyntax)} is not a fluent setup class", nameof(setupCandidate));
+        }
 
-      public bool TryGetMissingType(out string missingType)
-      {
-         if (FluentSetupAttribute == null)
-         {
-            missingType = FluentSetupAttributeName;
-            return true;
-         }
+        public IEnumerable<SetupClassInfo> FindFluentSetups(IEnumerable<ClassDeclarationSyntax> setupCandidates)
+        {
+            foreach (var setupCandidate in setupCandidates)
+            {
+                if (InspectAndInitialize(setupCandidate, out SetupClassInfo classInfo))
+                    yield return classInfo;
+            }
+        }
 
-         if (FluentMemberAttribute == null)
-         {
-            missingType = FluentMemberAttributeName;
-            return true;
-         }
+        public bool TryGetMissingType(out string missingType)
+        {
+            if (FluentSetupAttribute == null)
+            {
+                missingType = FluentSetupAttributeName;
+                return true;
+            }
 
-         missingType = null;
-         return false;
-      }
+            if (FluentMemberAttribute == null)
+            {
+                missingType = FluentMemberAttributeName;
+                return true;
+            }
 
-      #endregion
-
-      #region Methods
-
-      internal bool IsFluentSetupAttribute(AttributeData attributeData)
-      {
-         if (FluentSetupAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
-            return true;
-         return false;
-      }
-
-      private bool IsSetupClass(ClassDeclarationSyntax candidate)
-      {
-         var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
-
-         var classSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
-         if (classSymbol == null)
+            missingType = null;
             return false;
+        }
 
-         foreach (var attributeData in classSymbol.GetAttributes())
-         {
+        #endregion
+
+        #region Methods
+
+        internal bool IsFluentSetupAttribute(AttributeData attributeData)
+        {
             if (FluentSetupAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
-               return true;
+                return true;
 
-            var attributeName = attributeData.AttributeClass?.Name;
-            if (attributeName == "FluentSetupAttribute")
-               return true;
-
-            if (attributeName == "FluentSetup")
-               return true;
-         }
-
-         return false;
-      }
-
-      private bool TryGetSetupClass(ClassDeclarationSyntax candidate, out SetupClassInfo setupClassInfo)
-      {
-         setupClassInfo = null;
-         var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
-
-         if (!(semanticModel.GetDeclaredSymbol(candidate) is ITypeSymbol classSymbol))
             return false;
+        }
 
-         var fluentAttribute = classSymbol.GetAttributes().FirstOrDefault(IsFluentSetupAttribute);
-         if (fluentAttribute == null)
+        private bool InspectAndInitialize(ClassDeclarationSyntax candidate, out SetupClassInfo setupClassInfo)
+        {
+            setupClassInfo = null;
+            var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
+
+            if (!(semanticModel.GetDeclaredSymbol(candidate) is INamedTypeSymbol classSymbol))
+                return false;
+
+            foreach (var attributeData in classSymbol.GetAttributes())
+            {
+                if (IsFluentSetupAttribute(attributeData))
+                {
+                    setupClassInfo = new SetupClassInfo(this, candidate, semanticModel, classSymbol, attributeData);
+                    return true;
+                }
+
+                if (IsFluentRootAttribute(attributeData))
+                {
+                    FluentRoot = new FluentRootInfo(candidate, classSymbol);
+                    return false;
+                }
+            }
+
             return false;
+        }
 
-         setupClassInfo = new SetupClassInfo(this, candidate, semanticModel, classSymbol, fluentAttribute);
-         return true;
-      }
+        private bool IsFluentRootAttribute(AttributeData attributeData)
+        {
+            return FluentRootAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default);
+        }
 
-      #endregion
-   }
+        private bool IsSetupClass(ClassDeclarationSyntax candidate)
+        {
+            var semanticModel = Compilation.GetSemanticModel(candidate.SyntaxTree);
+
+            var classSymbol = (ITypeSymbol)semanticModel.GetDeclaredSymbol(candidate);
+
+            if (classSymbol == null)
+                return false;
+
+            foreach (var attributeData in classSymbol.GetAttributes())
+            {
+                if (FluentSetupAttribute.Equals(attributeData.AttributeClass, SymbolEqualityComparer.Default))
+                    return true;
+
+                var attributeName = attributeData.AttributeClass?.Name;
+
+                if (attributeName == "FluentSetupAttribute")
+                    return true;
+
+                if (attributeName == "FluentSetup")
+                    return true;
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        public string GetFluentRootName(string defaultValue)
+        {
+            return FluentRoot?.ClassSymbol?.Name ?? defaultValue;
+        }
+
+        public string GetFluentRootNamespace(string defaultValue)
+        {
+            return FluentRoot?.ClassSymbol?.ContainingNamespace.ToString() ?? defaultValue;
+        }
+    }
 }

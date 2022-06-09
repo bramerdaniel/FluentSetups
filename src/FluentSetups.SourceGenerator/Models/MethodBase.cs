@@ -26,19 +26,19 @@ namespace FluentSetups.SourceGenerator.Models
       /// <param name="name">The name of the method.</param>
       /// <param name="parameterTypeName">Name of the parameter type of the first parameter.</param>
       /// <exception cref="System.ArgumentNullException">name</exception>
-      protected MethodBase(FClass setupClass, string name, string parameterTypeName)
+      protected MethodBase(IFluentClass setupClass, string name, string parameterTypeName)
       {
-         SetupClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
+         ContainingClass = setupClass ?? throw new ArgumentNullException(nameof(setupClass));
          Name = name ?? throw new ArgumentNullException(nameof(name));
          ParameterTypeName = parameterTypeName;
       }
 
-      protected MethodBase(FClass setupClass, string name)
+      protected MethodBase(IFluentClass setupClass, string name)
          : this(setupClass, name, (string)null)
       {
       }
 
-      protected MethodBase(FClass setupClass, string name, ITypeSymbol parameterType)
+      protected MethodBase(IFluentClass setupClass, string name, ITypeSymbol parameterType)
          : this(setupClass, name, parameterType?.ToString())
       {
          Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -68,6 +68,8 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string ParameterTypeName { get; }
 
+      public string Documentation { get; set; }
+
       public string ReturnTypeName { get; protected set; } = "void";
 
       /// <summary>Gets the signature of the method.</summary>
@@ -77,7 +79,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Properties
 
-      protected FClass SetupClass { get; }
+      protected IFluentClass ContainingClass { get; }
 
       #endregion
 
@@ -124,6 +126,14 @@ namespace FluentSetups.SourceGenerator.Models
 
          builder.Append(")");
          return builder.ToString();
+      }
+
+      protected void AppendDocumentation(StringBuilder codeBuilder)
+      {
+         if(string.IsNullOrWhiteSpace(Documentation))
+            return;
+
+         codeBuilder.AppendLine($"/// <summary>{Documentation}</summary>");
       }
 
       #endregion

@@ -15,5 +15,11 @@ namespace FluentSetups.SourceGenerator.Models
 
       /// <summary>Gets a value indicating whether this member has default value.</summary>
       bool HasDefaultValue { get; }
+
+      /// <summary>Gets a value indicating whether this member is a sort of list.</summary>
+      bool IsListMember { get; }
+
+      /// <summary>Gets the type of the element.</summary>
+      ITypeSymbol ElementType { get; }
    }
 }

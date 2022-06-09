@@ -11,7 +11,7 @@ namespace FluentSetups.SourceGenerator.Models
    using System.Text;
 
    [DebuggerDisplay("{Signature}")]
-   internal class FCreateTargetMethod : MethodBase
+   internal class FCreateTargetMethod : SetupMethodBase
    {
       public FTarget Target { get; }
 

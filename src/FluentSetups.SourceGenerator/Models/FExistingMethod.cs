@@ -23,7 +23,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       #region Constructors and Destructors
 
-      public FExistingMethod(FClass setupClass, IMethodSymbol methodSymbol)
+      public FExistingMethod(IFluentClass setupClass, IMethodSymbol methodSymbol)
          : base(setupClass, methodSymbol?.Name, methodSymbol?.Parameters.FirstOrDefault()?.Type)
       {
          this.methodSymbol = methodSymbol ?? throw new ArgumentNullException(nameof(methodSymbol));

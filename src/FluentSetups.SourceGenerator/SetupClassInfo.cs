@@ -17,7 +17,7 @@ namespace FluentSetups.SourceGenerator
    {
       #region Constructors and Destructors
 
-      public SetupClassInfo(FluentGeneratorContext context, ClassDeclarationSyntax candidate, SemanticModel semanticModel, ITypeSymbol classSymbol,
+      public SetupClassInfo(FluentGeneratorContext context, ClassDeclarationSyntax candidate, SemanticModel semanticModel, INamedTypeSymbol classSymbol,
          AttributeData fluentSetupAttribute)
       {
          Context = context;
@@ -32,7 +32,7 @@ namespace FluentSetups.SourceGenerator
       #region Public Properties
 
       /// <summary>Gets or sets the class symbol.</summary>
-      public ITypeSymbol ClassSymbol { get; }
+      public INamedTypeSymbol ClassSymbol { get; }
 
       public ClassDeclarationSyntax ClassSyntax { get; }
 

@@ -1,16 +1,15 @@
 ﻿namespace FluentSetupTester
 {
+   using System.Collections.Generic;
+   using FluentSetups.IntegrationTests.Targets;
    using FluentSetups;
 
-   [FluentSetup(typeof(Tool))]
-   public partial class ToolSetup
+ 
+
+   [FluentSetup(typeof(Room))]
+   public partial class RoomSetup
    {
    }
 
-   public class Tool
-   {
-      public string Name { get; set; }
 
-      public int Number { get; set; }
-   }
 }

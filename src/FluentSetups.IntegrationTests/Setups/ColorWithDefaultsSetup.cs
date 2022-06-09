@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ColorWithDefaultsSetup.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="ColorWithDefaultsSetup.cs" company="consolovers">
+//   Copyright (c) daniel bramer 2022 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,18 +12,26 @@ namespace FluentSetups.IntegrationTests.Setups
     [FluentSetup(typeof(Color), SetupMethod = "ColorWithDefaults")]
     public partial class ColorWithDefaultsSetup
     {
-        private bool nameWasSet;
+        #region Constants and Fields
 
         [FluentMember]
         private string name = string.Empty;
 
+        private bool nameWasSet;
+
         [FluentMember]
         private int opacity = InitOpacity();
+
+        #endregion
+
+        #region Methods
 
         private static int InitOpacity()
         {
             return -1;
         }
+
+        #endregion
     }
 #pragma warning restore CS0414
 }

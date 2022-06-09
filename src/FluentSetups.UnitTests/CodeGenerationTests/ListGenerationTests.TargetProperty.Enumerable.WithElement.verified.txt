@@ -1,0 +1,8 @@
+﻿public BagSetup WithValue(string value)
+{
+    if (values == null)
+        values = new List<string>();
+    values.Add(value);
+    valuesWasSet = true;
+    return this;
+}

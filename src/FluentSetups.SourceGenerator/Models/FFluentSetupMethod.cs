@@ -12,7 +12,7 @@ namespace FluentSetups.SourceGenerator.Models
    using Microsoft.CodeAnalysis;
 
    [DebuggerDisplay("{Signature}")]
-   internal class FFluentSetupMethod : MethodBase
+   internal class FFluentSetupMethod : SetupMethodBase
    {
       #region Constructors and Destructors
 
@@ -74,7 +74,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       protected virtual string ComputeModifier()
       {
-         return "internal";
+         return SetupClass.Modifier;
       }
 
       private string ComputeCategory(string methodName)

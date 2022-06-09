@@ -63,8 +63,7 @@ namespace FluentSetups.SourceGenerator
          context.ReportDiagnostic(Diagnostic.Create(missingReference, Location.None, attributeName));
       }
 
-      private void RunSourceGeneration(GeneratorExecutionContext context, FluentGeneratorContext fluentContext,
-         FluentSetupSyntaxReceiver syntaxReceiver)
+      private void RunSourceGeneration(GeneratorExecutionContext context, FluentGeneratorContext fluentContext, FluentSetupSyntaxReceiver syntaxReceiver)
       {
          var fluentSetupClasses = fluentContext.FindFluentSetups(syntaxReceiver.SetupCandidates).ToArray();
          if (fluentSetupClasses.Length == 0)
