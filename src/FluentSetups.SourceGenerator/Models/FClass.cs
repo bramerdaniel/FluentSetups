@@ -37,8 +37,8 @@ namespace FluentSetups.SourceGenerator.Models
          ClassName = classSymbol.Name;
          ContainingNamespace = ComputeNamespace();
          Modifier = ComputeModifier(classSymbol);
-         EntryClassName = fluentSetupAttribute.GetSetupEntryClassName();
-         EntryClassNamespace = fluentSetupAttribute.GetSetupEntryNameSpace() ?? classSymbol.ContainingAssembly.MetadataName;
+         EntryClassName = fluentSetupAttribute.GetSetupEntryClassName(context.GetFluentRootName("Setup"));
+         EntryClassNamespace = fluentSetupAttribute.GetSetupEntryNameSpace(context.GetFluentRootNamespace(classSymbol.ContainingAssembly.MetadataName)) ;
 
          FillMembers();
       }

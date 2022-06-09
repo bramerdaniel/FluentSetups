@@ -57,16 +57,14 @@ namespace FluentSetups.SourceGenerator
          return default;
       }
 
-      internal static string GetSetupEntryNameSpace(this AttributeData attribute)
+      internal static string GetSetupEntryNameSpace(this AttributeData attribute, string defaultValue)
       {
          if (TryGetNamedArgument(attribute, "EntryNamespace", out var targetType) && targetType.Kind == TypedConstantKind.Primitive)
             return targetType.Value?.ToString();
-
-         // This should be the default namespace of the containing assembly
-         return null;
+         return defaultValue;
       }
 
-      internal static string GetSetupEntryClassName(this AttributeData attribute)
+      internal static string GetSetupEntryClassName(this AttributeData attribute, string defaultValue)
       {
          if (TryGetConstructorArgument(attribute, TypedConstantKind.Primitive, out var targetType))
             return targetType.Value?.ToString();
@@ -74,8 +72,7 @@ namespace FluentSetups.SourceGenerator
          if (TryGetNamedArgument(attribute, "EntryClassName", out targetType) && targetType.Kind == TypedConstantKind.Primitive)
             return targetType.Value?.ToString();
 
-         // TODO return default atttibute value
-         return "Setup";
+         return defaultValue;
       }
 
       internal static string GetSetupMethod(this AttributeData attribute)
