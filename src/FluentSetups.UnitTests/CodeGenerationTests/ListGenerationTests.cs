@@ -276,5 +276,35 @@ public class ListGenerationTests : VerifyBase
       result.Print();
    }
 
+   [TestMethod]
+   public async Task EnsureListWithoutTargetTypeIsGeneratedCorrectly()
+   {
+      string code = @"namespace DocumentHandling
+                      {
+                         using FluentSetups;
+                         using System.Collections.Generic;
+
+                         [FluentSetup]
+                         public partial class DocumentSetup
+                         {
+                            [FluentMember]
+                            public List<string> lines;
+                         }
+                      }";
+
+      var result = Setup.SourceGeneratorTest()
+         .WithSource(code)
+         .Done();
+      
+      result.Should().NotHaveErrors();
+         
+      var getLinesCode = await result.Should()
+         .HaveClass("DocumentHandling.DocumentSetup")
+         .WhereMethod("WithLines")
+         .GetCodeAsync();
+
+      Verify(getLinesCode);
+   }
+   
    #endregion
 }

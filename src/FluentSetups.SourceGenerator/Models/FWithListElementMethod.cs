@@ -20,7 +20,7 @@ namespace FluentSetups.SourceGenerator.Models
       #region Constructors and Destructors
 
       public FWithListElementMethod(FClass setupClass, IFluentTypedMember backingFieldSymbol)
-         : base(setupClass, ComputeWithElementName(backingFieldSymbol), setupClass.Target.TypeSymbol)
+         : base(setupClass, ComputeWithElementName(backingFieldSymbol), setupClass.Target?.TypeSymbol)
       {
          backingFieldListSymbol = backingFieldSymbol ?? throw new ArgumentNullException(nameof(backingFieldSymbol));
 
@@ -56,6 +56,9 @@ namespace FluentSetups.SourceGenerator.Models
 
       private static string ComputeWithElementName(IFluentTypedMember backingFieldSymbol)
       {
+         if (backingFieldSymbol is FField field)
+            return field.ComputeSetupNameFromAttribute(true);
+
          var fieldName = backingFieldSymbol.Name.ToFirstUpper();
          return $"With{Vocabularies.Default.Singularize(fieldName, false)}";
       }

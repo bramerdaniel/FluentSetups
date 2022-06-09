@@ -21,8 +21,12 @@ namespace FluentSetups.SourceGenerator
          AttributeData fluentSetupAttribute)
       {
          Context = context;
+         
+         // TODO remove this unused property
          ClassSyntax = candidate ?? throw new ArgumentNullException(nameof(candidate));
+         // TODO remove this unused property
          SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
+         
          ClassSymbol = classSymbol ?? throw new ArgumentNullException(nameof(classSymbol));
          FluentSetupAttribute = fluentSetupAttribute ?? throw new ArgumentNullException(nameof(fluentSetupAttribute));
       }

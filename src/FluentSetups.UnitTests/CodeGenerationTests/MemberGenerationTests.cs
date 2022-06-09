@@ -11,7 +11,7 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
    [TestClass]
-   public class MemberGenerationTests
+   public class MemberGenerationTests : VerifyBase
    {
       #region Public Methods and Operators
 
@@ -228,6 +228,43 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
          result.Should().NotHaveErrors().And
             .HaveClass("RonnyTheRobber.PersonSetup")
             .WithMethod("SetName");
+      }
+      
+      [TestMethod]
+      public async Task EnsureSetupMethodWithCustomNamePatternIsGeneratedCorrectly()
+      {
+         string code = @"namespace DocumentHandling
+                      {
+                         using FluentSetups;
+                         using System.Collections.Generic;
+
+                         [FluentSetup]
+                         public partial class DocumentSetup
+                         {
+                            [FluentSetups.FluentMember(""Add{0}"")]
+                            public IList<string> lines;
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors();
+         
+         var getLinesCode = await result.Should()
+            .HaveClass("DocumentHandling.DocumentSetup")
+            .WhereMethod("AddLines")
+            .GetCodeAsync();
+
+         Verify(getLinesCode).UseParameters("AddLines");
+         
+         var getLineCode = await result.Should().NotHaveErrors().And
+            .HaveClass("DocumentHandling.DocumentSetup")
+            .WhereMethod("AddLine")
+            .GetCodeAsync();
+
+         Verify(getLineCode).UseParameters("AddLine");
       }
 
       [TestMethod]
