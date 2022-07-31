@@ -44,7 +44,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string ToCode()
       {
-         return "NOT SUPPORTED";
+         return "// FConstructorParameter does not support code generation";
       }
 
       #endregion

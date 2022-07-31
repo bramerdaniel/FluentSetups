@@ -186,4 +186,29 @@ internal class ClassAssertion : ReferenceTypeAssertions<INamedTypeSymbol, ClassA
    }
 
    #endregion
+
+   public ClassAssertion WithoutCode(string expectedSubstring)
+   {
+      var syntaxReference = Subject.DeclaringSyntaxReferences.LastOrDefault();
+      if (syntaxReference == null)
+         throw new AssertFailedException("Syntax reference could not be found");
+
+      var code = syntaxReference.GetSyntax().ToString();
+      Assert.IsFalse(code.Contains(expectedSubstring), CreateMessage());
+
+      return this;
+
+      string CreateMessage()
+      {
+         var builder = new StringBuilder();
+         builder.AppendLine($"The generated code contained '{expectedSubstring}' but is should not.");
+         builder.AppendLine();
+         builder.AppendLine("CLASS CODE");
+         builder.AppendLine();
+         builder.AppendLine(code);
+
+         return builder.ToString();
+      }
+
+   }
 }

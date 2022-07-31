@@ -62,7 +62,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       public string ToCode()
       {
-         return "// NOT IMPLEMENTED";
+         return "// FProperty does not support code generation";
       }
 
       public bool IsUserDefined => propertySymbol != null;

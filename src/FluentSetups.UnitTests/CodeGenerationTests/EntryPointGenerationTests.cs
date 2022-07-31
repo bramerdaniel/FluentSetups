@@ -37,6 +37,10 @@ public class EntryPointGenerationTests
          .HaveClass("MyUnitTests.Setup")
          .WithPublicModifier()
          .WithStaticMethod("Person");
+
+      result.Should()
+         .HaveClass("MyUnitTests.Setup")
+         .WithoutCode("NOT SUPPORTED");
    }
 
    [TestMethod]
