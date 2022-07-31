@@ -258,6 +258,34 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .HasParameter("Person target");
       }
 
+      [TestMethod]
+      public void EnsurePropertyWithNameValueIsGeneratedCorrectly()
+      {
+         var code = @"namespace DonnyTheDagger
+                      {
+                         using FluentSetups;
+
+                         public class Argument
+                         {
+                            public string Value { get ;set; }
+                         }
+
+                         [FluentSetup(typeof(Argument))]
+                         public partial class ArgumentSetup
+                         {
+                         }
+                      }";
+
+         var result = Setup.SourceGeneratorTest()
+            .WithSource(code)
+            .Done();
+
+         result.Should().NotHaveErrors().And
+            .HaveClass("DonnyTheDagger.ArgumentSetup")
+            .WhereMethod("WithValue")
+            .Contains("this.value = value;");
+      }
+
       #endregion
    }
 }
