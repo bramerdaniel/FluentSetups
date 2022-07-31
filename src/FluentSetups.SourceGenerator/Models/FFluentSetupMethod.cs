@@ -6,6 +6,7 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
+   using System;
    using System.Diagnostics;
    using System.Text;
 
@@ -73,9 +74,9 @@ namespace FluentSetups.SourceGenerator.Models
 
          string ComputeSourceName()
          {
-            if (Source.Name == "value")
-               return $"this.{Source.Name}";
-            return Source.Name;
+            return string.Equals(Source.Name, "value", StringComparison.InvariantCulture) 
+               ? $"this.{Source.Name}"
+               : Source.Name;
          }
       }
 
