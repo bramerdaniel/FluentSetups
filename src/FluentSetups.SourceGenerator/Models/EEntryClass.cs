@@ -155,7 +155,7 @@ namespace FluentSetups.SourceGenerator.Models
 
       private void GenerateEntryPoints(StringBuilder sourceBuilder)
       {
-         foreach (var method in Methods)
+         foreach (var method in Methods.Where(m => !m.IsUserDefined))
             sourceBuilder.AppendLine(method.ToCode());
       }
 

@@ -51,7 +51,7 @@ namespace FluentSetups.SourceGenerator.Models
       public override string ToCode()
       {
          // Existing methods are not generated !
-         return "// NOT SUPPORTED";
+         return "// FExistingMethod does not support code generation";
       }
 
       #endregion

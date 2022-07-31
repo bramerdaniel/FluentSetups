@@ -6,6 +6,7 @@
 
 namespace FluentSetups.SourceGenerator.Models
 {
+   using System;
    using System.Diagnostics;
    using System.Text;
 
@@ -65,11 +66,18 @@ namespace FluentSetups.SourceGenerator.Models
       protected virtual void AppendMethodContent(StringBuilder codeBuilder)
       {
          if (Source != null)
-            codeBuilder.AppendLine($"   {Source.Name} = value;");
+            codeBuilder.AppendLine($"   {ComputeSourceName()} = value;");
          if (SetupIndicatorField != null)
             codeBuilder.AppendLine($"   {SetupIndicatorField.Name} = true;");
 
          codeBuilder.AppendLine("   return this;");
+
+         string ComputeSourceName()
+         {
+            return string.Equals(Source.Name, "value", StringComparison.InvariantCulture) 
+               ? $"this.{Source.Name}"
+               : Source.Name;
+         }
       }
 
       protected virtual string ComputeModifier()
