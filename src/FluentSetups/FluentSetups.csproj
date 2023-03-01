@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
-		<TargetFrameworks>net461;net6.0;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net472;net6.0;netstandard2.0</TargetFrameworks>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Version>$(FluentSetupsPackageVersion)</Version>
 		<PackageTags>Fluent FluentApi Builder Setup BuilderPattern Pattern</PackageTags>
