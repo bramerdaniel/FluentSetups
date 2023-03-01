@@ -257,14 +257,16 @@ namespace FluentSetups.UnitTests.CodeGenerationTests
             .WhereMethod("AddLines")
             .GetCodeAsync();
 
-         Verify(getLinesCode).UseParameters("AddLines");
+         await Verify(getLinesCode)
+            .UseMethodName($"{nameof(EnsureSetupMethodWithCustomNamePatternIsGeneratedCorrectly)}.AddLines");
          
          var getLineCode = await result.Should().NotHaveErrors().And
             .HaveClass("DocumentHandling.DocumentSetup")
             .WhereMethod("AddLine")
             .GetCodeAsync();
 
-         Verify(getLineCode).UseParameters("AddLine");
+         await Verify(getLineCode)
+            .UseMethodName($"{nameof(EnsureSetupMethodWithCustomNamePatternIsGeneratedCorrectly)}.AddLine");
       }
 
       [TestMethod]

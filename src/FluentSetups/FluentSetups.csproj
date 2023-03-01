@@ -10,7 +10,10 @@
 		<PackageIcon>packageIcon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReleaseNotes>0.3.5 to 0.3.6
+		<PackageReleaseNotes>0.3.7 to 0.3.8
+- Added #file header
+- Added #nullable disabled
+0.3.5 to 0.3.6
 - Added FluentRootAttribute to support a default setup entry point other than 'Setup'
 - Added support for list types
 - Added signularization for plural list members

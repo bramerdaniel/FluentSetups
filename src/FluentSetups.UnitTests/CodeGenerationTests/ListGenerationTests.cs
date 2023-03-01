@@ -303,7 +303,7 @@ public class ListGenerationTests : VerifyBase
          .WhereMethod("WithLines")
          .GetCodeAsync();
 
-      Verify(getLinesCode);
+      await Verify(getLinesCode);
    }
    
    #endregion

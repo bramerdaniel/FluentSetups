@@ -1,0 +1,8 @@
+﻿public DocumentSetup AddLine(string value)
+{
+    if (lines == null)
+        lines = new List<string>();
+    lines.Add(value);
+    linesWasSet = true;
+    return this;
+}

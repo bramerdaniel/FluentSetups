@@ -1,0 +1,6 @@
+﻿public DocumentSetup WithLines(System.Collections.Generic.List<string> value)
+{
+    lines = value;
+    linesWasSet = true;
+    return this;
+}
